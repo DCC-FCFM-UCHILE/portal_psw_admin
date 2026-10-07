@@ -1,0 +1,13 @@
+-r base.txt
+
+django-debug-toolbar    
+django-extensions     
+
+black
+isort
+flake8
+bandit
+
+pytest
+pytest-django
+coverage
