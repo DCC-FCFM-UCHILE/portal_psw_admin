@@ -1,0 +1,36 @@
+{% extends "admin/base_site.html" %}
+{% load unfold %}
+
+{% block extrahead %}
+    {{ block.super }}
+    {{ form.media }}
+{% endblock %}
+
+{% block content %}
+<div class="flex max-w-4xl flex-col gap-6">
+    <section aria-labelledby="titulo-postulacion">
+        {% component "unfold/components/card.html" %}
+            <h2 id="titulo-postulacion" class="mb-4 font-semibold text-important">Postulación</h2>
+            <dl class="grid gap-4 text-sm md:grid-cols-4">
+                <div><dt class="font-medium text-important">Título</dt><dd class="break-words">{{ postulacion.titulo }}</dd></div>
+                <div><dt class="font-medium text-important">Postulante</dt><dd class="break-words">{{ postulacion.postulante }}</dd></div>
+                <div><dt class="font-medium text-important">Organización</dt><dd class="break-words">{{ postulacion.organizacion|default:"Sin organización" }}</dd></div>
+                <div><dt class="font-medium text-important">Estado</dt><dd>{{ postulacion.get_estado_display }}</dd></div>
+            </dl>
+        {% endcomponent %}
+    </section>
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+        {% component "unfold/components/card.html" %}
+            {% for campo in form %}
+                {% include "unfold/helpers/field.html" with field=campo %}
+            {% endfor %}
+        {% endcomponent %}
+        <div class="mt-4 flex gap-2">
+            {% component "unfold/components/button.html" with submit=1 variant="primary" %}Enviar{% endcomponent %}
+            {% component "unfold/components/button.html" with href=cancelar variant="default" %}Cancelar{% endcomponent %}
+        </div>
+    </form>
+</div>
+{% endblock %}

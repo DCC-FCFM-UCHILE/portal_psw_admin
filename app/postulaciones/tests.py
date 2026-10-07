@@ -1,0 +1,214 @@
+import datetime
+from unittest import mock
+
+from django.contrib.auth.models import Permission, User
+from django.core import mail
+from django.core.exceptions import ValidationError
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import TestCase, override_settings
+from django.urls import reverse
+
+from convenios.models import RulesApplications
+from postulaciones import tablas_compartidas
+from postulaciones.models import Announcement, Application, ApprovedProject, Candidate, Organization, Unit
+
+
+@override_settings(MEDIA_ROOT="/tmp/admin-pruebas-media")
+class BaseCompartida(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        tablas_compartidas.crear()
+        super().setUpClass()
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.docente = User.objects.create_superuser("docente", "docente@dcc.uchile.cl", "clave-de-prueba")
+        convenio = RulesApplications.objects.create(
+            descripcion="Formato 2026", perfil_de_proyecto="perfil.docx", convenio_de_colaboracion="convenio.pdf"
+        )
+        cls.convocatoria = Announcement.objects.create(
+            convenio=convenio, inicio=datetime.date(2026, 7, 1), cierre=datetime.date(2026, 8, 31), semestre="SP", anio=2026
+        )
+        organizacion = Organization.objects.create(rut="76.123.456-7", nombre="Fundación Ejemplo")
+        unidad = Unit.objects.create(nombre="Fundación Ejemplo", organizacion=organizacion)
+        postulante = Candidate.objects.create(organizacion=organizacion, correo="ana@ejemplo.cl", nombre="Ana Pérez")
+        cls.postulacion = Application.objects.create(
+            postulante=postulante,
+            convocatoria=cls.convocatoria,
+            unidad=unidad,
+            titulo="Sistema de riego",
+            archivo=SimpleUploadedFile("perfil.pdf", b"%PDF-1.4"),
+        )
+
+    def setUp(self):
+        self.client.force_login(self.docente)
+
+
+class ListadoTests(BaseCompartida):
+    def test_muestra_la_postulacion_con_su_estado(self):
+        respuesta = self.client.get(reverse("admin:applications_application_changelist"))
+        self.assertContains(respuesta, "Sistema de riego")
+        self.assertContains(respuesta, "Creada")
+        self.assertContains(respuesta, "Fundación Ejemplo")
+
+    def test_filtra_por_convocatoria(self):
+        url = reverse("admin:applications_application_changelist")
+        respuesta = self.client.get(url, {"convocatoria__id__exact": self.convocatoria.pk})
+        self.assertContains(respuesta, "Sistema de riego")
+
+    def test_todas_las_vistas_del_menu_responden(self):
+        for modelo in ["application", "organization", "unit", "candidate", "approvedproject", "member", "announcement"]:
+            with self.subTest(modelo=modelo):
+                self.assertEqual(self.client.get(reverse(f"admin:applications_{modelo}_changelist")).status_code, 200)
+        self.assertEqual(self.client.get(reverse("admin:commons_rulesapplications_changelist")).status_code, 200)
+        self.assertEqual(self.client.get(reverse("admin:applications_application_change", args=[self.postulacion.pk])).status_code, 200)
+
+    def test_no_ofrece_borrar_en_bloque(self):
+        respuesta = self.client.get(reverse("admin:applications_application_changelist"))
+        self.assertNotContains(respuesta, 'value="delete_selected"')
+
+
+class AccionesTests(BaseCompartida):
+    def aplicar(self, accion):
+        return self.client.post(
+            reverse("admin:applications_application_changelist"),
+            {"action": accion, "_selected_action": [self.postulacion.pk]},
+            follow=True,
+        )
+
+    def test_aceptar(self):
+        Application.objects.filter(pk=self.postulacion.pk).update(fue_notificada=True)
+        respuesta = self.aplicar("aceptar")
+        self.postulacion.refresh_from_db()
+        self.assertEqual(self.postulacion.estado, Application.Estado.ACEPTADA)
+        self.assertFalse(self.postulacion.fue_notificada)
+        self.assertContains(respuesta, "Postulaciones actualizadas a aceptadas.")
+
+    def test_rechazar(self):
+        self.aplicar("rechazar")
+        self.postulacion.refresh_from_db()
+        self.assertEqual(self.postulacion.estado, Application.Estado.RECHAZADA)
+
+    def test_la_accion_no_crea_el_proyecto(self):
+        self.aplicar("aceptar")
+        self.assertFalse(ApprovedProject.objects.exists())
+
+    def test_sin_permiso_de_cambio_no_acepta(self):
+        lector = User.objects.create_user("lector", password="clave-de-prueba", is_staff=True)
+        lector.user_permissions.add(Permission.objects.get(codename="view_application"))
+        self.client.force_login(lector)
+        self.aplicar("aceptar")
+        self.postulacion.refresh_from_db()
+        self.assertEqual(self.postulacion.estado, Application.Estado.CREADA)
+
+
+class SenalTests(BaseCompartida):
+    def test_guardar_aceptada_crea_el_proyecto_con_sus_datos(self):
+        self.postulacion.estado = Application.Estado.ACEPTADA
+        self.postulacion.save()
+        proyecto = ApprovedProject.objects.get(postulacion=self.postulacion)
+        self.assertEqual(proyecto.titulo, "Sistema de riego")
+        self.assertEqual((proyecto.semestre, proyecto.anio), ("SP", 2026))
+        self.assertFalse(proyecto.es_visible)
+
+    def test_un_proyecto_visible_no_se_sobrescribe(self):
+        self.postulacion.estado = Application.Estado.ACEPTADA
+        self.postulacion.save()
+        ApprovedProject.objects.filter(postulacion=self.postulacion).update(es_visible=True, titulo="Título publicado")
+        self.postulacion.titulo = "Otro título"
+        self.postulacion.save()
+        self.assertEqual(ApprovedProject.objects.get().titulo, "Título publicado")
+
+    def test_guardar_creada_no_crea_proyecto(self):
+        self.postulacion.save()
+        self.assertFalse(ApprovedProject.objects.exists())
+
+
+class ConvocatoriaTests(BaseCompartida):
+    def test_rechaza_fechas_que_se_cruzan(self):
+        otra = Announcement(
+            convenio=self.convocatoria.convenio,
+            inicio=datetime.date(2026, 8, 1),
+            cierre=datetime.date(2026, 9, 30),
+            semestre="SP",
+            anio=2026,
+        )
+        with self.assertRaisesMessage(ValidationError, "Ya existe un periodo"):
+            otra.clean()
+
+    def test_rechaza_cierre_antes_del_inicio(self):
+        otra = Announcement(
+            convenio=self.convocatoria.convenio,
+            inicio=datetime.date(2027, 3, 1),
+            cierre=datetime.date(2027, 2, 1),
+            semestre="FA",
+            anio=2027,
+        )
+        with self.assertRaisesMessage(ValidationError, "fecha de inicio"):
+            otra.clean()
+
+    def test_editar_la_misma_no_choca_consigo(self):
+        self.convocatoria.clean()
+
+    def test_enlace_a_sus_postulaciones(self):
+        respuesta = self.client.get(reverse("admin:applications_announcement_changelist"))
+        self.assertContains(respuesta, f"?convocatoria__id__exact={self.convocatoria.pk}")
+
+
+class CorreoTests(BaseCompartida):
+    def url(self, tipo):
+        return reverse(f"admin:applications_application_{tipo}_correo", args=[self.postulacion.pk])
+
+    def test_notificar_aceptada_trae_el_texto_de_aceptacion(self):
+        Application.objects.filter(pk=self.postulacion.pk).update(estado=Application.Estado.ACEPTADA)
+        respuesta = self.client.get(self.url("notificar"))
+        self.assertContains(respuesta, "ha sido aceptado")
+        self.assertContains(respuesta, "ana@ejemplo.cl")
+
+    def test_notificar_creada_parte_vacio(self):
+        respuesta = self.client.get(self.url("notificar"))
+        self.assertNotContains(respuesta, "ha sido")
+
+    def test_enviar_marca_notificada(self):
+        respuesta = self.client.post(
+            self.url("contactar"), {"correo": "ana@ejemplo.cl", "asunto": "Reunión", "contenido": "<p>Hola</p>"}, follow=True
+        )
+        self.assertContains(respuesta, "Correo enviado exitosamente.")
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].to, ["ana@ejemplo.cl"])
+        self.assertIn("<p>Hola</p>", mail.outbox[0].alternatives[0].content)
+        self.postulacion.refresh_from_db()
+        self.assertTrue(self.postulacion.fue_notificada)
+
+    def test_si_el_correo_falla_no_marca_notificada(self):
+        with mock.patch("postulaciones.correo.EmailMultiAlternatives.send", side_effect=OSError("red caída")):
+            respuesta = self.client.post(
+                self.url("notificar"), {"correo": "ana@ejemplo.cl", "asunto": "Resultado", "contenido": "<p>x</p>"}
+            )
+        self.assertContains(respuesta, "No se pudo enviar el correo")
+        self.postulacion.refresh_from_db()
+        self.assertFalse(self.postulacion.fue_notificada)
+
+    def test_sin_mensaje_no_envia(self):
+        respuesta = self.client.post(self.url("notificar"), {"correo": "ana@ejemplo.cl", "asunto": "Resultado", "contenido": ""})
+        self.assertEqual(respuesta.status_code, 200)
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_requiere_permiso_de_cambio(self):
+        lector = User.objects.create_user("lector", password="clave-de-prueba", is_staff=True)
+        lector.user_permissions.add(Permission.objects.get(codename="view_application"))
+        self.client.force_login(lector)
+        self.assertEqual(self.client.get(self.url("notificar")).status_code, 403)
+
+    def test_la_accion_de_fila_lleva_al_formulario(self):
+        respuesta = self.client.get(reverse("admin:applications_application_notificar", args=[self.postulacion.pk]))
+        self.assertRedirects(respuesta, self.url("notificar"))
+
+
+class RestablecerTests(TestCase):
+    def test_el_login_ofrece_restablecer(self):
+        respuesta = self.client.get(reverse("admin:login"))
+        self.assertContains(respuesta, reverse("admin_password_reset"))
+
+    def test_el_formulario_responde(self):
+        self.assertEqual(self.client.get(reverse("admin_password_reset")).status_code, 200)
