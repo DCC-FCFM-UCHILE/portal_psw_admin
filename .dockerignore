@@ -1,0 +1,38 @@
+# Git
+.git
+.gitignore
+.gitmodules
+
+# Docker
+.docker/data
+.docker/app/.env
+.docker/app/.env.test
+
+# Python
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Media (Should be handled by volumes)
+app/_media
+
+# Environment and Secrets
+.env
+.env.test
+
+# Databases
+*.db
+*.sqlite3
+
+# IDEs and OS
+.idea
+.vscode
+.DS_Store
+Thumbs.db

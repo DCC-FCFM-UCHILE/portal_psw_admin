@@ -1,0 +1,25 @@
+services:
+    django:
+        container_name: portal-admin-psw
+        build:
+            context: ../
+            dockerfile: .docker/app/Dockerfile
+            target: develop
+        command: [ "sh", "-c", "python manage.py runserver 0.0.0.0:8000 --settings=core.settings.docker" ]
+        tty: true
+        stdin_open: true
+        restart: always
+        volumes:
+            - ../app/:/app/:cached
+            - ${MEDIA_PUBLICO:-../../portal_psw_mobile/app/_media}/:/media/:cached
+            - ../app/_staticfiles/:/static/:cached
+            - ./data/logs:/logs:cached
+        ports:
+            - 8003:8000
+            - 5682:5678
+        env_file: ./app/.env
+
+networks:
+    default:
+        name: ${RED_PUBLICO:-portal-publico-psw_default}
+        external: true
