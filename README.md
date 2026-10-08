@@ -8,7 +8,9 @@ convocatorias, postulaciones, proyectos y cuentas que comparte con el portal pú
 ## Stack
 
 - Django 5.2 LTS y PostgreSQL
-- django-unfold (trae Tailwind, Alpine y HTMX ya compilados, no hay pipeline de Node)
+- django-unfold, que trae su propio Tailwind compilado, Alpine y HTMX
+- Tailwind CSS 4 para la hoja propia (`administrativo.css`), con los mismos colores y nombres
+  que el portal público
 - Docker Compose
 
 ## Levantarlo en local
@@ -32,7 +34,8 @@ make migrar
 make superusuario
 ```
 
-Queda en http://localhost:8003/admin/.
+Queda en http://localhost:8003/admin/. El contenedor `portal-admin-tailwind` recompila
+`administrativo.css` cada vez que cambia una plantilla, un `.py` o la hoja fuente.
 
 Si el público vive en otra carpeta o con otro nombre de proyecto, `MEDIA_PUBLICO` y
 `RED_PUBLICO` en el mismo `.env` apuntan a sus archivos y a su red.
@@ -53,8 +56,20 @@ app/core/settings/  base.py más un archivo por entorno
 app/cuentas/        usuarios, grupos y restablecer la contraseña
 app/postulaciones/  convocatorias, postulaciones, proyectos y correos a postulantes
 app/convenios/      formatos de postulación
-app/_templates/     plantillas que sobrescriben las de unfold
+app/_templates/     plantillas que sobrescriben las de unfold y páginas de error
+app/_node/          fuente de administrativo.css y su compilación
+app/_staticfiles/   logo, favicon y administrativo.js
+app/_locale/        textos de unfold en español (unfold no trae traducción)
 .docker/            Dockerfile, compose y Makefile
+```
+
+## Textos en español
+
+unfold no trae catálogo en español. Los textos están en `app/_locale/es/LC_MESSAGES/django.po`.
+Después de editarlo:
+
+```bash
+docker exec portal-admin-psw python manage.py compilemessages -l es
 ```
 
 ## Pruebas
