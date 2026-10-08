@@ -188,6 +188,13 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }).observe(document.body, { childList: true, subtree: true });
 
+    const cabecera = document.getElementById("cabecera");
+    if (cabecera && "ResizeObserver" in window) {
+        new ResizeObserver(() => {
+            document.documentElement.style.setProperty("--alto-cabecera", `${Math.ceil(cabecera.getBoundingClientRect().height)}px`);
+        }).observe(cabecera);
+    }
+
     const avisos = document.getElementById("avisos");
     if (avisos && !document.querySelector("[autofocus]")) {
         avisos.focus({ preventScroll: true });

@@ -176,7 +176,7 @@ html.cargando-vista #content > :not(.silueta-vista) {
 }
 
 html {
-  scroll-padding-top: 5rem;
+  scroll-padding-top: calc(var(--alto-cabecera, 4rem) + 1rem);
 }
 
 @media (min-width: 1024px) {
