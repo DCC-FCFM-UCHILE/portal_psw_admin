@@ -1,0 +1,14 @@
+{% load unfold %}
+
+<header id="cabecera" class="sticky top-0 z-40 mb-6 border-b border-base-200 bg-white px-4 shadow-xs sm:px-6 dark:border-base-800 dark:bg-base-900 dark:text-font-default-dark {% element_classes 'header' %}">
+    <div class="{% if not cl.model_admin.list_fullwidth and is_fullwidth != "1" and not is_popup %}container{% endif %} mx-auto flex h-16 items-center {% element_classes 'header_inner' %}">
+        <div id="header-inner" class="relative flex w-full items-center">
+            <div class="flex w-full items-center gap-3">
+                {% if has_permission %}
+                    {% include 'unfold/helpers/welcomemsg.html' %}
+                    {% include 'unfold/helpers/userlinks.html' %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</header>

@@ -1,0 +1,90 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Inicio | {{ site_title }}{% endblock %}
+
+{% block content %}
+    <div class="flex flex-wrap items-end justify-between gap-4">
+        <div>
+            <h1 class="titulo-pagina">Hola, {{ request.user.first_name|default:request.user.get_username }}</h1>
+            <p class="bajada">
+                {% if convocatoria_abierta %}
+                    Convocatoria {{ convocatoria_abierta }} abierta, cierra el {{ convocatoria_abierta.cierre|date:"j \d\e F" }}.
+                {% elif convocatoria %}
+                    No hay convocatorias abiertas. La última, {{ convocatoria }}, cerró el {{ convocatoria.cierre|date:"j \d\e F \d\e Y" }}.
+                {% else %}
+                    Todavía no hay convocatorias.
+                {% endif %}
+            </p>
+        </div>
+        {% if perms.applications.view_application %}
+            <div class="flex flex-wrap gap-3">
+                {% if perms.applications.view_announcement %}
+                    <a href="{% url 'admin:applications_announcement_changelist' %}" class="boton-secundario">Ver convocatorias</a>
+                {% endif %}
+                <a href="{% url 'admin:applications_application_changelist' %}{% if convocatoria %}?convocatoria__id__exact={{ convocatoria.pk }}{% endif %}" class="boton-primario">Revisar postulaciones</a>
+            </div>
+        {% endif %}
+    </div>
+
+    {% if tarjetas %}
+        <h2 class="sr-only">Resumen</h2>
+        <ul role="list" class="mt-6 grid grid-cols-[repeat(auto-fit,minmax(min(14rem,100%),1fr))] gap-4">
+            {% for tarjeta in tarjetas %}
+                <li>
+                    <a href="{{ tarjeta.enlace }}" class="indicador h-full">
+                        <span>
+                            <span class="indicador-etiqueta block">{{ tarjeta.etiqueta }}</span>
+                            <span class="indicador-valor block">{{ tarjeta.valor }}</span>
+                        </span>
+                        <span class="indicador-icono" aria-hidden="true"><span class="material-symbols-outlined md-18">{{ tarjeta.icono }}</span></span>
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <div class="mt-6 grid items-start gap-5 lg:grid-cols-[1.55fr_1fr]">
+        <section class="tarjeta" aria-labelledby="titulo-actividad">
+            <div class="tarjeta-cabecera">
+                <h2 id="titulo-actividad" class="titulo-seccion">Actividad reciente</h2>
+            </div>
+            {% if actividad %}
+                <ul role="list" class="linea-tiempo">
+                    {% for registro in actividad %}
+                        <li>
+                            <span class="linea-tiempo-punto" aria-hidden="true"></span>
+                            <div class="min-w-0 text-sm">
+                                <p class="break-words text-gris-oscuro dark:text-base-200">
+                                    <span class="font-semibold">{{ registro.quien }}</span> {{ registro.accion }} {{ registro.tipo }}
+                                    {% if registro.enlace %}<a href="{{ registro.enlace }}" class="enlace">{{ registro.objeto }}</a>{% else %}<span class="font-semibold">{{ registro.objeto }}</span>{% endif %}
+                                </p>
+                                <p class="mt-0.5 text-xs text-gris-medio dark:text-base-400"><time datetime="{{ registro.cuando|date:'c' }}">{{ registro.cuando|date:"j \d\e F, H:i" }}</time></p>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="px-5 py-4 text-sm text-gris-medio dark:text-base-400">Todavía no hay cambios registrados.</p>
+            {% endif %}
+        </section>
+
+        {% if accesos %}
+            <section class="tarjeta" aria-labelledby="titulo-accesos">
+                <div class="tarjeta-cabecera">
+                    <h2 id="titulo-accesos" class="titulo-seccion">Accesos rápidos</h2>
+                </div>
+                <ul role="list" class="lista-accesos divide-y divide-base-200 dark:divide-base-800">
+                    {% for acceso in accesos %}
+                        <li>
+                            <a href="{{ acceso.enlace }}"{% if acceso.externo %} target="_blank" rel="noopener"{% endif %}>
+                                <span class="material-symbols-outlined md-18 text-gris-medio dark:text-base-400" aria-hidden="true">{{ acceso.icono }}</span>
+                                {{ acceso.titulo }}
+                                {% if acceso.externo %}<span class="sr-only">(se abre en otra pestaña)</span><span class="material-symbols-outlined md-16 ml-auto" aria-hidden="true">open_in_new</span>{% endif %}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        {% endif %}
+    </div>
+{% endblock %}

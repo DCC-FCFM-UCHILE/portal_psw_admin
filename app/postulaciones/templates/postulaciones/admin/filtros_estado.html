@@ -1,0 +1,13 @@
+{% if filtros_estado %}
+    <nav aria-label="Filtrar por estado" class="mb-4">
+        <ul role="list" class="flex flex-wrap gap-2">
+            {% for filtro in filtros_estado %}
+                <li>
+                    <a href="{{ filtro.enlace }}" class="filtro-estado"{% if filtro.actual %} aria-current="page"{% endif %}>
+                        {{ filtro.nombre }} <span class="filtro-estado-cantidad">{{ filtro.total }}</span>
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </nav>
+{% endif %}

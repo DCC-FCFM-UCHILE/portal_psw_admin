@@ -1,0 +1,56 @@
+{% load interfaz %}
+
+{% if original %}
+    <div class="mb-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <section class="tarjeta px-5 py-4" aria-labelledby="resumen-estado">
+            <h2 id="resumen-estado" class="indicador-etiqueta">Estado</h2>
+            <p class="mt-2">
+                {% if original.estado == "AC" %}
+                    <span class="inline-flex items-center gap-1.5 rounded-full border border-green-200 bg-green-50 px-2.5 py-0.5 text-xs font-bold text-green-800 dark:border-green-900 dark:bg-green-950 dark:text-green-300"><span class="size-1.5 rounded-full bg-current" aria-hidden="true"></span>Aceptada</span>
+                {% elif original.estado == "RE" %}
+                    <span class="inline-flex items-center gap-1.5 rounded-full border border-red-200 bg-red-50 px-2.5 py-0.5 text-xs font-bold text-rojo dark:border-red-900 dark:bg-red-950 dark:text-red-300"><span class="size-1.5 rounded-full bg-current" aria-hidden="true"></span>Rechazada</span>
+                {% else %}
+                    <span class="inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-xs font-bold text-amber-800 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-300"><span class="size-1.5 rounded-full bg-current" aria-hidden="true"></span>Creada</span>
+                {% endif %}
+            </p>
+            <p class="mt-2 text-sm text-gris-medio dark:text-base-400">
+                {% if original.estado == "CR" %}Sin resolver.{% elif original.fue_notificada %}El postulante ya fue notificado.{% else %}Falta notificar al postulante.{% endif %}
+            </p>
+        </section>
+
+        <section class="tarjeta px-5 py-4" aria-labelledby="resumen-postulante">
+            <h2 id="resumen-postulante" class="indicador-etiqueta">Postulante</h2>
+            <p class="mt-2 break-words text-sm font-semibold text-gris-oscuro dark:text-white">{{ original.postulante }}</p>
+            <p class="break-words text-sm"><a href="mailto:{{ original.postulante.correo }}" class="enlace">{{ original.postulante.correo }}</a></p>
+            <p class="mt-1 break-words text-sm text-gris-medio dark:text-base-400">{{ original.organizacion|default:"Sin organización" }}{% if original.unidad %} · {{ original.unidad }}{% endif %}</p>
+        </section>
+
+        <section class="tarjeta px-5 py-4" aria-labelledby="resumen-perfil">
+            <h2 id="resumen-perfil" class="indicador-etiqueta">Perfil de proyecto</h2>
+            {% if original.archivo %}
+                <p class="mt-2 break-all text-sm text-gris-oscuro dark:text-white">{{ original.archivo|nombre_archivo }}</p>
+                <p class="mt-1 text-sm">
+                    <a href="{{ original.archivo.url }}" target="_blank" rel="noopener" class="enlace-accion">
+                        <span class="material-symbols-outlined md-18" aria-hidden="true">description</span>Ver el perfil<span class="sr-only"> (se abre en otra pestaña)</span>
+                    </a>
+                </p>
+            {% else %}
+                <p class="mt-2 text-sm text-gris-medio dark:text-base-400">Sin archivo.</p>
+            {% endif %}
+        </section>
+
+        <section class="tarjeta px-5 py-4" aria-labelledby="resumen-historial">
+            <h2 id="resumen-historial" class="indicador-etiqueta">Historial</h2>
+            <ul role="list" class="mt-2 space-y-1.5 text-sm">
+                <li class="text-gris-oscuro dark:text-base-200">Recibida el <time datetime="{{ original.creada_en|date:'c' }}">{{ original.creada_en|date:"j \d\e F \d\e Y" }}</time></li>
+                {% for registro in historial %}
+                    <li class="text-gris-oscuro dark:text-base-200">
+                        {{ registro.user.get_full_name|default:registro.user.get_username }}
+                        {% if registro.is_addition %}la agregó{% elif registro.is_deletion %}la eliminó{% else %}la modificó{% endif %}
+                        el <time datetime="{{ registro.action_time|date:'c' }}">{{ registro.action_time|date:"j \d\e F" }}</time>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+    </div>
+{% endif %}

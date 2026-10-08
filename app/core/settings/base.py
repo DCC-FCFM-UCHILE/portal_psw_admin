@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from django.templatetags.static import static
 from django.urls import reverse_lazy
 
 from core.functions import get_env_variable
@@ -113,6 +114,7 @@ DEFAULT_FROM_EMAIL = get_env_variable("DJANGO_DEFAULT_FROM_EMAIL", "no-reply@dcc
 EMAIL_TIMEOUT = 10
 
 URL_PORTAL_PAGOS = get_env_variable("DJANGO_URL_PORTAL_PAGOS", "")
+URL_PORTAL_PUBLICO = get_env_variable("DJANGO_URL_PORTAL_PUBLICO", "")
 
 
 def puede(permiso):
@@ -158,15 +160,73 @@ NAVEGACION = [
 ]
 
 if URL_PORTAL_PAGOS:
-    NAVEGACION.append({"title": "Pagos", "items": [{"title": "Portal de pagos", "icon": "payments", "link": URL_PORTAL_PAGOS}]})
+    NAVEGACION.append(
+        {
+            "title": "Pagos",
+            "items": [
+                {
+                    "title": "Portal de pagos",
+                    "icon": "payments",
+                    "link": URL_PORTAL_PAGOS,
+                    "link_attrs": {"target": "_blank", "rel": "noopener"},
+                }
+            ],
+        }
+    )
 
 UNFOLD = {
     "SITE_TITLE": "Portal PSW · Administración",
     "SITE_HEADER": "Portal PSW",
     "SITE_SUBHEADER": "Administración",
+    "SITE_URL": URL_PORTAL_PUBLICO or None,
     "SITE_SYMBOL": "school",
+    "SITE_FAVICONS": [
+        {"rel": "icon", "sizes": "any", "type": "image/x-icon", "href": lambda request: static("images/favicon/favicon.ico")},
+    ],
     "SHOW_HISTORY": True,
     "SHOW_VIEW_ON_SITE": False,
+    "BORDER_RADIUS": "8px",
+    "DASHBOARD_CALLBACK": "postulaciones.inicio.indicadores",
+    "SCRIPTS": [lambda request: static("js/administrativo.js")],
+    "COLORS": {
+        "base": {
+            "50": "#f4f6fa",
+            "100": "#edeff3",
+            "200": "#e3e7ef",
+            "300": "#cdd2db",
+            "400": "#9aa1ac",
+            "500": "#646e7a",
+            "600": "#4b5563",
+            "700": "#374151",
+            "800": "#2b2f36",
+            "900": "#1d2025",
+            "950": "#15171b",
+        },
+        "primary": {
+            "50": "#fef2f2",
+            "100": "#fee2e2",
+            "200": "#fecaca",
+            "300": "#fca5a5",
+            "400": "#f87171",
+            "500": "#ef6b6b",
+            "600": "#b71c1c",
+            "700": "#8b1515",
+            "800": "#761212",
+            "900": "#5f0f0f",
+            "950": "#3b0808",
+        },
+        "font": {
+            "subtle-light": "var(--color-base-500)",
+            "subtle-dark": "var(--color-base-400)",
+            "default-light": "var(--color-base-600)",
+            "default-dark": "var(--color-base-300)",
+            "important-light": "#333333",
+            "important-dark": "var(--color-base-100)",
+        },
+    },
+    "COMMAND": {
+        "search_models": True,
+    },
     "SIDEBAR": {
         "show_search": True,
         "show_all_applications": False,

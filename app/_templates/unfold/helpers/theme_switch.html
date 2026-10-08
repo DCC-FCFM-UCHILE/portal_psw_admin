@@ -1,0 +1,20 @@
+{% if not theme %}
+    <fieldset class="grupo-tema">
+        <legend>Tema</legend>
+        <label class="opcion-tema">
+            <input type="radio" name="tema" value="light" x-model="adminTheme">
+            <span class="material-symbols-outlined md-18" aria-hidden="true">light_mode</span>
+            Claro
+        </label>
+        <label class="opcion-tema">
+            <input type="radio" name="tema" value="dark" x-model="adminTheme">
+            <span class="material-symbols-outlined md-18" aria-hidden="true">dark_mode</span>
+            Oscuro
+        </label>
+        <label class="opcion-tema">
+            <input type="radio" name="tema" value="auto" x-model="adminTheme">
+            <span class="material-symbols-outlined md-18" aria-hidden="true">computer</span>
+            Sistema
+        </label>
+    </fieldset>
+{% endif %}

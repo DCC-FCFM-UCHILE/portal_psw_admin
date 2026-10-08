@@ -1,4 +1,7 @@
 from django.contrib import admin, messages
+from django.contrib.admin.models import LogEntry
+from django.contrib.contenttypes.models import ContentType
+from django.db.models import Count
 from django.shortcuts import redirect
 from django.urls import path, reverse
 from django.utils.html import format_html
@@ -10,10 +13,25 @@ from postulaciones.models import Announcement, Application, ApprovedProject, Can
 from postulaciones.views import CorreoPostulanteView
 
 ESTADOS = {
-    Application.Estado.CREADA: "info",
+    Application.Estado.CREADA: "warning",
     Application.Estado.ACEPTADA: "success",
     Application.Estado.RECHAZADA: "danger",
 }
+
+
+class NotificacionFilter(admin.SimpleListFilter):
+    title = "notificación"
+    parameter_name = "notificacion"
+
+    def lookups(self, request, model_admin):
+        return [("pendiente", "Resuelta sin notificar"), ("notificada", "Notificada")]
+
+    def queryset(self, request, queryset):
+        if self.value() == "pendiente":
+            return queryset.exclude(estado=Application.Estado.CREADA).filter(fue_notificada=False)
+        if self.value() == "notificada":
+            return queryset.filter(fue_notificada=True)
+        return queryset
 
 
 @admin.register(Announcement)
@@ -25,14 +43,14 @@ class AnnouncementAdmin(ModelAdmin):
     @display(description="Postulaciones")
     def ver_postulaciones(self, obj):
         url = reverse("admin:applications_application_changelist")
-        return format_html('<a href="{}?convocatoria__id__exact={}" class="text-primary-600">Ver postulaciones</a>', url, obj.pk)
+        return format_html('<a href="{}?convocatoria__id__exact={}" class="enlace">Ver postulaciones</a>', url, obj.pk)
 
 
 @admin.register(Application)
 class ApplicationAdmin(ModelAdmin):
     list_display = ["titulo", "convocatoria", "organizacion", "unidad", "postulante", "mostrar_estado", "fue_notificada", "perfil"]
     list_display_links = ["titulo"]
-    list_filter = ["estado", ("convocatoria", RelatedDropdownFilter)]
+    list_filter = ["estado", NotificacionFilter, ("convocatoria", RelatedDropdownFilter)]
     list_filter_submit = True
     search_fields = ["titulo", "unidad__nombre", "unidad__organizacion__nombre"]
     list_select_related = ["convocatoria", "postulante", "unidad__organizacion"]
@@ -40,6 +58,47 @@ class ApplicationAdmin(ModelAdmin):
     actions = ["aceptar", "rechazar"]
     actions_row = ["notificar", "contactar"]
     actions_detail = ["notificar", "contactar"]
+    list_before_template = "postulaciones/admin/filtros_estado.html"
+    change_form_before_template = "postulaciones/admin/resumen_postulacion.html"
+
+    def changelist_view(self, request, extra_context=None):
+        respuesta = super().changelist_view(request, extra_context)
+        if hasattr(respuesta, "context_data") and "cl" in respuesta.context_data:
+            respuesta.context_data["filtros_estado"] = self.filtros_estado(request)
+        return respuesta
+
+    def filtros_estado(self, request):
+        postulaciones = self.get_queryset(request)
+        convocatoria = request.GET.get("convocatoria__id__exact")
+        if convocatoria and convocatoria.isdigit():
+            postulaciones = postulaciones.filter(convocatoria_id=convocatoria)
+        busqueda = request.GET.get("q")
+        if busqueda:
+            postulaciones, _ = self.get_search_results(request, postulaciones, busqueda)
+        cantidades = dict(postulaciones.order_by().values_list("estado").annotate(total=Count("id")))
+        actual = request.GET.get("estado__exact", "")
+        parametros = request.GET.copy()
+        parametros.pop("p", None)
+        parametros.pop("estado__exact", None)
+        filtros = [{"nombre": "Todas", "valor": "", "total": sum(cantidades.values())}]
+        filtros += [{"nombre": nombre, "valor": valor, "total": cantidades.get(valor, 0)} for valor, nombre in Application.Estado.choices]
+        for filtro in filtros:
+            consulta = parametros.copy()
+            if filtro["valor"]:
+                consulta["estado__exact"] = filtro["valor"]
+            filtro["enlace"] = f"?{consulta.urlencode()}" if consulta else "?"
+            filtro["actual"] = filtro["valor"] == actual
+        return filtros
+
+    def change_view(self, request, object_id, form_url="", extra_context=None):
+        extra_context = extra_context or {}
+        if object_id and str(object_id).isdigit():
+            extra_context["historial"] = (
+                LogEntry.objects.filter(content_type=ContentType.objects.get_for_model(Application), object_id=str(object_id))
+                .select_related("user")
+                .order_by("-action_time")[:4]
+            )
+        return super().change_view(request, object_id, form_url, extra_context)
 
     def get_actions(self, request):
         acciones = super().get_actions(request)
@@ -70,7 +129,7 @@ class ApplicationAdmin(ModelAdmin):
         if not obj.archivo:
             return "Sin archivo"
         return format_html(
-            '<a href="{}" target="_blank" rel="noopener" class="text-primary-600">Descargar<span class="sr-only">'
+            '<a href="{}" target="_blank" rel="noopener" class="enlace">Descargar<span class="sr-only">'
             " el perfil de {} (se abre en otra pestaña)</span></a>",
             obj.archivo.url,
             obj.titulo,
@@ -104,6 +163,7 @@ class MemberInline(TabularInline):
 @admin.register(ApprovedProject)
 class ApprovedProjectAdmin(ModelAdmin):
     list_display = ["titulo", "convocatoria", "organizacion", "unidad", "postulante", "semestre", "anio", "tutor", "es_visible"]
+    list_filter = ["es_visible"]
     search_fields = ["titulo", "postulacion__titulo"]
     list_select_related = ["postulacion__convocatoria", "postulacion__postulante", "postulacion__unidad__organizacion"]
     list_per_page = 10

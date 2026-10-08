@@ -1,0 +1,44 @@
+{% load static unfold interfaz %}
+
+<nav id="nav-sidebar-inner" aria-label="Menú principal" class="flex h-full min-h-screen flex-col {% element_classes 'navigation_inner' %}">
+    <div class="flex h-16 shrink-0 items-center gap-2 border-b border-white/10 px-4">
+        <a href="{% url 'admin:index' %}" class="flex min-w-0 items-center gap-3 rounded-md py-1">
+            <img src="{% static 'images/logosimple_dcc.svg' %}" alt="" class="h-8 w-auto shrink-0">
+            <span class="min-w-0">
+                <span class="block truncate text-sm font-bold text-white">{{ site_header }}</span>
+                {% if site_subheader %}<span class="block truncate text-xs text-[#B0B6BF]">{{ site_subheader }}</span>{% endif %}
+            </span>
+        </a>
+        <button type="button" id="cerrar-menu" class="ml-auto flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-md text-gray-300 hover:bg-white/5 hover:text-white xl:hidden" x-on:click="sidebarToggle(); $nextTick(() => document.getElementById('alternar-menu')?.focus())" aria-label="Cerrar el menú">
+            <span class="material-symbols-outlined" aria-hidden="true">close</span>
+        </button>
+    </div>
+
+    <div id="nav-sidebar-apps" class="h-0 grow overflow-y-auto overflow-x-hidden px-3 pb-4 scrollbar-default-hover">
+        {% for grupo in sidebar_navigation %}
+            {% if grupo.items %}
+                <h2 id="grupo-menu-{{ forloop.counter }}" class="lateral-grupo">{{ grupo.title }}</h2>
+                <ul role="list" aria-labelledby="grupo-menu-{{ forloop.counter }}" class="flex flex-col gap-0.5">
+                    {% for item in grupo.items %}
+                        {% if item.has_permission %}
+                            <li>
+                                <a href="{% if item.link_callback %}{{ item.link_callback }}{% else %}{{ item.link }}{% endif %}" class="lateral-enlace"{% if item.active %} aria-current="page"{% endif %}{% if item.link_attrs %} {% include "unfold/helpers/attrs.html" with attrs=item.link_attrs %}{% endif %}>
+                                    {% if item.icon %}<span class="material-symbols-outlined md-18 shrink-0" aria-hidden="true">{{ item.icon }}</span>{% endif %}
+                                    <span class="min-w-0 truncate">{{ item.title }}</span>
+                                    {% if item.link_attrs.target == "_blank" %}
+                                        <span class="material-symbols-outlined md-16 ml-auto shrink-0 opacity-70" aria-hidden="true">open_in_new</span>
+                                        <span class="sr-only">(se abre en otra pestaña)</span>
+                                    {% endif %}
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% empty %}
+            <p class="px-3 py-4 text-sm">Tu cuenta no tiene permisos para ver ni editar nada.</p>
+        {% endfor %}
+    </div>
+
+    {% include "unfold/helpers/navigation_user.html" %}
+</nav>

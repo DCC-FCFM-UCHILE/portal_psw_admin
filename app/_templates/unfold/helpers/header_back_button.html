@@ -1,0 +1,20 @@
+{% load admin_urls unfold %}
+
+{% if show_back_button %}
+    {% if object %}
+        {% admin_object_app_url object "changelist" as changelist_url %}
+        {% url changelist_url as resolved_changelist_url %}
+        {% if resolved_changelist_url %}
+            <a href="{{ resolved_changelist_url }}" class="flex size-10 shrink-0 items-center justify-center rounded-md hover:bg-base-100 dark:hover:bg-base-800">
+                <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span><span class="sr-only">Volver al listado</span>
+            </a>
+        {% endif %}
+    {% elif opts and adminform %}
+        {% url opts|admin_urlname:'changelist' as changelist_url %}
+        {% if changelist_url %}
+            <a href="{% add_preserved_filters changelist_url %}" class="flex size-10 shrink-0 items-center justify-center rounded-md hover:bg-base-100 dark:hover:bg-base-800">
+                <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span><span class="sr-only">Volver al listado</span>
+            </a>
+        {% endif %}
+    {% endif %}
+{% endif %}

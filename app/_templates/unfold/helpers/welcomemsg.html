@@ -1,0 +1,41 @@
+{% load unfold interfaz %}
+
+<div class="flex min-w-0 grow items-center gap-2">
+    {% if is_nav_sidebar_enabled and not is_popup %}
+        <button type="button" id="alternar-menu" class="flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-md text-gris-medio hover:bg-base-100 hover:text-gris-oscuro dark:text-base-300 dark:hover:bg-base-800" x-on:click="sidebarToggle(); if (sidebarOpen && window.innerWidth < 1280) $nextTick(() => document.getElementById('cerrar-menu')?.focus())" aria-controls="nav-sidebar" x-bind:aria-expanded="sidebarOpen.toString()">
+            <span class="material-symbols-outlined" aria-hidden="true">menu</span>
+            <span class="sr-only">Menú principal</span>
+        </button>
+        <span class="block h-5 w-px shrink-0 bg-base-200 dark:bg-base-700" aria-hidden="true"></span>
+    {% endif %}
+
+    {% if not is_popup %}
+        {% include "unfold/helpers/header_back_button.html" %}
+    {% endif %}
+
+    {% migas as migas %}
+    <div class="flex min-w-0 items-center gap-2 text-sm leading-5 xl:text-base">
+        {% if migas.ruta %}
+            <nav aria-label="Ruta" class="hidden shrink-0 md:block">
+                <ol role="list" class="flex items-center gap-2">
+                    {% for miga in migas.ruta %}
+                        <li class="flex items-center gap-2">
+                            {% if miga.enlace %}<a href="{{ miga.enlace }}" class="rounded text-gris-medio hover:text-rojo hover:underline dark:text-base-400">{{ miga.titulo }}</a>{% else %}<span class="text-gris-medio">{{ miga.titulo }}</span>{% endif %}
+                            <span class="material-symbols-outlined md-18 text-base-400" aria-hidden="true">chevron_right</span>
+                        </li>
+                    {% endfor %}
+                </ol>
+            </nav>
+        {% endif %}
+        {% if titulo_cabecera_secundario %}
+            <p class="min-w-0 line-clamp-2 font-semibold leading-tight sm:truncate sm:leading-normal text-gris-oscuro dark:text-white">{{ migas.titulo }}</p>
+        {% else %}
+            <h1 class="min-w-0 line-clamp-2 font-semibold leading-tight sm:truncate sm:leading-normal text-gris-oscuro dark:text-white">{{ migas.titulo }}</h1>
+        {% endif %}
+        {% if cl and cl.full_result_count != cl.result_count and cl.paginator|class_name != "InfinitePaginator" %}
+            <span class="hidden shrink-0 text-xs font-medium text-gris-medio sm:inline dark:text-base-400">
+                {{ cl.result_count }} de {{ cl.full_result_count }} (<a href="?{% if cl.is_popup %}_popup=1{% endif %}" class="enlace">ver todo</a>)
+            </span>
+        {% endif %}
+    </div>
+</div>

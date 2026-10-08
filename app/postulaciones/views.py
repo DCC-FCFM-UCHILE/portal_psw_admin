@@ -31,8 +31,15 @@ class CorreoPostulanteView(UnfoldModelAdminViewMixin, FormView):
         return {"correo": self.postulacion.postulante.correo, "contenido": contenido}
 
     def get_context_data(self, **kwargs):
-        cancelar = reverse("admin:applications_application_changelist")
-        return super().get_context_data(postulacion=self.postulacion, cancelar=cancelar, **kwargs)
+        ficha = reverse("admin:applications_application_change", args=[self.postulacion.pk])
+        migas = {
+            "ruta": [
+                {"titulo": "Postulaciones", "enlace": reverse("admin:applications_application_changelist")},
+                {"titulo": str(self.postulacion), "enlace": ficha},
+            ],
+            "titulo": self.titulos[self.tipo],
+        }
+        return super().get_context_data(postulacion=self.postulacion, cancelar=ficha, migas_vista=migas, **kwargs)
 
     def form_valid(self, form):
         if not correo.enviar(form.cleaned_data["correo"], form.cleaned_data["asunto"], form.cleaned_data["contenido"]):

@@ -1,0 +1,19 @@
+{% load interfaz %}
+
+<div class="relative shrink-0 border-t border-white/10 p-3" x-data="{ menuCuenta: false }" x-on:keydown.escape.stop="if (menuCuenta) { menuCuenta = false; $refs.botonCuenta.focus() }" x-on:click.outside="menuCuenta = false" x-on:focusout="if ($event.relatedTarget && !$el.contains($event.relatedTarget)) menuCuenta = false">
+
+    <button type="button" x-ref="botonCuenta" class="lateral-boton" aria-controls="menu-cuenta" x-bind:aria-expanded="menuCuenta.toString()" x-on:click="menuCuenta = !menuCuenta">
+        <span class="flex size-8 shrink-0 items-center justify-center rounded-full border border-red-800 bg-red-950 text-xs font-bold text-red-300" aria-hidden="true">{{ request.user|iniciales }}</span>
+        <span class="flex min-w-0 flex-col">
+            <span class="truncate text-sm font-semibold text-white">{{ request.user.get_full_name|default:request.user.get_username }}</span>
+            {% if request.user.email %}<span class="truncate text-xs text-[#B0B6BF]">{{ request.user.email }}</span>{% endif %}
+        </span>
+        <span class="sr-only">, opciones de la cuenta</span>
+        <span class="material-symbols-outlined ml-auto shrink-0" aria-hidden="true">unfold_more</span>
+    </button>
+
+    <div id="menu-cuenta" class="absolute inset-x-3 bottom-full z-50 mb-2 flex flex-col rounded-lg border border-base-200 bg-white py-1 text-sm text-gris-oscuro shadow-lg dark:border-base-700 dark:bg-base-800 dark:text-base-200" x-cloak x-show="menuCuenta" x-transition>
+        {% include "unfold/helpers/theme_switch.html" %}
+        {% include "unfold/helpers/account_links.html" %}
+    </div>
+</div>

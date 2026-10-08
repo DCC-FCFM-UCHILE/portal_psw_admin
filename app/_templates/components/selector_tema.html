@@ -1,0 +1,10 @@
+<div x-data="{ abierto: false }" x-cloak class="selector-tema relative" x-on:keydown.escape="if (abierto) { abierto = false; $refs.boton.focus() }" x-on:click.outside="abierto = false" x-on:focusout="if ($event.relatedTarget && !$el.contains($event.relatedTarget)) abierto = false">
+    <button type="button" x-ref="boton" class="boton-cabecera" aria-expanded="false" aria-controls="panel-tema" x-bind:aria-expanded="abierto.toString()" x-on:click="abierto = !abierto">
+        <span class="material-symbols-outlined dark:hidden" aria-hidden="true">light_mode</span>
+        <span class="material-symbols-outlined hidden dark:inline" aria-hidden="true">dark_mode</span>
+        <span class="sr-only">Tema</span>
+    </button>
+    <div id="panel-tema" class="panel-tema z-50" hidden x-bind:hidden="!abierto">
+        {% include "unfold/helpers/theme_switch.html" %}
+    </div>
+</div>
