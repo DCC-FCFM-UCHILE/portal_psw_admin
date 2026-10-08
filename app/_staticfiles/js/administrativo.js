@@ -31,6 +31,10 @@ document.addEventListener("alpine:init", () => {
         const iniciar = datos.init;
         datos.sistemaOscuro = sistema.matches;
         datos.esCajon = cajon.matches;
+        datos.cerrarCajon = function () {
+            this.sidebarOpen = false;
+            this.$nextTick(() => document.getElementById("alternar-menu")?.focus());
+        };
         datos.init = function () {
             iniciar?.call(this);
             if (typeof this.sidebarOpen === "function") {

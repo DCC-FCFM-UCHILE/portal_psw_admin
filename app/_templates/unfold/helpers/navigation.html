@@ -9,7 +9,7 @@
                 {% if site_subheader %}<span class="block truncate text-xs text-[#B0B6BF]">{{ site_subheader }}</span>{% endif %}
             </span>
         </a>
-        <button type="button" id="cerrar-menu" class="ml-auto flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-md text-gray-300 hover:bg-white/5 hover:text-white min-[1281px]:hidden" x-on:click="sidebarToggle(); $nextTick(() => document.getElementById('alternar-menu')?.focus())" aria-label="Cerrar el menú">
+        <button type="button" id="cerrar-menu" class="ml-auto flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-md text-gray-300 hover:bg-white/5 hover:text-white min-[1281px]:hidden" x-on:click="cerrarCajon()" aria-label="Cerrar el menú">
             <span class="material-symbols-outlined" aria-hidden="true">close</span>
         </button>
     </div>
