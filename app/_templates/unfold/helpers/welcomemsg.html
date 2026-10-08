@@ -1,12 +1,20 @@
 {% load unfold interfaz %}
 
-<div class="flex min-w-0 grow items-center gap-2">
+<div class="flex min-w-0 grow items-center gap-1 sm:gap-2{% if adminform %} max-sm:contents{% endif %}">
     {% if is_nav_sidebar_enabled and not is_popup %}
         <button type="button" id="alternar-menu" class="flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-md text-gris-medio hover:bg-base-100 hover:text-gris-oscuro dark:text-base-300 dark:hover:bg-base-800" x-on:click="sidebarToggle(); if (sidebarOpen && esCajon) $nextTick(() => document.getElementById('cerrar-menu')?.focus())" aria-controls="nav-sidebar" x-bind:aria-expanded="sidebarOpen.toString()">
             <span class="material-symbols-outlined" aria-hidden="true">menu</span>
             <span class="sr-only">Menú principal</span>
         </button>
-        <span class="block h-5 w-px shrink-0 bg-base-200 dark:bg-base-700" aria-hidden="true"></span>
+    {% endif %}
+
+    {% if not is_popup %}
+        {% url 'admin:index' as inicio %}
+        <a href="{{ inicio }}" id="ir-al-inicio" class="flex size-10 shrink-0 items-center justify-center rounded-md text-gris-medio hover:bg-base-100 hover:text-gris-oscuro aria-[current=page]:bg-base-100 aria-[current=page]:text-gris-oscuro aria-[current=page]:shadow-[inset_0_-3px_0_var(--color-rojo)] dark:text-base-300 dark:hover:bg-base-800 dark:hover:text-white dark:aria-[current=page]:bg-base-800 dark:aria-[current=page]:text-white dark:aria-[current=page]:shadow-[inset_0_-3px_0_var(--color-primary-500)]"{% if request.path == inicio %} aria-current="page"{% endif %}>
+            <span class="material-symbols-outlined" aria-hidden="true">home</span>
+            <span class="sr-only">Inicio</span>
+        </a>
+        <span class="hidden h-5 w-px shrink-0 bg-base-200 sm:block dark:bg-base-700" aria-hidden="true"></span>
     {% endif %}
 
     {% if not is_popup %}
@@ -14,7 +22,7 @@
     {% endif %}
 
     {% migas as migas %}
-    <div class="flex min-w-0 items-center gap-2 text-sm leading-5 xl:text-base">
+    <div class="ml-1 flex min-w-0 items-center gap-2 text-sm leading-5 sm:ml-0 xl:text-base{% if adminform %} max-sm:order-last max-sm:ml-0 max-sm:basis-full{% endif %}">
         {% if migas.ruta %}
             <nav aria-label="Ruta" class="hidden shrink-0 md:block">
                 <ol role="list" class="flex items-center gap-2">
@@ -28,9 +36,9 @@
             </nav>
         {% endif %}
         {% if titulo_cabecera_secundario %}
-            <p class="min-w-0 line-clamp-2 font-semibold leading-tight sm:truncate sm:leading-normal text-gris-oscuro dark:text-white">{{ migas.titulo }}</p>
+            <p class="min-w-0 line-clamp-3 font-semibold leading-tight wrap-anywhere hyphens-auto sm:line-clamp-2 sm:wrap-normal text-gris-oscuro dark:text-white">{{ migas.titulo }}</p>
         {% else %}
-            <h1 class="min-w-0 line-clamp-2 font-semibold leading-tight sm:truncate sm:leading-normal text-gris-oscuro dark:text-white">{{ migas.titulo }}</h1>
+            <h1 class="min-w-0 line-clamp-3 font-semibold leading-tight wrap-anywhere hyphens-auto sm:line-clamp-2 sm:wrap-normal text-gris-oscuro dark:text-white">{{ migas.titulo }}</h1>
         {% endif %}
         {% if cl and cl.full_result_count != cl.result_count and cl.paginator|class_name != "InfinitePaginator" %}
             <span class="hidden shrink-0 text-xs font-medium text-gris-medio sm:inline dark:text-base-400">

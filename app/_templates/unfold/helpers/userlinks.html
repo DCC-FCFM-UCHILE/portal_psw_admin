@@ -1,7 +1,7 @@
 {% load unfold interfaz %}
 
 {% if not is_popup %}
-    <div class="ml-auto flex shrink-0 items-center gap-3">
+    <div class="ml-auto flex shrink-0 items-center gap-2 sm:gap-3">
         {% if environment %}
             {% include "unfold/helpers/label.html" with text=environment.0 type=environment.1 %}
         {% endif %}
