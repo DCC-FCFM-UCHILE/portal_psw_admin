@@ -189,7 +189,13 @@ const nombrar = (transicion) => {
     transicion.finished.finally(() => raiz.classList.remove("en-transicion"));
 };
 
-window.addEventListener("pageswap", (evento) => nombrar(evento.viewTransition));
+const hayCapaAbierta = () => [...document.querySelectorAll(".velo-lateral, #modal-overlay, [aria-modal='true']")].some((capa) => capa.checkVisibility());
+
+window.addEventListener("pageswap", (evento) => {
+    if (!hayCapaAbierta()) {
+        nombrar(evento.viewTransition);
+    }
+});
 window.addEventListener("pagereveal", (evento) => nombrar(evento.viewTransition));
 
 window.addEventListener("pagehide", () => {
