@@ -17,14 +17,14 @@ class Semestre(models.TextChoices):
 
 class Organization(Auditada):
     rut = models.CharField("RUT", max_length=50)
-    nombre = models.CharField("Nombre", max_length=200, blank=True, null=True, db_column="name")
-    rubro = models.CharField("Rubro o giro", max_length=50, blank=True, null=True, db_column="organization_line")
+    nombre = models.CharField("nombre", max_length=200, blank=True, null=True, db_column="name")
+    rubro = models.CharField("rubro o giro", max_length=50, blank=True, null=True, db_column="organization_line")
 
     class Meta:
         managed = False
         db_table = "applications_organization"
-        verbose_name = "Organización"
-        verbose_name_plural = "Organizaciones"
+        verbose_name = "organización"
+        verbose_name_plural = "organizaciones"
 
     def __str__(self):
         return self.nombre or self.rut
@@ -32,16 +32,16 @@ class Organization(Auditada):
 
 class Candidate(Auditada):
     organizacion = models.ForeignKey(
-        Organization, on_delete=models.PROTECT, related_name="postulantes", db_column="organization_id", verbose_name="Organización"
+        Organization, on_delete=models.PROTECT, related_name="postulantes", db_column="organization_id", verbose_name="organización"
     )
-    correo = models.EmailField("Correo", max_length=50, db_column="email")
-    nombre = models.CharField("Nombre", max_length=100, blank=True, null=True, db_column="names")
+    correo = models.EmailField("correo", max_length=50, db_column="email")
+    nombre = models.CharField("nombre", max_length=100, blank=True, null=True, db_column="names")
 
     class Meta:
         managed = False
         db_table = "applications_candidate"
-        verbose_name = "Postulante"
-        verbose_name_plural = "Postulantes"
+        verbose_name = "postulante"
+        verbose_name_plural = "postulantes"
 
     def __str__(self):
         return self.nombre or self.correo
@@ -53,18 +53,18 @@ class Announcement(Auditada):
         on_delete=models.PROTECT,
         related_name="convocatorias",
         db_column="rules_id",
-        verbose_name="Formato de postulación",
+        verbose_name="formato de postulación",
     )
-    inicio = models.DateField("Inicio", db_column="start")
-    cierre = models.DateField("Cierre", db_column="end")
-    semestre = models.CharField("Semestre", max_length=2, choices=Semestre.choices, db_column="semester")
-    anio = models.PositiveIntegerField("Año", default=anio_actual, db_column="year")
+    inicio = models.DateField("inicio", db_column="start")
+    cierre = models.DateField("cierre", db_column="end")
+    semestre = models.CharField("semestre", max_length=2, choices=Semestre.choices, db_column="semester")
+    anio = models.PositiveIntegerField("año", default=anio_actual, db_column="year")
 
     class Meta:
         managed = False
         db_table = "applications_announcement"
-        verbose_name = "Convocatoria"
-        verbose_name_plural = "Convocatorias"
+        verbose_name = "convocatoria"
+        verbose_name_plural = "convocatorias"
         ordering = ["-cierre"]
 
     def __str__(self):
@@ -81,9 +81,9 @@ class Announcement(Auditada):
 
 
 class Unit(Auditada):
-    nombre = models.CharField("Nombre", max_length=200, blank=True, null=True, db_column="name")
-    logo = models.FileField("Logo", blank=True, null=True, validators=[FileExtensionValidator(allowed_extensions=["png", "jpg", "svg"])])
-    esta_vetada = models.BooleanField("Está vetada", default=False, db_column="is_veto")
+    nombre = models.CharField("nombre", max_length=200, blank=True, null=True, db_column="name")
+    logo = models.FileField("logo", blank=True, null=True, validators=[FileExtensionValidator(allowed_extensions=["png", "jpg", "svg"])])
+    esta_vetada = models.BooleanField("está vetada", default=False, db_column="is_veto")
     organizacion = models.ForeignKey(
         Organization,
         on_delete=models.PROTECT,
@@ -91,14 +91,14 @@ class Unit(Auditada):
         db_column="organization_id",
         blank=True,
         null=True,
-        verbose_name="Organización",
+        verbose_name="organización",
     )
 
     class Meta:
         managed = False
         db_table = "applications_unit"
-        verbose_name = "Unidad"
-        verbose_name_plural = "Unidades"
+        verbose_name = "unidad"
+        verbose_name_plural = "unidades"
 
     def __str__(self):
         return self.nombre or ""
@@ -111,25 +111,25 @@ class Application(Auditada):
         ACEPTADA = "AC", "Aceptada"
 
     postulante = models.ForeignKey(
-        Candidate, on_delete=models.PROTECT, related_name="postulaciones", db_column="candidate_id", verbose_name="Postulante"
+        Candidate, on_delete=models.PROTECT, related_name="postulaciones", db_column="candidate_id", verbose_name="postulante"
     )
     convocatoria = models.ForeignKey(
-        Announcement, on_delete=models.PROTECT, related_name="postulaciones", db_column="announcement_id", verbose_name="Convocatoria"
+        Announcement, on_delete=models.PROTECT, related_name="postulaciones", db_column="announcement_id", verbose_name="convocatoria"
     )
     unidad = models.ForeignKey(
-        Unit, on_delete=models.PROTECT, related_name="postulaciones", db_column="unit_id", null=True, verbose_name="Unidad"
+        Unit, on_delete=models.PROTECT, related_name="postulaciones", db_column="unit_id", null=True, verbose_name="unidad"
     )
-    titulo = models.CharField("Título", max_length=100, db_column="title")
-    descripcion = models.CharField("Descripción", max_length=200, blank=True, null=True, db_column="short_description")
-    archivo = models.FileField("Perfil de proyecto", db_column="file", validators=[FileExtensionValidator(allowed_extensions=["pdf"])])
-    estado = models.CharField("Estado", max_length=2, choices=Estado.choices, default=Estado.CREADA, db_column="status")
-    fue_notificada = models.BooleanField("Notificada", default=False, db_column="is_notified")
+    titulo = models.CharField("título", max_length=100, db_column="title")
+    descripcion = models.CharField("descripción", max_length=200, blank=True, null=True, db_column="short_description")
+    archivo = models.FileField("perfil de proyecto", db_column="file", validators=[FileExtensionValidator(allowed_extensions=["pdf"])])
+    estado = models.CharField("estado", max_length=2, choices=Estado.choices, default=Estado.CREADA, db_column="status")
+    fue_notificada = models.BooleanField("notificada", default=False, db_column="is_notified")
 
     class Meta:
         managed = False
         db_table = "applications_application"
-        verbose_name = "Postulación"
-        verbose_name_plural = "Postulaciones"
+        verbose_name = "postulación"
+        verbose_name_plural = "postulaciones"
         ordering = ["-id"]
 
     def __str__(self):
@@ -148,20 +148,20 @@ class ApprovedProject(Auditada):
         db_column="application_id",
         blank=True,
         null=True,
-        verbose_name="Postulación",
+        verbose_name="postulación",
     )
-    titulo = models.CharField("Título", max_length=100, db_column="title")
-    descripcion = models.TextField("Descripción", blank=True, null=True, db_column="description")
-    semestre = models.CharField("Semestre", max_length=2, choices=Semestre.choices, db_column="semester")
-    anio = models.PositiveIntegerField("Año", default=anio_actual, db_column="year")
-    tutor = models.CharField("Auxiliar", max_length=100, db_column="aux")
-    es_visible = models.BooleanField("Visible", default=False, db_column="is_visible")
+    titulo = models.CharField("título", max_length=100, db_column="title")
+    descripcion = models.TextField("descripción", blank=True, null=True, db_column="description")
+    semestre = models.CharField("semestre", max_length=2, choices=Semestre.choices, db_column="semester")
+    anio = models.PositiveIntegerField("año", default=anio_actual, db_column="year")
+    tutor = models.CharField("auxiliar", max_length=100, db_column="aux")
+    es_visible = models.BooleanField("visible", default=False, db_column="is_visible")
 
     class Meta:
         managed = False
         db_table = "applications_approvedproject"
-        verbose_name = "Proyecto"
-        verbose_name_plural = "Proyectos"
+        verbose_name = "proyecto"
+        verbose_name_plural = "proyectos"
         ordering = ["-postulacion__convocatoria__cierre", "-id"]
 
     def __str__(self):
@@ -170,16 +170,16 @@ class ApprovedProject(Auditada):
 
 class Member(Auditada):
     proyecto = models.ForeignKey(
-        ApprovedProject, on_delete=models.PROTECT, related_name="integrantes", db_column="project_id", verbose_name="Proyecto"
+        ApprovedProject, on_delete=models.PROTECT, related_name="integrantes", db_column="project_id", verbose_name="proyecto"
     )
-    nombre = models.CharField("Nombre", max_length=100, db_column="name")
-    es_visible = models.BooleanField("Visible", default=False, db_column="is_visible")
+    nombre = models.CharField("nombre", max_length=100, db_column="name")
+    es_visible = models.BooleanField("visible", default=False, db_column="is_visible")
 
     class Meta:
         managed = False
         db_table = "applications_member"
-        verbose_name = "Integrante"
-        verbose_name_plural = "Integrantes"
+        verbose_name = "integrante"
+        verbose_name_plural = "integrantes"
 
     def __str__(self):
         return self.nombre

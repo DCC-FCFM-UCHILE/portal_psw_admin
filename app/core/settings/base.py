@@ -96,6 +96,8 @@ TIME_ZONE = "America/Santiago"
 USE_I18N = True
 USE_TZ = True
 
+LOCALE_PATHS = [BASE_DIR / "_locale"]
+
 FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
 

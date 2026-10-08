@@ -1,0 +1,567 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: es\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Select record"
+msgstr "Seleccionar el registro"
+
+msgid "Select action"
+msgstr "Seleccionar una acción"
+
+msgid "Save"
+msgstr "Guardar"
+
+msgid "Collapse"
+msgstr "Contraer"
+
+msgid "Name"
+msgstr "Nombre"
+
+msgid "Value"
+msgstr "Valor"
+
+msgid "Default"
+msgstr "Por defecto"
+
+msgid "Code"
+msgstr "Código"
+
+msgid "Current file"
+msgstr "Archivo actual"
+
+msgid "Reset to default"
+msgstr "Volver al valor por defecto"
+
+msgid "All"
+msgstr "Todo"
+
+msgid " By %(filter_title)s "
+msgstr " Por %(filter_title)s "
+
+msgid "Yes"
+msgstr "Sí"
+
+msgid "No"
+msgstr "No"
+
+msgid "From"
+msgstr "Desde"
+
+msgid "To"
+msgstr "Hasta"
+
+msgid "Date from"
+msgstr "Fecha desde"
+
+msgid "Time"
+msgstr "Hora"
+
+msgid "Date to"
+msgstr "Fecha hasta"
+
+msgid "Not enough data."
+msgstr "No hay datos suficientes."
+
+msgid "Add new item"
+msgstr "Agregar un elemento"
+
+msgid "Paragraph"
+msgstr "Párrafo"
+
+msgid "Underlined"
+msgstr "Subrayado"
+
+msgid "Bold"
+msgstr "Negrita"
+
+msgid "Italic"
+msgstr "Cursiva"
+
+msgid "Strike"
+msgstr "Tachado"
+
+msgid "Link"
+msgstr "Enlace"
+
+msgid "Heading"
+msgstr "Título"
+
+msgid "Quote"
+msgstr "Cita"
+
+msgid "Unordered list"
+msgstr "Lista con viñetas"
+
+msgid "Ordered list"
+msgstr "Lista numerada"
+
+msgid "Indent increase"
+msgstr "Aumentar la sangría"
+
+msgid "Indent decrease"
+msgstr "Reducir la sangría"
+
+msgid "Undo"
+msgstr "Deshacer"
+
+msgid "Redo"
+msgstr "Rehacer"
+
+msgid "Enter an URL"
+msgstr "Escribe una dirección"
+
+msgid "Unlink"
+msgstr "Quitar el enlace"
+
+msgid "Object"
+msgstr "Registro"
+
+msgid "Group"
+msgstr "Grupo"
+
+msgid "Permissions"
+msgstr "Permisos"
+
+msgid "User"
+msgstr "Usuario"
+
+msgid "Edit"
+msgstr "Editar"
+
+msgid "Submit"
+msgstr "Enviar"
+
+msgid "Delete"
+msgstr "Eliminar"
+
+msgid "Update"
+msgstr "Actualizar"
+
+msgid "Comment"
+msgstr "Comentario"
+
+msgid "Changes"
+msgstr "Cambios"
+
+msgid "Field"
+msgstr "Campo"
+
+msgid "Old value"
+msgstr "Valor anterior"
+
+msgid "New value"
+msgstr "Valor nuevo"
+
+msgid "Close"
+msgstr "Cerrar"
+
+msgid "Select action to run"
+msgstr "Elige la acción que quieres aplicar"
+
+msgid "Raw passwords are not stored, so there is no way to see this user’s password, but you can change the password using <a href=\"{}\" class=\"text-primary-600 dark:text-primary-500\">this form</a>."
+msgstr "La contraseña no se guarda tal cual, así que no hay forma de verla, pero puedes cambiarla con <a href=\"{}\" class=\"enlace\">este formulario</a>."
+
+msgid "Items must be selected in order to perform actions on them. No items have been changed."
+msgstr "Para aplicar una acción, primero selecciona al menos un registro. No se cambió nada."
+
+msgid "Select value"
+msgstr "Selecciona un valor"
+
+msgid "Run the selected action"
+msgstr "Aplicar la acción seleccionada"
+
+msgid "Run"
+msgstr "Aplicar"
+
+msgid "Click here to select the objects across all pages"
+msgstr "Seleccionar los registros de todas las páginas"
+
+msgid "Select all %(total_count)s %(module_name)s"
+msgstr "Seleccionar los %(total_count)s registros de %(module_name)s"
+
+msgid "Clear selection"
+msgstr "Quitar la selección"
+
+msgid "Django site admin"
+msgstr "Administración"
+
+msgid "Models in the %(name)s application"
+msgstr "Secciones de %(name)s"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "Tu cuenta no tiene permisos para ver ni editar nada."
+
+msgid "After you've created a user, you’ll be able to edit more user options."
+msgstr "Después de crear el usuario podrás editar el resto de sus datos."
+
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr "Escribe una contraseña nueva para <strong>%(username)s</strong>."
+
+msgid "Change password"
+msgstr "Cambiar la contraseña"
+
+msgid "History"
+msgstr "Historial"
+
+msgid "View on site"
+msgstr "Ver en el portal"
+
+msgid "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting related objects, but your account doesn't have permission to delete the following types of objects:"
+msgstr "Eliminar %(object_name)s «%(escaped_object)s» eliminaría registros relacionados, pero tu cuenta no tiene permiso para eliminar estos tipos de registro:"
+
+msgid "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the following protected related objects:"
+msgstr "Para eliminar %(object_name)s «%(escaped_object)s» habría que eliminar antes estos registros relacionados protegidos:"
+
+msgid "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? All of the following related items will be deleted:"
+msgstr "¿Seguro que quieres eliminar %(object_name)s «%(escaped_object)s»? También se eliminarán todos estos registros relacionados:"
+
+msgid "Objects"
+msgstr "Registros"
+
+msgid "Deleting the selected %(objects_name)s would result in deleting related objects, but your account doesn't have permission to delete the following types of objects:"
+msgstr "Eliminar los %(objects_name)s seleccionados eliminaría registros relacionados, pero tu cuenta no tiene permiso para eliminar estos tipos de registro:"
+
+msgid "Deleting the selected %(objects_name)s would require deleting the following protected related objects:"
+msgstr "Para eliminar los %(objects_name)s seleccionados habría que eliminar antes estos registros relacionados protegidos:"
+
+msgid "Are you sure you want to delete the selected %(objects_name)s? All of the following objects and their related items will be deleted:"
+msgstr "¿Seguro que quieres eliminar los %(objects_name)s seleccionados? Se eliminarán estos registros y todo lo relacionado con ellos:"
+
+msgid "Summary"
+msgstr "Resumen"
+
+msgid "Welcome back to"
+msgstr "Ingresa a"
+
+msgid "You are authenticated as %(username)s, but are not authorized to access this page. Would you like to login to a different account?"
+msgstr "Ingresaste como %(username)s, pero esa cuenta no tiene acceso a esta página. ¿Quieres ingresar con otra cuenta?"
+
+msgid "Log in"
+msgstr "Ingresar"
+
+msgid "Forgotten your password or username?"
+msgstr "¿Olvidaste tu contraseña?"
+
+msgid "Action"
+msgstr "Acción"
+
+msgid "This object doesn’t have a change history. It probably wasn’t added via this admin site."
+msgstr "Este registro no tiene historial de cambios. Probablemente no se creó desde el administrativo."
+
+msgid "Show all"
+msgstr "Ver todo"
+
+msgid "Type to search"
+msgstr "Escribe para buscar"
+
+msgid "Save and continue editing"
+msgstr "Guardar y seguir editando"
+
+msgid "Save and view"
+msgstr "Guardar y ver"
+
+msgid "Save and add another"
+msgstr "Guardar y agregar otro"
+
+msgid "Save as new"
+msgstr "Guardar como nuevo"
+
+msgid "You have been successfully logged out from the administration"
+msgstr "Cerraste la sesión del administrativo"
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr "Puedes cerrar esta pestaña."
+
+msgid "Log in again"
+msgstr "Ingresar de nuevo"
+
+msgid "Your password was changed."
+msgstr "Tu contraseña se cambió."
+
+msgid "Please enter your old password, for security’s sake, and then enter your new password twice so we can verify you typed it in correctly."
+msgstr "Por seguridad, escribe tu contraseña actual y después la nueva dos veces, para confirmar que quedó bien escrita."
+
+msgid "No data"
+msgstr "Sin datos"
+
+msgid "View site"
+msgstr "Ver el portal público"
+
+msgid "Log out"
+msgstr "Cerrar sesión"
+
+msgid "Add %(name)s"
+msgstr "Agregar %(name)s"
+
+msgid "All applications"
+msgstr "Todas las secciones"
+
+msgid "View"
+msgstr "Ver"
+
+msgid "Change"
+msgstr "Editar"
+
+msgid "Add"
+msgstr "Agregar"
+
+msgid "Unknown"
+msgstr "Desconocido"
+
+msgid "True"
+msgstr "Sí"
+
+msgid "False"
+msgstr "No"
+
+msgid "Apply Filters"
+msgstr "Aplicar los filtros"
+
+msgid "Hide counts"
+msgstr "Ocultar los totales"
+
+msgid "Show counts"
+msgstr "Mostrar los totales"
+
+msgid "Clear all filters"
+msgstr "Quitar todos los filtros"
+
+msgid "Filters"
+msgstr "Filtros"
+
+msgid "Toggle sorting"
+msgstr "Cambiar el orden"
+
+msgid "Remove from sorting"
+msgstr "Quitar del orden"
+
+msgid "Sorting priority: %(priority_number)s"
+msgstr "Prioridad de orden: %(priority_number)s"
+
+msgid "Navigate"
+msgstr "Moverse"
+
+msgid "Select"
+msgstr "Elegir"
+
+msgid "Clear"
+msgstr "Cerrar"
+
+msgid "Recent searches"
+msgstr "Búsquedas recientes"
+
+msgid "Nothing matched your search"
+msgstr "No hay resultados para esa búsqueda"
+
+msgid "No, take me back"
+msgstr "No, volver"
+
+msgid "Yes, I’m sure"
+msgstr "Sí, eliminar"
+
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgid "This item will be deleted."
+msgstr "Este elemento se eliminará."
+
+msgid "Click to cancel"
+msgstr "Deshacer"
+
+msgid "No results found"
+msgstr "No hay resultados"
+
+msgid "This page yielded into no results. Create a new item or reset your filters."
+msgstr "No hay registros que mostrar. Crea uno nuevo o quita los filtros."
+
+msgid "Reset filters"
+msgstr "Quitar los filtros"
+
+msgid "Image preview"
+msgstr "Vista previa de la imagen"
+
+msgid "Click to download"
+msgstr "Descargar"
+
+msgid "Go back"
+msgstr "Volver"
+
+msgid "Recent actions"
+msgstr "Actividad reciente"
+
+msgid "Unknown content"
+msgstr "Contenido desconocido"
+
+msgid "Previous"
+msgstr "Anterior"
+
+msgid "Next"
+msgstr "Siguiente"
+
+msgid "Search apps and models..."
+msgstr "Buscar secciones…"
+
+msgid "Available shortcuts"
+msgstr "Atajos de teclado"
+
+msgid "Global shortcuts"
+msgstr "En todo el portal"
+
+msgid "Open command tool"
+msgstr "Abrir la búsqueda"
+
+msgid "Open shortcuts list"
+msgstr "Ver los atajos"
+
+msgid "Toggle sidebar"
+msgstr "Mostrar u ocultar el menú"
+
+msgid "Toggle dark/light mode"
+msgstr "Cambiar entre tema claro y oscuro"
+
+msgid "Changelist shortcuts"
+msgstr "En los listados"
+
+msgid "Toggle filter"
+msgstr "Mostrar u ocultar los filtros"
+
+msgid "Create new record"
+msgstr "Crear un registro"
+
+msgid "Command tool shortcuts"
+msgstr "En la búsqueda"
+
+msgid "Open selection"
+msgstr "Abrir el resultado"
+
+msgid "Open selection in new tab"
+msgstr "Abrir el resultado en otra pestaña"
+
+msgid "Django administration"
+msgstr "Administración"
+
+msgid "Home"
+msgstr "Inicio"
+
+msgid "General"
+msgstr "General"
+
+msgid "Light"
+msgstr "Claro"
+
+msgid "Dark"
+msgstr "Oscuro"
+
+msgid "System"
+msgstr "Sistema"
+
+msgid "Return to site"
+msgstr "Volver al portal"
+
+msgid "%(full_result_count)s total"
+msgstr "%(full_result_count)s en total"
+
+msgid "Choose file to upload"
+msgstr "Elegir un archivo"
+
+msgid "Toggle password visibility"
+msgstr "Mostrar u ocultar la contraseña"
+
+msgid "Change selected %(model)s"
+msgstr "Editar la selección (%(model)s)"
+
+msgid "Add another %(model)s"
+msgstr "Agregar %(model)s"
+
+msgid "View selected %(model)s"
+msgstr "Ver la selección (%(model)s)"
+
+msgid "Delete selected %(model)s"
+msgstr "Eliminar la selección (%(model)s)"
+
+msgid "Add row"
+msgstr "Agregar una fila"
+
+msgid "Select all objects on this page for an action"
+msgstr "Seleccionar todos los registros de esta página"
+
+msgid "Date"
+msgstr "Fecha"
+
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Corrige el error que se indica abajo."
+msgstr[1] "Corrige los errores que se indican abajo."
+
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] "%(counter)s resultado"
+msgstr[1] "%(counter)s resultados"
+
+msgid "\n            Found <span class=\"font-medium text-important\">%(counter)s</span> result in %(time)s seconds\n        "
+msgid_plural "\n            Found <span class=\"font-medium text-important\">%(counter)s</span> results in %(time)s seconds\n        "
+msgstr[0] "\n            <span class=\"font-medium text-important\">%(counter)s</span> resultado\n        "
+msgstr[1] "\n            <span class=\"font-medium text-important\">%(counter)s</span> resultados\n        "
+
+msgid "Your password can’t be too similar to your other personal information."
+msgstr "Tu contraseña no puede parecerse demasiado a tus otros datos personales."
+
+msgid "Your password can’t be a commonly used password."
+msgstr "Tu contraseña no puede ser una de uso común."
+
+msgid "Your password can’t be entirely numeric."
+msgstr "Tu contraseña no puede tener solo números."
+
+#, python-format
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] "Tu contraseña debe tener al menos %(min_length)d carácter."
+msgstr[1] "Tu contraseña debe tener al menos %(min_length)d caracteres."
+
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr "La contraseña actual no es correcta. Escríbela de nuevo."
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully."
+msgstr "Se agregó “{obj}” ({name})."
+
+msgid "You may edit it again below."
+msgstr "Puedes seguir editando abajo."
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully. You may add another {name} below."
+msgstr "Se agregó “{obj}” ({name}). Puedes agregar otro registro abajo."
+
+#, python-brace-format
+msgid "The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr "Se guardaron los cambios de “{obj}” ({name}). Puedes seguir editando abajo."
+
+#, python-brace-format
+msgid "The {name} “{obj}” was changed successfully. You may add another {name} below."
+msgstr "Se guardaron los cambios de “{obj}” ({name}). Puedes agregar otro registro abajo."
+
+#, python-brace-format
+msgid "The {name} “{obj}” was changed successfully."
+msgstr "Se guardaron los cambios de “{obj}” ({name})."
+
+#, python-format
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr "Se eliminó “%(obj)s” (%(name)s)."
+
+#, python-format
+msgid "Successfully deleted %(count)d %(items)s."
+msgstr "Eliminación lista: %(count)d %(items)s."
+
+#, python-format
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
+msgstr "No hay registros de %(name)s con el ID “%(key)s”. Puede que se haya eliminado."
+
+#, python-format
+msgid "Select %s to change"
+msgstr "Elegir %s para editar"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "Elegir %s para ver"

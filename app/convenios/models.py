@@ -10,15 +10,15 @@ class Auditada(models.Model):
 
 
 class RulesApplications(Auditada):
-    descripcion = models.CharField("Descripción", max_length=200, db_column="short_description")
-    perfil_de_proyecto = models.FileField("Perfil de proyecto", db_column="document")
-    convenio_de_colaboracion = models.FileField("Convenio de colaboración", db_column="deal")
+    descripcion = models.CharField("descripción", max_length=200, db_column="short_description")
+    perfil_de_proyecto = models.FileField("perfil de proyecto", db_column="document")
+    convenio_de_colaboracion = models.FileField("convenio de colaboración", db_column="deal")
 
     class Meta:
         managed = False
         db_table = "commons_rulesapplications"
-        verbose_name = "Convenio"
-        verbose_name_plural = "Convenios"
+        verbose_name = "convenio"
+        verbose_name_plural = "convenios"
 
     def __str__(self):
         return self.descripcion
