@@ -5,6 +5,7 @@ from django.db.models import Count
 from django.shortcuts import redirect
 from django.urls import path, reverse
 from django.utils.html import format_html
+from django.utils.text import capfirst
 from unfold.admin import ModelAdmin, TabularInline
 from unfold.contrib.filters.admin import RelatedDropdownFilter
 from unfold.decorators import action, display
@@ -158,6 +159,12 @@ class MemberInline(TabularInline):
     model = Member
     fields = ["nombre", "es_visible"]
     extra = 0
+
+    def formfield_for_dbfield(self, db_field, request, **kwargs):
+        campo = super().formfield_for_dbfield(db_field, request, **kwargs)
+        if campo is not None:
+            campo.widget.attrs["aria-label"] = capfirst(db_field.verbose_name)
+        return campo
 
 
 @admin.register(ApprovedProject)

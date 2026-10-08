@@ -1,0 +1,62 @@
+{% load i18n %}
+
+<thead>
+    <tr>
+        {% if cl.model_admin.ordering_field %}
+            <th></th>
+        {% endif %}
+
+        {% if cl.model_admin.list_sections|length > 0 %}
+            <th></th>
+        {% endif %}
+
+        {% for header in result_headers %}
+            <th class="align-middle font-semibold py-2 text-left text-important whitespace-nowrap {{ header.class_attrib }} {% if "action-toggle" in header.text and forloop.counter == 1 %}pl-3 w-px{% else %}px-3{% endif %}" scope="col">
+                <div class="flex items-center {% if header.formatting == "price" %}justify-end{% endif %}">
+                    <div class="text">
+                        {% if header.sortable %}
+                            <a href="{{ header.url_primary }}">
+                                {{ header.text|capfirst }}
+                            </a>
+                        {% else %}
+                            {% if "action-toggle" in header.text and forloop.counter == 1 %}
+                                <label class="flex flex-row items-center gap-2">
+                                    {{ header.text|capfirst }}
+                                </label>
+                            {% else %}
+                                <span>
+                                    {{ header.text|capfirst }}
+                                </span>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+
+                    {% if header.sortable %}
+                        {% if header.sort_priority > 0 %}
+                            <div class="sortoptions flex items-center ml-2">
+                                <a href="{{ header.url_toggle }}" class="flex size-6 items-center justify-center rounded leading-none text-gris-medio hover:text-gris-oscuro dark:text-oscuro-suave dark:hover:text-oscuro-texto toggle {% if header.ascending %}ascending{% else %}descending{% endif %}">
+                                    {% if header.ascending %}
+                                        <span class="block material-symbols-outlined md-18" aria-hidden="true">arrow_circle_down</span>
+                                        <span class="sr-only">Orden ascendente por {{ header.text }}, cambiar a descendente</span>
+                                    {% else %}
+                                        <span class="block material-symbols-outlined md-18" aria-hidden="true">arrow_circle_up</span>
+                                        <span class="sr-only">Orden descendente por {{ header.text }}, cambiar a ascendente</span>
+                                    {% endif %}
+                                </a>
+
+                                <a class="sortremove ml-0.5 flex size-6 items-center justify-center rounded leading-none text-gris-medio transition-colors hover:text-rojo dark:text-oscuro-suave dark:hover:text-oscuro-acento" href="{{ header.url_remove }}">
+                                    <span class="block material-symbols-outlined md-18" aria-hidden="true">cancel</span>
+                                    <span class="sr-only">Quitar el orden por {{ header.text }}</span>
+                                </a>
+                            </div>
+
+                            {% if num_sorted_fields > 1 %}
+                                <span class="sortpriority font-medium ml-2 text-xs"><span class="sr-only">Prioridad de orden </span>{{ header.sort_priority }}</span>
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </th>
+        {% endfor %}
+    </tr>
+</thead>

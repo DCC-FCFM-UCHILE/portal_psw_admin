@@ -6,4 +6,4 @@ from unfold.widgets import UnfoldAdminEmailInputWidget, UnfoldAdminTextInputWidg
 class CorreoForm(forms.Form):
     correo = forms.EmailField(label="Correo", max_length=100, widget=UnfoldAdminEmailInputWidget)
     asunto = forms.CharField(label="Asunto", max_length=100, widget=UnfoldAdminTextInputWidget)
-    contenido = forms.CharField(label="Mensaje", widget=WysiwygWidget)
+    contenido = forms.CharField(label="Mensaje", widget=WysiwygWidget(attrs={"aria-required": "true"}))

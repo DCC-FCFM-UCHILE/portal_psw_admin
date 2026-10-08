@@ -40,6 +40,17 @@ document.addEventListener("alpine:init", () => {
     };
 });
 
+const marcarFormato = (evento) => {
+    requestAnimationFrame(() => {
+        evento.target.toolbarElement?.querySelectorAll("button[data-trix-attribute]").forEach((boton) => {
+            boton.setAttribute("aria-pressed", boton.classList.contains("trix-active").toString());
+        });
+    });
+};
+
+document.addEventListener("trix-initialize", marcarFormato);
+document.addEventListener("trix-selection-change", marcarFormato);
+
 const icono = ".material-symbols-outlined:not([aria-hidden])";
 const ayuda = ".help-tooltip[aria-label]:not([role])";
 

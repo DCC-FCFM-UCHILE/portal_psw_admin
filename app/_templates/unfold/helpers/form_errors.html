@@ -1,0 +1,11 @@
+{% if errors %}
+    <div{% if field.auto_id %} id="{{ field.auto_id }}_error"{% endif %} class="mt-2 text-xs text-rojo dark:text-oscuro-acento">
+        <ul>
+            {% for error in errors %}
+                <li>
+                    {{ error }}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}

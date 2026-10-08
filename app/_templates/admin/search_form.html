@@ -1,0 +1,33 @@
+{% load i18n static %}
+
+{% if cl.search_fields %}
+    <div id="toolbar">
+        <form {% if not cl.is_dataset %}id="changelist-search"{% endif %} method="get" role="search" aria-label="Buscar en el listado">
+            <div class="buscador-listado bg-white border border-base-200 flex flex-row items-center px-3 rounded-default relative shadow-xs w-full focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-rojo lg:w-96 dark:focus-within:outline-white dark:bg-base-900 dark:border-base-700">
+                <button type="submit" class="-ml-1.5 flex size-8 shrink-0 cursor-pointer items-center justify-center rounded text-gris-medio hover:text-gris-oscuro dark:text-oscuro-suave dark:hover:text-oscuro-texto" id="searchbar-submit">
+                    <span class="material-symbols-outlined md-18" aria-hidden="true">search</span>
+                    <span class="sr-only">Buscar</span>
+                </button>
+
+                <label for="searchbar" class="sr-only">Buscar</label>
+
+                <input type="text"
+                       class="w-0 grow font-medium min-w-0 overflow-hidden p-2 placeholder-font-subtle-light truncate focus:outline-hidden dark:bg-base-900 dark:placeholder-font-subtle-dark dark:text-font-default-dark"
+                       name="{{ search_var }}"
+                       value="{{ cl.query }}"
+                       {% if not cl.is_dataset %}id="searchbar"{% endif %}
+                       placeholder="{% if cl.search_help_text %}{{ cl.search_help_text }}{% else %}{% trans "Type to search" %}{% endif %}" />
+
+                {% if not cl.is_dataset %}
+                    {% include "unfold/helpers/shortcut.html" with shortcut="/" %}
+                {% endif %}
+            </div>
+
+            {% for pair in cl.filter_params.items %}
+                {% for val in pair.1 %}
+                    {% if pair.0 != search_var %}<input type="hidden" name="{{ pair.0 }}" value="{{ val }}">{% endif %}
+                {% endfor %}
+            {% endfor %}
+        </form>
+    </div>
+{% endif %}

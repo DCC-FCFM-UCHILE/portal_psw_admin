@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.humanize",
+    "django.forms",
 ]
 
 INSTALLED_APPS += [
@@ -94,6 +95,8 @@ LANGUAGE_CODE = "es-cl"
 TIME_ZONE = "America/Santiago"
 USE_I18N = True
 USE_TZ = True
+
+FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
 
 STATIC_URL = "static/"
