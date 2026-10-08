@@ -12,6 +12,7 @@ urlpatterns = [
     path("admin/password_reset/done/", views.RestablecerEnviadoView.as_view(), name="password_reset_done"),
     path("reset/<uidb64>/<token>/", views.RestablecerConfirmarView.as_view(), name="password_reset_confirm"),
     path("reset/done/", views.RestablecerListoView.as_view(), name="password_reset_complete"),
+    path("admin/siluetas/", views.SiluetasView.as_view(), name="siluetas"),
     path("admin/", admin.site.urls),
 ]
 

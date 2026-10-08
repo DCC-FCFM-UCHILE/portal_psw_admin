@@ -10,12 +10,14 @@
             @view-transition { navigation: none; }
         }
     </style>
+    <script>{% filter compactar %}{% include "components/layout/arranque.js" %}{% endfilter %}</script>
     <script>{% filter compactar %}{% include "components/layout/navegacion.js" %}{% endfilter %}</script>
 {% endblock %}
 
 {% block base %}
     <a href="#contenido" class="salto boton-primario">Saltar al contenido</a>
     <div id="barra-progreso" class="fixed left-0 top-0 z-[1100] h-1 w-0 opacity-0" aria-hidden="true"></div>
+    <p id="estado-navegacion" role="status" class="sr-only"></p>
 
     <div id="page" class="flex max-w-full min-h-screen {% element_classes 'page' %}">
         {% if not is_popup and is_nav_sidebar_enabled %}

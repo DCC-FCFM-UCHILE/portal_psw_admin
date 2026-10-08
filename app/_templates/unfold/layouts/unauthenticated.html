@@ -1,6 +1,6 @@
 {% extends 'unfold/layouts/skeleton.html' %}
 
-{% load static %}
+{% load static interfaz %}
 
 {% block bodyclass %}{{ block.super }}login{% endblock %}
 
@@ -18,10 +18,13 @@
             @view-transition { navigation: none; }
         }
     </style>
+    <script>{% filter compactar %}{% include "components/layout/arranque.js" %}{% endfilter %}</script>
+    <script>{% filter compactar %}{% include "components/layout/navegacion.js" %}{% endfilter %}</script>
 {% endblock %}
 
 {% block base %}
     <a href="#contenido" class="salto boton-primario">Saltar al contenido</a>
+    <div id="barra-progreso" class="fixed left-0 top-0 z-[1100] h-1 w-0 opacity-0" aria-hidden="true"></div>
     <div id="page" class="flex min-h-screen flex-col bg-gris-claro dark:bg-oscuro-fondo">
         <header class="barra-oscura border-b border-white/10 bg-gris-oscuro text-white dark:bg-oscuro-cabecera">
             <div class="mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-4 px-4 sm:px-6">

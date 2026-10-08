@@ -50,6 +50,16 @@ html {
   }
 }
 
+html[data-arranque] #changelist-filter,
+html[data-arranque="lateral-cerrada"] .envoltura-lateral {
+  display: none;
+}
+
+.envoltura-lateral,
+.envoltura-lateral #nav-sidebar {
+  width: var(--ancho-lateral, 288px);
+}
+
 html.en-transicion #nav-sidebar { view-transition-name: lateral; }
 html.en-transicion #cabecera { view-transition-name: cabecera; }
 html.en-transicion #contenido { view-transition-name: contenido; }
@@ -72,6 +82,35 @@ html.vista-entrante #contenido {
 
 #avisos {
   animation: var(--animate-entrada);
+}
+
+html.cargando-vista #content > :not(.silueta-vista) {
+  display: none;
+}
+
+.silueta-vista.entrando {
+  animation: var(--animate-entrada);
+}
+
+.silueta-bloque {
+  @apply bg-base-200 dark:bg-base-800;
+}
+
+@keyframes pulso {
+  50% { opacity: 0.55; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .silueta-bloque {
+    animation: pulso 1.6s ease-in-out infinite;
+  }
+}
+
+@media (forced-colors: active) {
+  .silueta-bloque {
+    forced-color-adjust: none;
+    background-color: GrayText;
+  }
 }
 
 :where(a, button, summary, [tabindex]:not([tabindex="-1"]), input[type="checkbox"], input[type="radio"]):focus-visible {
@@ -239,6 +278,7 @@ input[type="checkbox"].appearance-none.rounded-full {
 
 @media (prefers-reduced-motion: reduce) {
   #avisos,
+  .silueta-vista.entrando,
   html.vista-saliente #contenido,
   html.vista-entrante #contenido {
     animation: none;

@@ -216,6 +216,24 @@ class CorreoTests(BaseCompartida):
         self.assertRedirects(respuesta, self.url("notificar"))
 
 
+class NavegacionTests(BaseCompartida):
+    def test_las_siluetas_van_versionadas_y_en_cache(self):
+        inicio = self.client.get(reverse("admin:index")).content.decode()
+        url = inicio.split('const urlSiluetas = "', 1)[1].split('"', 1)[0]
+        self.assertIn("?v=", url)
+        respuesta = self.client.get(url)
+        self.assertIn("immutable", respuesta["Cache-Control"])
+        for forma in ["inicio", "listado", "ficha"]:
+            self.assertContains(respuesta, f'data-forma="{forma}"')
+
+    def test_el_documento_no_espera_a_alpine_para_mostrarse(self):
+        for url in [reverse("admin:index"), reverse("admin:applications_application_changelist")]:
+            with self.subTest(url=url):
+                self.assertContains(self.client.get(url), 'raiz.removeAttribute("x-cloak")')
+        self.client.logout()
+        self.assertContains(self.client.get(reverse("admin:login")), 'raiz.removeAttribute("x-cloak")')
+
+
 class RestablecerTests(TestCase):
     def test_el_login_ofrece_restablecer(self):
         respuesta = self.client.get(reverse("admin:login"))
