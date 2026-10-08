@@ -40,6 +40,13 @@ document.addEventListener("alpine:init", () => {
     };
 });
 
+document.addEventListener("trix-before-initialize", () => {
+    const parrafo = window.Trix?.config.blockAttributes.p;
+    if (parrafo) {
+        parrafo.group = false;
+    }
+});
+
 const marcarFormato = (evento) => {
     requestAnimationFrame(() => {
         evento.target.toolbarElement?.querySelectorAll("button[data-trix-attribute]").forEach((boton) => {

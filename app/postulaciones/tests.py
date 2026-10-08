@@ -180,6 +180,17 @@ class CorreoTests(BaseCompartida):
         self.postulacion.refresh_from_db()
         self.assertTrue(self.postulacion.fue_notificada)
 
+    def test_el_texto_plano_conserva_los_parrafos(self):
+        self.client.post(
+            self.url("contactar"),
+            {
+                "correo": "ana@ejemplo.cl",
+                "asunto": "Reunión",
+                "contenido": "<p>Hola <strong>Ana</strong>:</p><p>Saludos,<br>Cecilia&nbsp;B.</p>",
+            },
+        )
+        self.assertEqual(mail.outbox[0].body, "Hola Ana:\n\nSaludos,\nCecilia B.")
+
     def test_si_el_correo_falla_no_marca_notificada(self):
         with mock.patch("postulaciones.correo.EmailMultiAlternatives.send", side_effect=OSError("red caída")):
             respuesta = self.client.post(
