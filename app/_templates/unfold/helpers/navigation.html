@@ -17,8 +17,10 @@
     <div id="nav-sidebar-apps" class="h-0 grow overflow-y-auto overflow-x-hidden px-3 pb-4 scrollbar-default-hover">
         {% for grupo in sidebar_navigation %}
             {% if grupo.items %}
-                <h2 id="grupo-menu-{{ forloop.counter }}" class="lateral-grupo">{{ grupo.title }}</h2>
-                <ul role="list" aria-labelledby="grupo-menu-{{ forloop.counter }}" class="flex flex-col gap-0.5">
+                {% if grupo.title %}
+                    <h2 id="grupo-menu-{{ forloop.counter }}" class="lateral-grupo">{{ grupo.title }}</h2>
+                {% endif %}
+                <ul role="list"{% if grupo.title %} aria-labelledby="grupo-menu-{{ forloop.counter }}"{% endif %} class="flex flex-col gap-0.5{% if not grupo.title %} mt-4{% endif %}">
                     {% for item in grupo.items %}
                         {% if item.has_permission %}
                             <li>

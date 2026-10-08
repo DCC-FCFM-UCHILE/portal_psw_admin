@@ -139,6 +139,11 @@ def entrada(titulo, icono, modelo):
 
 NAVEGACION = [
     {
+        "items": [
+            {"title": "Inicio", "icon": "home", "link": reverse_lazy("admin:index")},
+        ],
+    },
+    {
         "title": "Postulaciones",
         "items": [
             entrada("Postulaciones", "assignment", "applications.application"),
