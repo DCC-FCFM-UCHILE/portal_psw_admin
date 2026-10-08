@@ -1,0 +1,36 @@
+{% load static %}<!DOCTYPE html>
+{% url 'admin:index' as inicio %}
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="robots" content="noindex">
+        <title>{% block titulo %}Lo sentimos, hay un problema con el portal{% endblock %} · Portal PSW · Administración</title>
+        <link rel="icon" href="{% static 'images/favicon/favicon.ico' %}" sizes="any">
+        <link rel="stylesheet" href="{% static 'unfold/fonts/inter/styles.css' %}">
+        <link rel="stylesheet" href="{% static 'unfold/css/styles.css' %}">
+    </head>
+    <body class="flex min-h-screen flex-col bg-gris-claro font-sans text-gris-oscuro antialiased">
+        <header class="bg-gris-oscuro text-white">
+            <div class="mx-auto flex h-16 max-w-[900px] items-center px-4 sm:px-6">
+                <a href="{{ inicio|default:'/' }}" class="flex min-w-0 items-center gap-3 rounded-md">
+                    <img src="{% static 'images/logosimple_dcc.svg' %}" alt="" class="h-8 w-auto shrink-0">
+                    <span class="truncate text-sm font-bold">Portal PSW · Administración</span>
+                </a>
+            </div>
+        </header>
+        <main id="contenido" class="flex-1">
+            <div class="mx-auto max-w-[900px] px-4 py-16 sm:px-6">
+                <h1 class="titulo-pagina">{% block titulo_h1 %}Lo sentimos, hay un problema con el portal{% endblock %}</h1>
+                <div class="mt-4 max-w-2xl space-y-3 text-gris-medio">
+                    {% block cuerpo %}{% endblock %}
+                </div>
+                <div class="mt-8 flex flex-wrap gap-3">
+                    {% block acciones %}
+                        <a href="{{ inicio|default:'/' }}" class="boton-primario">Ir al inicio</a>
+                    {% endblock %}
+                </div>
+            </div>
+        </main>
+    </body>
+</html>

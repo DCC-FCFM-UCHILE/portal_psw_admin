@@ -1,0 +1,9 @@
+{% extends "error_minimo.html" %}
+
+{% block titulo %}No pudimos guardar los cambios{% endblock %}
+{% block titulo_h1 %}No pudimos guardar los cambios{% endblock %}
+{% block cuerpo %}
+    <p>Por seguridad, cada formulario va acompañado de un dato que el navegador guarda al abrir la página. Esta vez no llegó o ya no era válido, y los cambios no quedaron registrados.</p>
+    <p>Suele pasar cuando la página estuvo abierta mucho rato, cuando la sesión se cerró en otra pestaña o cuando el navegador bloquea las cookies de este sitio.</p>
+    <p>Vuelve a la página anterior, recárgala y guarda de nuevo.</p>
+{% endblock %}
