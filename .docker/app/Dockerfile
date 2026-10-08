@@ -1,4 +1,4 @@
-FROM python:3.12.7-bookworm AS base
+FROM python:3.12.15-bookworm AS base
 
 WORKDIR /app
 
@@ -11,7 +11,7 @@ RUN mkdir -p /static /logs /media /backup
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     gettext \
-    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \
     && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
