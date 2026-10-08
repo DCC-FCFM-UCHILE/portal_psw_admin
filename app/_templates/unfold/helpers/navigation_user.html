@@ -12,7 +12,7 @@
         <span class="material-symbols-outlined ml-auto shrink-0" aria-hidden="true">unfold_more</span>
     </button>
 
-    <div id="menu-cuenta" class="absolute inset-x-3 bottom-full z-50 mb-2 flex flex-col rounded-lg border border-base-200 bg-white py-1 text-sm text-gris-oscuro shadow-lg dark:border-base-700 dark:bg-base-800 dark:text-base-200" x-cloak x-show="menuCuenta" x-transition>
+    <div id="menu-cuenta" class="origin-bottom absolute inset-x-3 bottom-full z-50 mb-2 flex flex-col rounded-lg border border-base-200 bg-white py-1 text-sm text-gris-oscuro shadow-lg dark:border-base-700 dark:bg-base-800 dark:text-base-200" x-cloak x-show="menuCuenta" x-transition:enter="emergente-entra" x-transition:enter-start="emergente-fuera" x-transition:enter-end="" x-transition:leave="emergente-sale" x-transition:leave-start="" x-transition:leave-end="emergente-fuera">
         {% include "unfold/helpers/theme_switch.html" %}
         {% include "unfold/helpers/account_links.html" %}
     </div>

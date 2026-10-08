@@ -24,6 +24,11 @@
 
   --color-velo: rgb(0 0 0 / 0.32);
 
+  --ease-enfatizada-entrada: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --ease-enfatizada-salida: cubic-bezier(0.3, 0, 0.8, 0.15);
+  --ease-estandar-entrada: cubic-bezier(0, 0, 0, 1);
+  --ease-estandar-salida: cubic-bezier(0.3, 0, 1, 1);
+
   --animate-salida: desvanecer-saliente 140ms var(--ease-in) both;
   --animate-entrada: desvanecer-entrante 220ms var(--ease-out) both;
 
@@ -60,6 +65,62 @@ html[data-arranque="lateral-cerrada"] .envoltura-lateral {
 .envoltura-lateral,
 .envoltura-lateral #nav-sidebar {
   width: var(--ancho-lateral, 288px);
+}
+
+@layer base {
+  :root {
+    --duracion-capa-entrada: 300ms;
+    --duracion-capa-salida: 200ms;
+    --duracion-emergente-entrada: 150ms;
+    --duracion-emergente-salida: 100ms;
+  }
+}
+
+.capa-entra {
+  transition-duration: var(--duracion-capa-entrada);
+  transition-timing-function: var(--ease-enfatizada-entrada);
+}
+
+.capa-sale {
+  transition-duration: var(--duracion-capa-salida);
+  transition-timing-function: var(--ease-enfatizada-salida);
+}
+
+:is(.capa-entra, .capa-sale) {
+  transition-property: opacity, translate;
+}
+
+.capa-fuera {
+  opacity: 0;
+  translate: 0 0.5rem;
+}
+
+.capa-fuera-lateral {
+  opacity: 0;
+  translate: 1rem 0;
+}
+
+.velo-fuera {
+  opacity: 0;
+}
+
+.emergente-entra {
+  transition: opacity var(--duracion-emergente-entrada) var(--ease-estandar-entrada), scale var(--duracion-emergente-entrada) var(--ease-estandar-entrada);
+}
+
+.emergente-sale {
+  transition: opacity var(--duracion-emergente-salida) var(--ease-estandar-salida), scale var(--duracion-emergente-salida) var(--ease-estandar-salida);
+}
+
+.emergente-fuera {
+  opacity: 0;
+  scale: 0.95;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :is(.capa-entra, .capa-sale, .emergente-entra, .emergente-sale) {
+    transition: none;
+  }
 }
 
 html.en-transicion #nav-sidebar { view-transition-name: lateral; }

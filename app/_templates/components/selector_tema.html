@@ -4,7 +4,7 @@
         <span class="material-symbols-outlined hidden dark:inline" aria-hidden="true">dark_mode</span>
         <span class="sr-only">Tema</span>
     </button>
-    <div id="panel-tema" class="panel-tema z-50" hidden x-bind:hidden="!abierto">
+    <div id="panel-tema" class="panel-tema z-50 origin-top-right" x-show="abierto" x-transition:enter="emergente-entra" x-transition:enter-start="emergente-fuera" x-transition:enter-end="" x-transition:leave="emergente-sale" x-transition:leave-start="" x-transition:leave-end="emergente-fuera">
         {% include "unfold/helpers/theme_switch.html" %}
     </div>
 </div>

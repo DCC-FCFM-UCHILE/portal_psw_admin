@@ -17,11 +17,11 @@
                             </button>
 
                             <template x-teleport="body">
-                                <nav class="bg-white border border-base-200 flex flex-col py-1 rounded-default shadow-lg top-7 z-50 w-56 dark:bg-base-800 dark:border-base-700 *:opacity-50 *:[&[href]]:opacity-100 *:flex *:items-center *:gap-2 *:mx-1 *:px-3 *:py-2 *:max-h-[30px] *:truncate *:rounded-default *:hover:bg-base-100 *:dark:hover:bg-base-700 *:dark:hover:text-base-200"
+                                <nav class="origin-top-right bg-white border border-base-200 flex flex-col py-1 rounded-default shadow-lg top-7 z-50 w-56 dark:bg-base-800 dark:border-base-700 *:opacity-50 *:[&[href]]:opacity-100 *:flex *:items-center *:gap-2 *:mx-1 *:px-3 *:py-2 *:max-h-[30px] *:truncate *:rounded-default *:hover:bg-base-100 *:dark:hover:bg-base-700 *:dark:hover:text-base-200"
                                      id="related-widget-wrapper-{{ name }}"
                                      aria-label="Acciones de {{ model }}"
                                      x-cloak
-                                     x-transition
+                                     x-transition:enter="emergente-entra" x-transition:enter-start="emergente-fuera" x-transition:enter-end="" x-transition:leave="emergente-sale" x-transition:leave-start="" x-transition:leave-end="emergente-fuera"
                                      x-bind="menu"
                                      x-anchor.bottom-end.offset.4="$refs.disparador">
                                     {% if can_change_related %}
