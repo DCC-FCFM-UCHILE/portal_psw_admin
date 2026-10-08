@@ -22,6 +22,8 @@
 
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 
+  --color-velo: rgb(0 0 0 / 0.32);
+
   --animate-salida: desvanecer-saliente 140ms var(--ease-in) both;
   --animate-entrada: desvanecer-entrante 220ms var(--ease-out) both;
 
