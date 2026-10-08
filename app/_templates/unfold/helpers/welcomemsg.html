@@ -2,7 +2,7 @@
 
 <div class="flex min-w-0 grow items-center gap-2">
     {% if is_nav_sidebar_enabled and not is_popup %}
-        <button type="button" id="alternar-menu" class="flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-md text-gris-medio hover:bg-base-100 hover:text-gris-oscuro dark:text-base-300 dark:hover:bg-base-800" x-on:click="sidebarToggle(); if (sidebarOpen && window.innerWidth < 1280) $nextTick(() => document.getElementById('cerrar-menu')?.focus())" aria-controls="nav-sidebar" x-bind:aria-expanded="sidebarOpen.toString()">
+        <button type="button" id="alternar-menu" class="flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-md text-gris-medio hover:bg-base-100 hover:text-gris-oscuro dark:text-base-300 dark:hover:bg-base-800" x-on:click="sidebarToggle(); if (sidebarOpen && esCajon) $nextTick(() => document.getElementById('cerrar-menu')?.focus())" aria-controls="nav-sidebar" x-bind:aria-expanded="sidebarOpen.toString()">
             <span class="material-symbols-outlined" aria-hidden="true">menu</span>
             <span class="sr-only">Menú principal</span>
         </button>

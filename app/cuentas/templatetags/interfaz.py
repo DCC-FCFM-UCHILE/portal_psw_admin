@@ -4,6 +4,7 @@ from functools import lru_cache
 
 from django import template
 from django.conf import settings
+from django.contrib.admin.views.main import PAGE_VAR
 from django.template.loader import render_to_string
 from django.urls import NoReverseMatch, reverse
 from django.utils.text import capfirst
@@ -70,3 +71,8 @@ def url_siluetas():
     except Exception:
         logger.exception("No se pudo armar la dirección de las siluetas")
         return ""
+
+
+@register.simple_tag
+def url_pagina(cl, numero):
+    return cl.get_query_string({PAGE_VAR: numero})

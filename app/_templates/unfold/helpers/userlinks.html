@@ -13,7 +13,7 @@
         {% endif %}
 
         {% if sidebar_show_search %}
-            <button type="button" class="flex min-h-10 cursor-pointer items-center gap-2 whitespace-nowrap rounded-lg border border-borde bg-gris-claro px-3 text-sm text-gris-medio hover:border-rojo 2xl:w-80 dark:border-[#7B8494] dark:bg-base-950 dark:text-base-300" x-on:click="$dispatch('opencommand')">
+            <button type="button" id="abrir-busqueda" class="flex min-h-10 cursor-pointer items-center gap-2 whitespace-nowrap rounded-lg border border-borde bg-gris-claro px-3 text-sm text-gris-medio hover:border-rojo 2xl:w-80 dark:border-[#7B8494] dark:bg-base-950 dark:text-base-300" x-on:click="$dispatch('opencommand')">
                 <span class="material-symbols-outlined md-18" aria-hidden="true">search</span>
                 <span class="hidden 2xl:inline">Buscar postulación, organización, RUT…</span>
                 <span class="hidden sm:inline 2xl:hidden">Buscar</span>

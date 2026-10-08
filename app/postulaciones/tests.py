@@ -9,6 +9,7 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from convenios.models import RulesApplications
+from cuentas.forms import NuevaClaveForm, RestablecerForm
 from postulaciones import tablas_compartidas
 from postulaciones.models import Announcement, Application, ApprovedProject, Candidate, Organization, Unit
 
@@ -241,3 +242,10 @@ class RestablecerTests(TestCase):
 
     def test_el_formulario_responde(self):
         self.assertEqual(self.client.get(reverse("admin_password_reset")).status_code, 200)
+
+    def test_los_campos_llevan_el_estilo_de_unfold(self):
+        usuario = User.objects.create_user("ana", "ana@dcc.uchile.cl", "clave-de-prueba")
+        for formulario in [RestablecerForm(), NuevaClaveForm(usuario)]:
+            for campo in formulario:
+                with self.subTest(campo=campo.name):
+                    self.assertIn("border-base-200", campo.field.widget.attrs["class"])

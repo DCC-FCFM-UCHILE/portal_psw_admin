@@ -5,6 +5,8 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_control
 from django.views.generic import TemplateView
 
+from cuentas.forms import NuevaClaveForm, RestablecerForm
+
 
 class ConSitio:
     def get_context_data(self, **kwargs):
@@ -12,6 +14,7 @@ class ConSitio:
 
 
 class RestablecerView(ConSitio, views.PasswordResetView):
+    form_class = RestablecerForm
     success_url = reverse_lazy("password_reset_done")
 
 
@@ -20,6 +23,7 @@ class RestablecerEnviadoView(ConSitio, views.PasswordResetDoneView):
 
 
 class RestablecerConfirmarView(ConSitio, views.PasswordResetConfirmView):
+    form_class = NuevaClaveForm
     success_url = reverse_lazy("password_reset_complete")
 
 

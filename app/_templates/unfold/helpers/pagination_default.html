@@ -1,0 +1,29 @@
+{% load interfaz %}
+
+{% if pagination_required %}
+    <div class="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 py-2 pr-2">
+        {% for i in page_range %}
+            {% if i == cl.paginator.ELLIPSIS %}
+                <span class="inline-flex min-h-6 min-w-6 items-center justify-center">…</span>
+            {% elif i == cl.page_num %}
+                {% include "unfold/helpers/pagination_current_item.html" with number=i %}
+            {% else %}
+                <a href="{% url_pagina cl i %}" class="inline-flex min-h-6 min-w-6 items-center justify-center rounded hover:text-rojo dark:hover:text-oscuro-acento">{{ i }}</a>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endif %}
+
+<div class="shrink-0 py-4">
+    {% if pagination_required %}
+        -
+    {% endif %}
+
+    {{ cl.result_count }}
+
+    {% if cl.result_count == 1 %}
+        {{ cl.opts.verbose_name }}
+    {% else %}
+        {{ cl.opts.verbose_name_plural }}
+    {% endif %}
+</div>

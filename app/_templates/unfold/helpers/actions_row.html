@@ -14,18 +14,16 @@
                 {% endfor %}
 
                 {% if actions|has_row_action_in_dropdown %}
-                    <div class="group/action leading-none relative" x-data="{ openActionsId{{ action_id }}: false }">
-                        <button type="button" x-ref="rowDropdown{{ action_id }}" class="cursor-pointer flex h-7 select-none -my-1 items-center justify-center rounded-default text-gris-medio w-7 group-hover/action:bg-base-100 group-hover/action:text-gris-oscuro dark:text-oscuro-suave dark:group-hover/action:bg-base-800 dark:group-hover/action:text-white"
-                              aria-controls="acciones-fila-{{ action_id }}" aria-expanded="false" x-bind:aria-expanded="openActionsId{{ action_id }}.toString()"
-                              x-on:click="openActionsId{{ action_id }} = !openActionsId{{ action_id }}"
-                              x-on:keydown.escape="openActionsId{{ action_id }} = false"
-                              x-bind:class="{'bg-base-100 text-gris-oscuro dark:bg-base-800 dark:text-white': openActionsId{{ action_id }} }">
+                    <div class="group/action leading-none relative" x-data="menuEmergente">
+                        <button type="button" x-ref="disparador" x-bind="disparador" class="cursor-pointer flex h-7 select-none -my-1 items-center justify-center rounded-default text-gris-medio w-7 group-hover/action:bg-base-100 group-hover/action:text-gris-oscuro dark:text-oscuro-suave dark:group-hover/action:bg-base-800 dark:group-hover/action:text-white"
+                              aria-controls="acciones-fila-{{ action_id }}" aria-expanded="false"
+                              x-bind:class="{'bg-base-100 text-gris-oscuro dark:bg-base-800 dark:text-white': abierto }">
                             <span class="material-symbols-outlined md-18" aria-hidden="true">more_horiz</span>
                             <span class="sr-only">Acciones de «{{ result.instance }}»</span>
                         </button>
 
                         <template x-teleport="body">
-                            <nav id="acciones-fila-{{ action_id }}" aria-label="Acciones de «{{ result.instance }}»" x-on:keydown.escape="openActionsId{{ action_id }} = false; $refs.rowDropdown{{ action_id }}.focus()" x-anchor.bottom-end.offset.4="$refs.rowDropdown{{ action_id }}" class="bg-white border border-base-200 flex flex-col py-1 rounded-default shadow-lg text-sm top-7 z-50 w-48 dark:bg-base-800 dark:border-base-700" x-cloak x-show="openActionsId{{ action_id }}" x-transition x-on:click.outside="openActionsId{{ action_id }} = false">
+                            <nav id="acciones-fila-{{ action_id }}" aria-label="Acciones de «{{ result.instance }}»" x-bind="menu" x-anchor.bottom-end.offset.4="$refs.disparador" class="bg-white border border-base-200 flex flex-col py-1 rounded-default shadow-lg text-sm top-7 z-50 w-48 dark:bg-base-800 dark:border-base-700" x-cloak x-transition>
                                 {% for action in actions %}
                                     {% if action.display_in_dropdown %}
                                         <a href="{% url action.raw_path instance_pk %}"

@@ -1,7 +1,7 @@
 {% load i18n %}
 
 {% if request.user.is_staff %}
-    <div class="flex flex-col fixed inset-0 p-4 lg:p-32 z-[1000]" x-data="searchCommand()" x-show="openCommandResults" x-transition x-transition:leave.duration.0ms x-cloak x-on:opencommand.window="handleOpen()" x-on:keydown.window="handleShortcut($event)" x-trap.noautofocus.noscroll="openCommandResults" role="dialog" aria-modal="true" aria-label="Buscar">
+    <div class="flex flex-col fixed inset-0 p-4 lg:p-32 z-[1000]" x-data="searchCommand()" x-show="openCommandResults" x-transition x-transition:leave.duration.0ms x-cloak x-on:opencommand.window="handleOpen()" x-on:keydown.window="handleShortcut($event)" x-trap.noautofocus.noscroll.noreturn="openCommandResults" x-init="let origen = null; $watch('openCommandResults', (abierto) => { if (abierto) { origen = document.activeElement; if (esCajon && sidebarOpen === true) { sidebarOpen = false; origen = document.getElementById('alternar-menu'); } return; } $nextTick(() => ((origen && origen !== document.body && origen.checkVisibility?.()) ? origen : document.getElementById('abrir-busqueda'))?.focus()); })" role="dialog" aria-modal="true" aria-label="Buscar">
         <div class="bg-base-50 dark:bg-base-800 flex flex-col max-w-3xl min-h-0 mx-auto overflow-hidden rounded-default shadow-lg w-full" x-on:click.outside="handleOutsideClick()">
             <div class="flex flex-row items-center px-4 w-full">
                 <span id="command-submit" class="group flex items-center" aria-hidden="true">
@@ -19,7 +19,7 @@
                     type="search"
                     placeholder="{% trans "Type to search" %}"
                     aria-label="Buscar postulaciones, organizaciones, postulantes y más"
-                    class="[&::-webkit-search-cancel-button]:hidden font-medium grow px-2 py-4 placeholder-text-subtle text-important focus:outline-hidden"
+                    class="[&::-webkit-search-cancel-button]:hidden font-medium grow min-w-0 px-2 py-4 placeholder-text-subtle text-important focus:outline-hidden"
                     name="s"
                     id="search-input-command"
                     x-ref="searchInputCommand"
@@ -38,7 +38,7 @@
                     hx-select-oob="#command-results-note"
                     hx-target="#command-results">
 
-                <button type="button" class="flex size-10 cursor-pointer items-center justify-center rounded-md text-icon-action" x-on:click="handleClear()" aria-label="Cerrar la búsqueda">
+                <button type="button" class="flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-md text-icon-action" x-on:click="handleClear()" aria-label="Cerrar la búsqueda">
                     <span class="material-symbols-outlined" aria-hidden="true">close</span>
                 </button>
             </div>

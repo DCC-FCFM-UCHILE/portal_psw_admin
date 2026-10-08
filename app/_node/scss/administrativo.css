@@ -123,13 +123,13 @@ html.cargando-vista #content > :not(.silueta-vista) {
   outline-color: #fff;
 }
 
-:where(input:not([type="checkbox"], [type="radio"], [type="hidden"]), select, textarea).border-base-200,
+:where(input:not([type="checkbox"], [type="radio"], [type="hidden"]), select, textarea).border-base-200:not([aria-invalid="true"]),
 :where(input[type="checkbox"], input[type="radio"]).border-base-300,
 .border-base-200:has(> input[type="file"]) {
   border-color: var(--color-borde);
 }
 
-.dark :where(input:not([type="checkbox"], [type="radio"], [type="hidden"]), select, textarea, input[type="checkbox"], input[type="radio"]),
+.dark :where(input:not([type="checkbox"], [type="radio"], [type="hidden"]), select, textarea, input[type="checkbox"], input[type="radio"]):not([aria-invalid="true"]),
 .dark .border-base-200:has(> input[type="file"]) {
   border-color: var(--color-oscuro-borde);
 }
@@ -169,8 +169,10 @@ html.cargando-vista #content > :not(.silueta-vista) {
   }
 }
 
-.changelist-actions :is(select, button, a):focus-visible {
-  outline-color: var(--color-white) !important;
+@layer utilities {
+  .changelist-actions :is(select, button, a):focus-visible {
+    outline-color: var(--color-white) !important;
+  }
 }
 
 html {
@@ -178,8 +180,13 @@ html {
 }
 
 @media (min-width: 1024px) {
-  html:has(#changelist) {
+  html:has(#changelist),
+  html:has([name="_save"]) {
     scroll-padding-bottom: 5rem;
+  }
+
+  html:has(#changelist input.action-select:checked) {
+    scroll-padding-bottom: 9rem;
   }
 }
 
@@ -399,9 +406,6 @@ input[type="checkbox"].appearance-none.rounded-full {
   }
   .lista-accesos > li > a {
     @apply flex min-h-11 items-center gap-3 px-5 py-2.5 text-sm font-medium text-gris-oscuro transition-colors hover:bg-gris-claro hover:text-rojo dark:text-white dark:hover:bg-base-800 dark:hover:text-red-300;
-  }
-  .aviso {
-    @apply rounded-lg border-l-4 border-gris-medio bg-gris-claro px-4 py-3 text-sm text-gris-oscuro;
   }
 }
 
