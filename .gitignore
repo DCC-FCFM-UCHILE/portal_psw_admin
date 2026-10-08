@@ -7,6 +7,11 @@ app/_fixtures/*
 
 app/_staticfiles/*
 !app/_staticfiles/.gitkeep
+!app/_staticfiles/js/
+!app/_staticfiles/images/
+app/_node/scss/unfold.css
+
+node_modules
 
 venv
 .venv

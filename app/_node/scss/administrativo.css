@@ -1,0 +1,390 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+@import "./unfold.css";
+
+@theme {
+  --color-rojo: #B71C1C;
+  --color-rojo-oscuro: #8B1515;
+  --color-rojo-claro: #f87171;
+  --color-borde: #8A8A8A;
+  --color-gris-oscuro: #333333;
+  --color-gris-medio: #646E7A;
+  --color-gris-claro: #f4f6fa;
+
+  --color-oscuro-fondo: #15171b;
+  --color-oscuro-superficie: #1d2025;
+  --color-oscuro-elevada: #2b2f36;
+  --color-oscuro-cabecera: #101114;
+  --color-oscuro-texto: #edeff3;
+  --color-oscuro-suave: #9aa1ac;
+  --color-oscuro-borde: #7b8494;
+  --color-oscuro-acento: #fca5a5;
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  --animate-salida: desvanecer-saliente 140ms var(--ease-in) both;
+  --animate-entrada: desvanecer-entrante 220ms var(--ease-out) both;
+
+  @keyframes desvanecer-saliente {
+    to { opacity: 0; transform: translateY(-6px); }
+  }
+
+  @keyframes desvanecer-entrante {
+    from { opacity: 0; transform: translateY(8px); }
+  }
+}
+
+@source "../../_templates";
+@source "../../core";
+@source "../../cuentas";
+@source "../../convenios";
+@source "../../postulaciones";
+@source "../../_staticfiles/js";
+
+html {
+  overflow-y: scroll;
+  color-scheme: light;
+
+  @variant dark {
+    color-scheme: dark;
+  }
+}
+
+html.en-transicion #nav-sidebar { view-transition-name: lateral; }
+html.en-transicion #cabecera { view-transition-name: cabecera; }
+html.en-transicion #contenido { view-transition-name: contenido; }
+
+::view-transition-old(contenido) {
+  animation: var(--animate-salida);
+}
+
+::view-transition-new(contenido) {
+  animation: var(--animate-entrada);
+}
+
+html.vista-saliente #contenido {
+  animation: var(--animate-salida);
+}
+
+html.vista-entrante #contenido {
+  animation: var(--animate-entrada);
+}
+
+#avisos {
+  animation: var(--animate-entrada);
+}
+
+:where(a, button, summary, [tabindex]:not([tabindex="-1"]), input[type="checkbox"], input[type="radio"]):focus-visible {
+  outline: 2px solid var(--color-rojo);
+  outline-offset: 2px;
+}
+
+.dark :where(a, button, summary, [tabindex]:not([tabindex="-1"]), input[type="checkbox"], input[type="radio"]):focus-visible,
+:where(.lateral, .barra-oscura) :where(a, button, summary, [tabindex]:not([tabindex="-1"])):focus-visible {
+  outline-color: #fff;
+}
+
+:where(input:not([type="checkbox"], [type="radio"], [type="hidden"]), select, textarea).border-base-200,
+:where(input[type="checkbox"], input[type="radio"]).border-base-300,
+.border-base-200:has(> input[type="file"]) {
+  border-color: var(--color-borde);
+}
+
+.dark :where(input:not([type="checkbox"], [type="radio"], [type="hidden"]), select, textarea, input[type="checkbox"], input[type="radio"]),
+.dark .border-base-200:has(> input[type="file"]) {
+  border-color: var(--color-oscuro-borde);
+}
+
+.dark :is(input, select, textarea, [contenteditable="true"]):is(:focus, :focus-visible) {
+  outline-color: var(--color-white);
+}
+
+@layer base {
+  trix-editor {
+    border-color: var(--color-borde) !important;
+
+    @variant dark {
+      border-color: var(--color-oscuro-borde) !important;
+    }
+  }
+
+  .errors trix-editor {
+    border-color: var(--color-rojo) !important;
+
+    @variant dark {
+      border-color: var(--color-red-400) !important;
+    }
+  }
+
+  .dark trix-editor:focus {
+    outline-color: var(--color-white) !important;
+  }
+}
+
+#menu-cuenta :where(a, button, input):focus-visible,
+.panel-tema :where(a, button, input):focus-visible {
+  outline-color: var(--color-rojo);
+
+  @variant dark {
+    outline-color: var(--color-white);
+  }
+}
+
+.changelist-actions :is(select, button, a):focus-visible {
+  outline-color: var(--color-white) !important;
+}
+
+html {
+  scroll-padding-top: 5rem;
+}
+
+@media (min-width: 1024px) {
+  html:has(#changelist) {
+    scroll-padding-bottom: 5rem;
+  }
+}
+
+html:has(input.action-select:checked) {
+  scroll-padding-bottom: 8rem;
+}
+
+body:has(input.action-select:checked) {
+  padding-bottom: 8rem;
+}
+
+@media (min-width: 1024px) {
+  body:has(input.action-select:checked) .lg\:sticky.lg\:bottom-0 {
+    bottom: 64px;
+  }
+}
+
+fieldset {
+  min-inline-size: 0;
+}
+
+.campo-archivo-unfold,
+.buscador-listado {
+  border-color: var(--color-borde) !important;
+
+  @variant dark {
+    border-color: var(--color-oscuro-borde) !important;
+  }
+}
+
+input[type="checkbox"].appearance-none.rounded-full {
+  background-color: var(--color-borde);
+
+  &::after {
+    background-color: var(--color-white);
+  }
+
+  &:checked {
+    background-color: var(--color-green-700);
+  }
+
+  @variant dark {
+    background-color: var(--color-oscuro-borde);
+
+    &:checked {
+      background-color: var(--color-green-600);
+    }
+  }
+}
+
+.selector-filter input:focus-visible {
+  outline: 2px solid var(--color-rojo);
+  outline-offset: 2px;
+
+  @variant dark {
+    outline-color: var(--color-white);
+  }
+}
+
+.campo-archivo-unfold:has(input[type="file"]:focus-visible) {
+  outline: 2px solid var(--color-rojo);
+  outline-offset: 2px;
+
+  @variant dark {
+    outline-color: var(--color-white);
+  }
+}
+
+#contenido:focus,
+#avisos:focus,
+#avisos:focus-visible {
+  outline: none;
+}
+
+.salto {
+  position: fixed;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 100;
+  translate: 0 -200%;
+}
+
+.salto:focus {
+  translate: none;
+}
+
+.pista-teclado {
+  display: none;
+}
+
+@media (hover: hover) and (pointer: fine) and (min-width: 40rem) {
+  .pista-teclado:not([hidden]) {
+    display: inline;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #avisos,
+  html.vista-saliente #contenido,
+  html.vista-entrante #contenido {
+    animation: none;
+  }
+
+  #barra-progreso {
+    transition: none;
+  }
+
+  body.navegando #barra-progreso {
+    animation: none;
+    width: 60%;
+  }
+}
+
+@layer components {
+  .lateral {
+    @apply bg-gris-oscuro text-gray-300 dark:bg-oscuro-cabecera;
+  }
+  .lateral-grupo {
+    @apply mx-3 mb-1 mt-5 flex items-center gap-2 px-3 text-[0.6875rem] font-bold uppercase tracking-widest text-[#B0B6BF];
+  }
+  .lateral-enlace {
+    @apply flex min-h-10 items-center gap-3 rounded-md border-l-4 border-transparent px-3 py-2 text-sm text-gray-300 transition-[color,background-color] hover:bg-white/5 hover:text-white;
+  }
+  .lateral-enlace[aria-current="page"] {
+    @apply border-rojo bg-white/10 font-semibold text-white;
+  }
+  .lateral-boton {
+    @apply flex min-h-10 w-full cursor-pointer items-center gap-3 rounded-md px-3 py-2 text-left text-sm text-gray-300 transition-[color,background-color] hover:bg-white/5 hover:text-white;
+  }
+  @media (forced-colors: active) {
+    .lateral-enlace[aria-current="page"] {
+      outline: 2px solid CanvasText;
+      outline-offset: -2px;
+    }
+  }
+  .boton-cabecera {
+    @apply inline-flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-md text-gray-300 transition-[color,background-color] hover:bg-white/5 hover:text-white;
+  }
+  .panel-tema {
+    @apply absolute right-0 top-full mt-2 w-56 rounded-lg border border-base-200 bg-white p-1.5 text-sm text-gris-oscuro shadow-lg dark:border-oscuro-elevada dark:bg-oscuro-superficie dark:text-oscuro-texto;
+  }
+  .grupo-tema legend {
+    @apply px-2.5 pb-1 pt-1.5 text-xs font-bold uppercase tracking-wider text-gris-medio dark:text-oscuro-suave;
+  }
+  #menu-cuenta .grupo-tema {
+    @apply mx-1 mb-1 border-b border-base-200 pb-1 dark:border-oscuro-elevada;
+  }
+  .opcion-tema {
+    @apply flex min-h-11 cursor-pointer items-center gap-3 rounded-md px-2.5 transition-colors hover:bg-base-100 has-checked:font-semibold has-checked:text-rojo dark:hover:bg-oscuro-elevada dark:has-checked:text-oscuro-acento;
+  }
+  .opcion-tema input {
+    @apply size-4 shrink-0 cursor-pointer accent-rojo dark:accent-oscuro-acento;
+  }
+  .avatar-iniciales {
+    @apply flex size-8 shrink-0 items-center justify-center rounded-full border border-red-200 bg-red-50 text-xs font-bold text-rojo dark:border-red-900 dark:bg-red-950 dark:text-red-300;
+  }
+  .titulo-pagina {
+    @apply text-2xl font-extrabold tracking-tight text-gris-oscuro dark:text-white;
+  }
+  .bajada {
+    @apply mt-1 text-sm text-gris-medio dark:text-oscuro-suave;
+  }
+  .titulo-seccion {
+    @apply text-sm font-bold text-gris-oscuro dark:text-white;
+  }
+  .enlace {
+    @apply rounded font-medium text-rojo underline underline-offset-2 hover:text-rojo-oscuro dark:text-red-300 dark:hover:text-red-200;
+  }
+  .enlace-accion {
+    @apply inline-flex min-h-6 flex-wrap items-center gap-2 rounded py-1.5 font-medium text-rojo hover:underline dark:text-red-300;
+  }
+  .tarjeta {
+    @apply rounded-xl border border-base-200 bg-white shadow-xs dark:border-base-800 dark:bg-base-900;
+  }
+  .tarjeta-cabecera {
+    @apply flex flex-wrap items-center justify-between gap-2 border-b border-base-200 px-5 py-4 dark:border-base-800;
+  }
+  .boton-primario {
+    @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-rojo px-4 py-2 text-sm font-semibold text-white shadow-sm transition-[color,background-color,transform] hover:bg-rojo-oscuro active:scale-95 motion-reduce:active:scale-100;
+  }
+  .boton-secundario {
+    @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border border-borde bg-white px-4 py-2 text-sm font-medium text-gris-oscuro transition-[color,background-color,border-color,transform] hover:bg-gray-50 active:scale-95 motion-reduce:active:scale-100 dark:border-oscuro-borde dark:bg-base-900 dark:text-white dark:hover:bg-base-800;
+  }
+  .indicador {
+    @apply flex items-center justify-between gap-4 rounded-xl border border-base-200 bg-white px-5 py-4 shadow-xs transition-[border-color,transform] hover:-translate-y-px hover:border-rojo motion-reduce:hover:translate-y-0 dark:border-base-800 dark:bg-base-900;
+  }
+  .indicador-etiqueta {
+    @apply text-[0.6875rem] font-bold uppercase tracking-wider text-gris-medio dark:text-oscuro-suave;
+  }
+  .indicador-valor {
+    @apply mt-1 text-2xl font-extrabold tabular-nums text-gris-oscuro dark:text-white;
+  }
+  .indicador-icono {
+    @apply flex size-10 shrink-0 items-center justify-center rounded-full bg-red-50 text-rojo dark:bg-red-950 dark:text-red-300;
+  }
+  .filtro-estado {
+    @apply inline-flex min-h-8 items-center gap-2 rounded-full border border-borde bg-white px-3 py-1 text-xs font-semibold text-gris-oscuro transition-[color,background-color,border-color] hover:border-rojo hover:text-rojo dark:border-oscuro-borde dark:bg-base-900 dark:text-white;
+  }
+  .filtro-estado[aria-current="page"] {
+    @apply border-rojo bg-rojo text-white hover:text-white dark:border-rojo dark:bg-rojo;
+  }
+  .filtro-estado-cantidad {
+    @apply rounded-full bg-black/5 px-1.5 tabular-nums dark:bg-white/10;
+  }
+  .filtro-estado[aria-current="page"] .filtro-estado-cantidad {
+    @apply bg-white/20;
+  }
+  .linea-tiempo {
+    @apply divide-y divide-base-200 dark:divide-base-800;
+  }
+  .linea-tiempo > li {
+    @apply flex gap-3 px-5 py-3;
+  }
+  .linea-tiempo-punto {
+    @apply mt-1.5 size-2 shrink-0 rounded-full bg-rojo;
+  }
+  .lista-accesos > li > a {
+    @apply flex min-h-11 items-center gap-3 px-5 py-2.5 text-sm font-medium text-gris-oscuro transition-colors hover:bg-gris-claro hover:text-rojo dark:text-white dark:hover:bg-base-800 dark:hover:text-red-300;
+  }
+  .aviso {
+    @apply rounded-lg border-l-4 border-gris-medio bg-gris-claro px-4 py-3 text-sm text-gris-oscuro;
+  }
+}
+
+@layer utilities {
+  #barra-progreso {
+    @apply bg-rojo-claro shadow-[0_0_8px_var(--color-rojo-claro)];
+    transition: opacity 150ms var(--ease-out);
+  }
+  body.navegando #barra-progreso {
+    opacity: 1;
+    transition: none;
+    animation: avance-carga 8s cubic-bezier(0.05, 0.7, 0.1, 1) forwards;
+  }
+}
+
+@keyframes avance-carga {
+  from { width: 15%; }
+  to { width: 90%; }
+}
+
+@media (forced-colors: active) {
+  #barra-progreso {
+    forced-color-adjust: none;
+    background-color: Highlight;
+  }
+}

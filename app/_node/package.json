@@ -1,0 +1,18 @@
+{
+    "devDependencies": {
+        "@tailwindcss/cli": "^4.0.0",
+        "lightningcss": "^1.32.0",
+        "nodemon": "^3.1.14",
+        "@tailwindcss/typography": "^0.5.16"
+    },
+    "name": "portal-administrativo",
+    "version": "1.0.0",
+    "main": "",
+    "scripts": {
+        "tailwind-build": "node preparar-unfold.mjs && npx @tailwindcss/cli -i ./scss/administrativo.css -o ../_staticfiles/unfold/css/styles.css && node aplanar-css.mjs ../_staticfiles/unfold/css/styles.css",
+        "tailwind-prod": "node preparar-unfold.mjs && npx @tailwindcss/cli -i ./scss/administrativo.css -o ../_staticfiles/unfold/css/styles.css && node aplanar-css.mjs ../_staticfiles/unfold/css/styles.css --minify"
+    },
+    "author": "Área de Desarrollo de Software",
+    "license": "UNLICENSED",
+    "description": ""
+}

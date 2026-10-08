@@ -19,6 +19,22 @@ services:
             - 5682:5678
         env_file: ./app/.env
 
+    tailwind:
+        container_name: portal-admin-tailwind
+        build:
+            context: ../
+            dockerfile: .docker/app/Dockerfile
+            target: develop
+        command: [ "sh", "-c", "npm install && npx -y nodemon -L --watch ../ --ignore ../_staticfiles/unfold/ --ignore scss/unfold.css --ext html,css,js,py --exec 'npm run tailwind-build'" ]
+        working_dir: /app/_node
+        tty: true
+        volumes:
+            - ../app/:/app/:cached
+            - /app/_node/node_modules/
+        restart: always
+        depends_on:
+            - django
+
 networks:
     default:
         name: ${RED_PUBLICO:-portal-publico-psw_default}
