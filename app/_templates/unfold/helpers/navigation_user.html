@@ -1,6 +1,6 @@
 {% load interfaz %}
 
-<div class="relative shrink-0 border-t border-white/10 p-3" x-data="{ menuCuenta: false }" x-on:keydown.escape.stop="if (menuCuenta) { menuCuenta = false; $refs.botonCuenta.focus() }" x-on:click.outside="menuCuenta = false" x-on:focusout="if ($event.relatedTarget && !$el.contains($event.relatedTarget)) menuCuenta = false">
+<div class="relative shrink-0 border-t border-white/10 p-3" x-data="{ menuCuenta: false }" x-on:keydown.escape="if (menuCuenta) { $event.stopPropagation(); menuCuenta = false; $refs.botonCuenta.focus() }" x-on:click.outside="menuCuenta = false" x-on:focusout="if ($event.relatedTarget && !$el.contains($event.relatedTarget)) menuCuenta = false">
 
     <button type="button" x-ref="botonCuenta" class="lateral-boton" aria-controls="menu-cuenta" x-bind:aria-expanded="menuCuenta.toString()" x-on:click="menuCuenta = !menuCuenta">
         <span class="flex size-8 shrink-0 items-center justify-center rounded-full border border-red-800 bg-red-950 text-xs font-bold text-red-300" aria-hidden="true">{{ request.user|iniciales }}</span>
