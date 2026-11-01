@@ -650,6 +650,17 @@ input[type="checkbox"].appearance-none.rounded-full {
   }
 }
 
+@media (width < 40rem) {
+  :is(input:not([type="checkbox"], [type="radio"], [type="file"], [type="hidden"], [type="submit"], [type="button"], [type="reset"], [type="range"], [type="color"]), select) {
+    font-size: 1rem;
+    line-height: 1.25rem;
+  }
+
+  textarea {
+    font-size: 1rem;
+  }
+}
+
 .selector-filter input:focus-visible {
   outline: 2px solid var(--color-rojo);
   outline-offset: 2px;
