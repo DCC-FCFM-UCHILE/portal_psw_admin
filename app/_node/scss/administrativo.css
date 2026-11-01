@@ -467,6 +467,12 @@ html:has(#listado[aria-busy="true"]) :is(#pie-listado, #conteo-cabecera) {
   @apply rounded font-medium text-rojo underline underline-offset-2 hover:text-rojo-oscuro dark:text-red-300 dark:hover:text-red-200;
 }
 
+@media (width >= 64rem) {
+  table.formset td.field-tabular:has(:is(input:not([type="checkbox"], [type="radio"], [type="hidden"]), select, textarea)) {
+    width: 43.25rem;
+  }
+}
+
 .dialogo-confirmar {
   position: fixed;
   inset: 0;
