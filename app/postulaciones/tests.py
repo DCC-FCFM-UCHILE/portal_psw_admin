@@ -1,5 +1,6 @@
 import datetime
 import re
+from pathlib import Path
 from types import SimpleNamespace
 from unittest import mock
 
@@ -7,6 +8,7 @@ from django.contrib import admin
 from django.contrib.admin.models import ADDITION, LogEntry
 from django.contrib.auth.models import Group, Permission, User
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.staticfiles import finders
 from django.core import mail
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -17,6 +19,8 @@ from django.utils import timezone
 from convenios.models import RulesApplications
 from core.politica import resumen
 from cuentas.forms import NuevaClaveForm, RestablecerForm
+from cuentas.iconos import FUENTE, iconos_posibles, iconos_recortados
+from cuentas.management.commands.recortar_iconos import ligaduras
 from cuentas.templatetags.interfaz import paginas_cercanas
 from postulaciones import correo, tablas_compartidas
 from postulaciones.models import Announcement, Application, ApprovedProject, Candidate, Member, Organization, Unit
@@ -796,7 +800,55 @@ class GuionesDeUnfoldTests(BaseCompartida):
                 respuesta = self.client.get(url)
                 self.assertNotContains(respuesta, "chart.js")
                 self.assertNotContains(respuesta, "alpine.sort.js")
+                self.assertNotContains(respuesta, "unfold/fonts/")
                 self.assertContains(respuesta, "alpine.focus.js")
+
+
+class IconosTests(BaseCompartida):
+    ICONO = re.compile(r'<[a-z]+[^>]*class="[^"]*\bmaterial-symbols-outlined\b[^"]*"[^>]*>([^<]*)<')
+    ETIQUETA = re.compile(r'<[a-z]+[^>]*class="[^"]*\bmaterial-symbols-outlined\b[^"]*"[^>]*>')
+
+    def iconos_en(self, respuesta):
+        html = respuesta.content.decode()
+        nombres = {nombre for contenido in self.ICONO.findall(html) for nombre in contenido.split()}
+        for etiqueta in self.ETIQUETA.findall(html):
+            nombres |= set(re.findall(r"'([a-z0-9_]+)'", etiqueta))
+        return nombres
+
+    def test_cada_icono_que_se_muestra_esta_en_la_fuente_recortada(self):
+        recortados = iconos_recortados()
+        unidad = self.postulacion.unidad
+        objetos = [self.postulacion, self.convocatoria, self.convocatoria.convenio, unidad, unidad.organizacion]
+        objetos += [self.postulacion.postulante, self.docente]
+        urls = [reverse("admin:index"), reverse("admin:password_change"), f"{reverse('admin:search')}?s=riego"]
+        for modelo in admin.site._registry:
+            urls += [reverse(f"admin:{modelo._meta.app_label}_{modelo._meta.model_name}_{vista}") for vista in ("changelist", "add")]
+        for objeto in objetos:
+            urls.append(reverse(f"admin:{objeto._meta.app_label}_{objeto._meta.model_name}_change", args=[objeto.pk]))
+        urls += [
+            reverse("admin:applications_application_notificar_correo", args=[self.postulacion.pk]),
+            reverse("admin:applications_application_delete", args=[self.postulacion.pk]),
+        ]
+        for url in urls:
+            with self.subTest(url=url):
+                self.assertEqual(self.iconos_en(self.client.get(url)) - recortados, set())
+        self.client.logout()
+        self.assertEqual(self.iconos_en(self.client.get(reverse("admin:login"))) - recortados, set())
+
+    def test_la_lista_de_iconos_esta_al_dia_con_el_codigo(self):
+        from fontTools.ttLib import TTFont
+
+        self.assertEqual(iconos_posibles() & ligaduras(TTFont(FUENTE)).keys(), iconos_recortados())
+
+    def test_los_iconos_que_pone_la_hoja_compilada_estan_en_la_fuente_recortada(self):
+        from fontTools.ttLib import TTFont
+
+        hoja = finders.find("unfold/css/styles.css")
+        if not hoja:
+            self.skipTest("falta compilar la hoja")
+        texto = Path(hoja).read_text(encoding="utf-8")
+        declarados = set(re.findall(r"""(?:content|--tw-content):\s*["']([a-z0-9_]+)["']""", texto))
+        self.assertEqual((declarados & ligaduras(TTFont(FUENTE)).keys()) - iconos_recortados(), set())
 
 
 class MenusDeFilaTests(BaseCompartida):
