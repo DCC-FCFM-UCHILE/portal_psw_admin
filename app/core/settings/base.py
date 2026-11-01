@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.forms",
+    "interfaz",
     "cuentas",
     "convenios",
     "postulaciones",
@@ -35,7 +36,7 @@ MIGRATION_MODULES = {
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "core.politica.PoliticaDeContenido",
+    "interfaz.politica.PoliticaDeContenido",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",

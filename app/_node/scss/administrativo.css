@@ -81,6 +81,7 @@
 @source "../../_templates";
 @source "../../core";
 @source "../../cuentas";
+@source "../../interfaz";
 @source "../../convenios";
 @source "../../postulaciones";
 @source "../../_staticfiles/js";

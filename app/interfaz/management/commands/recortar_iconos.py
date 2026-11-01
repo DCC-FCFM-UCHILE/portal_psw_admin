@@ -3,7 +3,7 @@ import shutil
 
 from django.core.management.base import BaseCommand
 
-from cuentas.iconos import CARPETA, FUENTE, LISTA, RECORTE, iconos_posibles
+from interfaz.iconos import CARPETA, FUENTE, LISTA, RECORTE, iconos_posibles
 
 
 def ligaduras(fuente):

@@ -54,11 +54,12 @@ se corre contra esa base.
 app/core/           configuración y URLs raíz
 app/core/settings/  base.py más un archivo por entorno
 app/cuentas/        usuarios, grupos y restablecer la contraseña
+app/interfaz/       etiquetas de plantilla, siluetas, recorte de íconos y política de contenido
 app/postulaciones/  convocatorias, postulaciones, proyectos y correos a postulantes
 app/convenios/      formatos de postulación
 app/_templates/     plantillas que sobrescriben las de unfold y páginas de error
 app/_node/          fuente de administrativo.css y su compilación
-app/_staticfiles/   logo, favicon y administrativo.js
+app/_staticfiles/   logo, favicon, fuente de íconos y js/administrativo/
 app/_locale/        textos de unfold en español (unfold no trae traducción)
 .docker/            Dockerfile, compose y Makefile
 ```

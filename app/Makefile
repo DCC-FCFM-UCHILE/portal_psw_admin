@@ -16,7 +16,7 @@ revisar:
 	ruff format --check .
 
 seguridad:
-	bandit -r core cuentas convenios postulaciones -x postulaciones/tests.py
+	bandit -r core cuentas interfaz convenios postulaciones -x postulaciones/tests.py
 
 test:
 	pytest

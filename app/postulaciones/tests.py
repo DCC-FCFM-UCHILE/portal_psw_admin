@@ -18,11 +18,11 @@ from django.utils import timezone
 from django.utils.formats import date_format
 
 from convenios.models import RulesApplications
-from core.politica import resumen
 from cuentas.forms import NuevaClaveForm, RestablecerForm
-from cuentas.iconos import FUENTE, iconos_posibles, iconos_recortados
-from cuentas.management.commands.recortar_iconos import ligaduras
-from cuentas.templatetags.interfaz import paginas_cercanas
+from interfaz.iconos import FUENTE, iconos_posibles, iconos_recortados
+from interfaz.management.commands.recortar_iconos import ligaduras
+from interfaz.politica import resumen
+from interfaz.templatetags.interfaz import paginas_cercanas
 from postulaciones import correo, tablas_compartidas
 from postulaciones.models import Announcement, Application, ApprovedProject, Candidate, Member, Organization, Unit
 

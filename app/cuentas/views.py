@@ -1,9 +1,6 @@
 from django.contrib import admin, messages
 from django.contrib.auth import views
 from django.urls import reverse_lazy
-from django.utils.decorators import method_decorator
-from django.views.decorators.cache import cache_control
-from django.views.generic import TemplateView
 
 from cuentas.forms import NuevaClaveForm, RestablecerForm
 
@@ -37,14 +34,4 @@ class SalirView(views.LogoutView):
     def post(self, request, *args, **kwargs):
         respuesta = super().post(request, *args, **kwargs)
         messages.success(request, "Cerraste la sesión.")
-        return respuesta
-
-
-@method_decorator(cache_control(public=True, max_age=31536000, immutable=True), name="dispatch")
-class SiluetasView(TemplateView):
-    template_name = "components/siluetas/vistas.html"
-
-    def get(self, request, *args, **kwargs):
-        respuesta = super().get(request, *args, **kwargs)
-        respuesta["X-Robots-Tag"] = "noindex"
         return respuesta

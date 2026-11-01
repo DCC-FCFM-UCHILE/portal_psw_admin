@@ -5,7 +5,7 @@ from functools import lru_cache
 from django.conf import settings
 from django.template.loader import render_to_string
 
-from cuentas.templatetags.interfaz import GUIONES_EN_LINEA, compactar
+from interfaz.templatetags.interfaz import GUIONES_EN_LINEA, compactar
 from postulaciones.correo import LOGO
 
 

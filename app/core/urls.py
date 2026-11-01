@@ -8,6 +8,7 @@ from django.views.decorators.http import last_modified
 
 from core.rutas import redirigir_antigua, traducir
 from cuentas import views
+from interfaz.views import SiluetasView
 
 ARRANQUE = timezone.now()
 
@@ -20,7 +21,7 @@ urlpatterns = [
     path("recuperar-contrasena/enviado/", views.RestablecerEnviadoView.as_view(), name="password_reset_done"),
     path("recuperar-contrasena/listo/", views.RestablecerListoView.as_view(), name="password_reset_complete"),
     path("recuperar-contrasena/<uidb64>/<token>/", views.RestablecerConfirmarView.as_view(), name="password_reset_confirm"),
-    path("siluetas/", views.SiluetasView.as_view(), name="siluetas"),
+    path("siluetas/", SiluetasView.as_view(), name="siluetas"),
     path("salir/", views.SalirView.as_view()),
     path("jsi18n/", admin.site.admin_view(catalogo, cacheable=True)),
 ]
