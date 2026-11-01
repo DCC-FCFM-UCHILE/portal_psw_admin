@@ -553,16 +553,6 @@ input[type="checkbox"].appearance-none.rounded-full {
   translate: none;
 }
 
-.pista-teclado {
-  display: none;
-}
-
-@media (hover: hover) and (pointer: fine) and (min-width: 40rem) {
-  .pista-teclado:not([hidden]) {
-    display: inline;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   #avisos,
   .silueta-vista.entrando,

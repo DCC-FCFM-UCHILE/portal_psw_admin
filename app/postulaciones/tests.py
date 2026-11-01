@@ -85,6 +85,11 @@ class ListadoTests(BaseCompartida):
         respuesta = self.client.get(reverse("admin:applications_application_changelist"))
         self.assertNotContains(respuesta, 'value="delete_selected"')
 
+    def test_los_buscadores_no_muestran_atajos_de_teclado(self):
+        for url in [reverse("admin:index"), reverse("admin:applications_application_changelist")]:
+            with self.subTest(url=url):
+                self.assertNotContains(self.client.get(url), "<kbd")
+
 
 class AccionesTests(BaseCompartida):
     def aplicar(self, accion):
