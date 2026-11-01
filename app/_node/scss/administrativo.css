@@ -571,6 +571,11 @@ html {
   }
 }
 
+.seleccion > select {
+  min-width: 0;
+  max-width: 100%;
+}
+
 .barra-acciones-seleccion .barra-acciones-boton {
   white-space: normal;
   text-align: left;
