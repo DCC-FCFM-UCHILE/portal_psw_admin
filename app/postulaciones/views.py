@@ -43,7 +43,8 @@ class CorreoPostulanteView(UnfoldModelAdminViewMixin, FormView):
         )
 
     def form_valid(self, form):
-        if not correo.enviar(form.cleaned_data["correo"], form.cleaned_data["asunto"], form.cleaned_data["contenido"]):
+        datos = form.cleaned_data
+        if not correo.enviar(datos["correo"], datos["asunto"], datos["contenido"], self.postulacion):
             messages.error(self.request, "No se pudo enviar el correo. Inténtalo de nuevo más tarde.")
             return self.render_to_response(self.get_context_data(form=form))
         self.postulacion.fue_notificada = True

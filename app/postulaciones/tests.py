@@ -280,10 +280,13 @@ class CorreoTests(BaseCompartida):
 
     def test_si_el_correo_falla_no_marca_notificada(self):
         with mock.patch("postulaciones.correo.EmailMultiAlternatives.send", side_effect=OSError("red caída")):
-            respuesta = self.client.post(
-                self.url("notificar"), {"correo": "ana@ejemplo.cl", "asunto": "Resultado", "contenido": "<p>x</p>"}
-            )
+            with self.assertLogs("postulaciones.correo", "ERROR") as registro:
+                respuesta = self.client.post(
+                    self.url("notificar"), {"correo": "ana@ejemplo.cl", "asunto": "Resultado", "contenido": "<p>x</p>"}
+                )
         self.assertContains(respuesta, "No se pudo enviar el correo")
+        self.assertIn(f"postulación {self.postulacion.pk}", registro.output[0])
+        self.assertNotIn("ana@ejemplo.cl", "\n".join(registro.output))
         self.postulacion.refresh_from_db()
         self.assertFalse(self.postulacion.fue_notificada)
 

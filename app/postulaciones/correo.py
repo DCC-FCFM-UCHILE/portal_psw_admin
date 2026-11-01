@@ -25,7 +25,6 @@ def sanear(contenido):
     )
 
 
-
 def texto_plano(contenido):
     texto = re.sub(r"<br\s*/?>", "\n", contenido, flags=re.IGNORECASE)
     texto = re.sub(r"</(p|div|h[1-6]|li|blockquote|pre)>", "\n\n", texto, flags=re.IGNORECASE)
@@ -33,7 +32,7 @@ def texto_plano(contenido):
     return re.sub(r"\n{3,}", "\n\n", texto).strip()
 
 
-def enviar(correo, asunto, contenido):
+def enviar(correo, asunto, contenido, postulacion):
     contenido = sanear(contenido)
     html = render_to_string("postulaciones/correo/notificacion.html", {"asunto": asunto, "contenido": contenido, "logo": LOGO})
     mensaje = EmailMultiAlternatives(
@@ -46,5 +45,5 @@ def enviar(correo, asunto, contenido):
     try:
         return mensaje.send() == 1
     except Exception:
-        logger.exception("No se pudo enviar el correo a %s", correo)
+        logger.exception("No se pudo enviar el correo de la postulación %s", postulacion.pk)
         return False
