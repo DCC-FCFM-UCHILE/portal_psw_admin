@@ -6,7 +6,7 @@
   body.navegando #barra-progreso {
     opacity: 1;
     transition: none;
-    animation: avance-carga 8s cubic-bezier(0.05, 0.7, 0.1, 1) forwards;
+    animation: avance-carga 4.5s cubic-bezier(0.05, 0.7, 0.1, 1) forwards;
   }
 }
 
