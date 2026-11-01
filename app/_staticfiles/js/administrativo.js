@@ -307,12 +307,16 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll(`${capasModales}, .envoltura-lateral`).forEach((capa) => capas.observe(capa, { attributes: true, attributeFilter: ["style"] }));
     window.addEventListener("resize", bloquearDesplazamiento);
 
-    const cabecera = document.getElementById("cabecera");
-    if (cabecera && "ResizeObserver" in window) {
-        new ResizeObserver(() => {
-            document.documentElement.style.setProperty("--alto-cabecera", `${Math.ceil(cabecera.getBoundingClientRect().height)}px`);
-        }).observe(cabecera);
-    }
+    const medirAlto = (elemento, variable) => {
+        if (elemento && "ResizeObserver" in window) {
+            new ResizeObserver(() => {
+                document.documentElement.style.setProperty(variable, `${Math.ceil(elemento.getBoundingClientRect().height)}px`);
+            }).observe(elemento);
+        }
+    };
+    medirAlto(document.getElementById("cabecera"), "--alto-cabecera");
+    medirAlto(document.querySelector(".pie-paginacion"), "--alto-pie");
+    medirAlto(document.querySelector(".barra-acciones"), "--alto-barra");
 
     const avisos = document.getElementById("avisos");
     if (avisos && !document.querySelector("[autofocus]")) {

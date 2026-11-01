@@ -380,17 +380,21 @@ html {
 @media (min-width: 1024px) {
   html:has(#changelist),
   html:has([name="_save"]) {
-    scroll-padding-bottom: 5rem;
+    scroll-padding-bottom: calc(var(--alto-pie, 4rem) + 1rem);
+  }
+
+  html:has(#changelist-form input.action-select:checked) {
+    scroll-padding-bottom: calc(max(var(--alto-pie, 4rem), var(--alto-barra, 4rem)) + 1rem);
   }
 }
 
 @media (max-width: 1023.98px) {
   html:has(input.action-select:checked) {
-    scroll-padding-bottom: 8rem;
+    scroll-padding-bottom: calc(var(--alto-barra, 7rem) + 1rem);
   }
 
   body:has(input.action-select:checked) {
-    padding-bottom: 8rem;
+    padding-bottom: calc(var(--alto-barra, 7rem) + 1rem);
   }
 }
 
