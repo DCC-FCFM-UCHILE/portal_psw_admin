@@ -27,7 +27,8 @@ document.addEventListener("alpine:init", () => {
         },
 
         lista() {
-            return document.getElementById(this.$refs.disparador.getAttribute("aria-controls"));
+            const disparador = this.$refs.disparador;
+            return disparador?.isConnected ? document.getElementById(disparador.getAttribute("aria-controls")) : null;
         },
 
         opciones() {
@@ -37,7 +38,7 @@ document.addEventListener("alpine:init", () => {
 
         ubicar() {
             const menu = this.lista();
-            if (!menu || !this.$refs.disparador.isConnected) {
+            if (!menu) {
                 return;
             }
             const ancla = this.$refs.disparador.getBoundingClientRect();
@@ -94,7 +95,7 @@ document.addEventListener("alpine:init", () => {
 
         cerrar() {
             this.abierto = false;
-            this.$refs.disparador.focus();
+            this.$refs.disparador?.focus();
         },
 
         disparador: {
@@ -120,7 +121,7 @@ document.addEventListener("alpine:init", () => {
                 return this.abierto;
             },
             "@click.outside"(evento) {
-                if (!this.$refs.disparador.contains(evento.target)) {
+                if (!this.$refs.disparador?.contains(evento.target)) {
                     this.abierto = false;
                 }
             },
