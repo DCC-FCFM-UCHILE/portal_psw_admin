@@ -2,6 +2,14 @@ from django import forms
 from django.template.response import TemplateResponse
 from django.utils.cache import patch_vary_headers
 
+SIN_USO = {
+    "admin/js/actions.js",
+    "admin/js/urlify.js",
+    "admin/js/prepopulate.js",
+    "admin/js/vendor/xregexp/xregexp.js",
+    "admin/js/vendor/xregexp/xregexp.min.js",
+}
+
 FRAGMENTOS = {
     "listado": "admin/listado_parcial.html",
     "resultados-listado": "admin/listado_resultados.html",
@@ -21,7 +29,7 @@ class ListadoParcial:
     @property
     def media(self):
         media = super().media
-        return forms.Media(js=[ruta for ruta in media._js if ruta != "admin/js/actions.js"], css=media._css)
+        return forms.Media(js=[ruta for ruta in media._js if ruta not in SIN_USO], css=media._css)
 
     def changelist_view(self, request, extra_context=None):
         respuesta = super().changelist_view(request, extra_context)
