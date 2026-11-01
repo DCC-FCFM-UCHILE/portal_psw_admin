@@ -1,4 +1,5 @@
 import datetime
+import io
 import re
 from pathlib import Path
 from types import SimpleNamespace
@@ -21,6 +22,7 @@ from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.utils.formats import date_format
 from django.utils.http import urlsafe_base64_encode
+from PIL import Image
 
 from convenios.models import RulesApplications
 from cuentas.forms import NuevaClaveForm, RestablecerForm
@@ -30,7 +32,19 @@ from interfaz.management.commands.recortar_iconos import ligaduras
 from interfaz.politica import resumen
 from interfaz.templatetags.interfaz import paginas_cercanas
 from postulaciones import correo, tablas_compartidas
+from postulaciones.imagenes import ImagenInvalida, comprimir
 from postulaciones.models import Announcement, Application, ApprovedProject, Candidate, Member, Organization, Unit
+
+
+def imagen(formato="PNG", tamano=(200, 100), modo="RGB", **ajustes):
+    salida = io.BytesIO()
+    Image.effect_noise(tamano, 60).convert(modo).save(salida, formato, **ajustes)
+    return salida.getvalue()
+
+
+def medidas(contenido):
+    with Image.open(io.BytesIO(contenido)) as abierta:
+        return abierta.format, abierta.size, abierta.mode
 
 
 @override_settings(MEDIA_ROOT="/tmp/admin-pruebas-media")
@@ -1258,10 +1272,29 @@ class LogoDeUnidadTests(BaseCompartida):
         self.assertFalse(Unit.objects.filter(nombre="Unidad nueva").exists())
 
     def test_acepta_png_y_jpg(self):
-        for nombre, contenido in [("logo.png", b"\x89PNG\r\n\x1a\n"), ("logo.jpg", b"\xff\xd8\xff\xe0")]:
+        for nombre, contenido in [("logo.png", imagen("PNG")), ("logo.jpg", imagen("JPEG"))]:
             with self.subTest(nombre=nombre):
                 self.assertEqual(self.agregar(nombre, contenido).status_code, 302)
                 Unit.objects.filter(nombre="Unidad nueva").delete()
+
+    def test_rechaza_un_archivo_con_firma_de_png_que_no_es_imagen(self):
+        respuesta = self.agregar("logo.png", b"\x89PNG\r\n\x1a\nno es una imagen")
+        self.assertContains(respuesta, "El logo tiene que ser una imagen PNG o JPG.")
+        self.assertFalse(Unit.objects.filter(nombre="Unidad nueva").exists())
+
+    def test_guarda_el_logo_reducido_y_sin_el_original(self):
+        grande = imagen("PNG", (2000, 1000))
+        self.assertEqual(self.agregar("logo.png", grande).status_code, 302)
+        with Unit.objects.get(nombre="Unidad nueva").logo.open("rb") as guardado:
+            contenido = guardado.read()
+        self.assertEqual(medidas(contenido)[:2], ("PNG", (640, 320)))
+        self.assertLess(len(contenido), len(grande))
+
+    def test_un_logo_que_ya_es_liviano_queda_igual(self):
+        liviano = imagen("PNG", (40, 20), optimize=True)
+        self.agregar("logo.png", liviano)
+        with Unit.objects.get(nombre="Unidad nueva").logo.open("rb") as guardado:
+            self.assertEqual(guardado.read(), liviano)
 
     def test_el_campo_solo_ofrece_png_y_jpg(self):
         respuesta = self.client.get(reverse("admin:applications_unit_add"))
@@ -1800,3 +1833,41 @@ class EntregaDeArchivosTests(BaseCompartida):
         respuesta = self.client.get(convenio.perfil_de_proyecto.url)
         self.assertEqual(respuesta.status_code, 200)
         self.assertTrue(respuesta["Content-Disposition"].startswith("attachment"))
+
+
+class CompresionTests(TestCase):
+    def test_reduce_dentro_del_recuadro_sin_cambiar_la_proporcion(self):
+        self.assertEqual(medidas(comprimir(imagen("PNG", (1000, 1000))))[1], (320, 320))
+
+    def test_un_jpeg_en_cmyk_queda_en_rgb(self):
+        formato, _, modo = medidas(comprimir(imagen("JPEG", (1200, 800), "CMYK", quality=100)))
+        self.assertEqual((formato, modo), ("JPEG", "RGB"))
+
+    def test_quita_los_metadatos(self):
+        exif = Image.Exif()
+        exif[0x010E] = "descripción con datos" * 50
+        comprimido = comprimir(imagen("JPEG", (1200, 800), exif=exif.tobytes()))
+        with Image.open(io.BytesIO(comprimido)) as abierta:
+            self.assertNotIn(0x010E, abierta.getexif())
+
+    def test_una_paleta_se_reduce_sin_perder_la_transparencia(self):
+        salida = io.BytesIO()
+        Image.new("RGBA", (1600, 800), (255, 0, 0, 0)).convert("P").save(salida, "PNG", transparency=0)
+        resultado = comprimir(salida.getvalue()) or salida.getvalue()
+        self.assertEqual(medidas(resultado)[1][0] <= 640, True)
+
+    def test_volver_a_comprimir_no_cambia_nada(self):
+        for formato in ["PNG", "JPEG"]:
+            with self.subTest(formato=formato):
+                self.assertIsNone(comprimir(comprimir(imagen(formato, (1600, 900)))))
+
+    def test_rechaza_una_imagen_de_demasiados_pixeles(self):
+        salida = io.BytesIO()
+        Image.new("1", (7000, 6000)).save(salida, "PNG")
+        with self.assertRaises(ImagenInvalida):
+            comprimir(salida.getvalue())
+
+    def test_rechaza_lo_que_no_es_png_ni_jpeg(self):
+        for contenido in [b"\x89PNG\r\n\x1a\nno es una imagen", imagen("GIF")]:
+            with self.subTest(contenido=contenido[:8]), self.assertRaises(ImagenInvalida):
+                comprimir(contenido)
