@@ -128,18 +128,16 @@ administrativo.confirmar = confirmar;
 const preguntarSalida = () =>
     confirmar({ titulo: "Hay cambios sin guardar", texto: "Si sales de esta página, se pierden.", si: "Salir sin guardar", no: "Seguir editando" });
 
+const mismaVista = (destino) => destino.pathname === location.pathname && destino.search === location.search;
+
 document.addEventListener(
     "click",
     (evento) => {
         const enlace = evento.target.closest?.("a[href]");
-        if (!enlace || evento.defaultPrevented || evento.button !== 0 || evento.metaKey || evento.ctrlKey || evento.shiftKey || evento.altKey) {
+        if (!enlace || !administrativo.clicSimple(evento) || !administrativo.enlaceComun(enlace) || enlace.matches(".related-widget-wrapper-link, [data-popup]")) {
             return;
         }
-        if (enlace.target || enlace.hasAttribute("download") || enlace.getAttribute("href").startsWith("#") || enlace.matches(".related-widget-wrapper-link, [data-popup]")) {
-            return;
-        }
-        const destino = new URL(enlace.href, location.href);
-        if ((destino.pathname === location.pathname && destino.search === location.search) || !hayCambios()) {
+        if (mismaVista(new URL(enlace.href, location.href)) || !hayCambios()) {
             return;
         }
         evento.preventDefault();

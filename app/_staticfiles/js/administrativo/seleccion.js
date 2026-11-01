@@ -67,6 +67,27 @@ document.addEventListener("change", (evento) => {
 
 window.addEventListener("pageshow", contarSeleccion);
 
+const pideConfirmacion = (accion) =>
+    accion.form.querySelector("input.select-across")?.value === "1" && ["aceptar", "rechazar"].includes(accion.dataset.accion) && !accion.dataset.confirmada;
+
+const confirmarEnLote = (accion) => {
+    const verbo = accion.dataset.accion === "aceptar" ? "Aceptar" : "Rechazar";
+    const total = accion.form.querySelector("span.all")?.textContent.match(/\d+/)?.[0] || "";
+    administrativo.confirmar({
+        titulo: `¿${verbo} ${total ? `las ${total} postulaciones` : "todas las postulaciones"}?`,
+        texto: "Incluye las que no están en esta página. Las que ya estaban en ese estado no cambian; las demás quedan sin notificar.",
+        si: total ? `${verbo} ${total}` : verbo,
+        no: "Cancelar",
+        principal: "si",
+    }).then((si) => {
+        if (si) {
+            accion.dataset.confirmada = "1";
+            accion.click();
+            delete accion.dataset.confirmada;
+        }
+    });
+};
+
 document.addEventListener("click", (evento) => {
     if (evento.target.id === "action-toggle") {
         marcar(casillasDeFila(), evento.target.checked);
@@ -82,24 +103,9 @@ document.addEventListener("click", (evento) => {
     const accion = evento.target.closest("[data-accion]");
     if (accion) {
         accion.form.elements.namedItem("action").value = accion.dataset.accion;
-        const todas = accion.form.querySelector("input.select-across")?.value === "1";
-        if (todas && ["aceptar", "rechazar"].includes(accion.dataset.accion) && !accion.dataset.confirmada) {
+        if (pideConfirmacion(accion)) {
             evento.preventDefault();
-            const verbo = accion.dataset.accion === "aceptar" ? "Aceptar" : "Rechazar";
-            const total = accion.form.querySelector("span.all")?.textContent.match(/\d+/)?.[0] || "";
-            administrativo.confirmar({
-                titulo: `¿${verbo} ${total ? `las ${total} postulaciones` : "todas las postulaciones"}?`,
-                texto: "Incluye las que no están en esta página. Las que ya estaban en ese estado no cambian; las demás quedan sin notificar.",
-                si: total ? `${verbo} ${total}` : verbo,
-                no: "Cancelar",
-                principal: "si",
-            }).then((si) => {
-                if (si) {
-                    accion.dataset.confirmada = "1";
-                    accion.click();
-                    delete accion.dataset.confirmada;
-                }
-            });
+            confirmarEnLote(accion);
         }
         return;
     }

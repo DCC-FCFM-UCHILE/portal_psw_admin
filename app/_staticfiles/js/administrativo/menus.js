@@ -2,6 +2,17 @@
 const SEPARACION_MENU = 4;
 const MARGEN_MENU = 5;
 
+const posicionDelMenu = (ancla, ancho, alto, limite) => {
+    const debajo = ancla.bottom + SEPARACION_MENU;
+    const encima = ancla.top - SEPARACION_MENU - alto;
+    const cabeDebajo = debajo + alto <= limite - MARGEN_MENU;
+    const subir = !cabeDebajo && encima >= MARGEN_MENU;
+    const ninguno = !cabeDebajo && !subir;
+    const izquierda = Math.max(MARGEN_MENU, Math.min(ancla.right - ancho, document.documentElement.clientWidth - ancho - MARGEN_MENU));
+    const arriba = ninguno ? Math.max(MARGEN_MENU, Math.min(debajo, limite - MARGEN_MENU - alto)) : subir ? encima : debajo;
+    return { izquierda, arriba, subir, ninguno };
+};
+
 document.addEventListener("alpine:init", () => {
     Alpine.data("menuEmergente", () => ({
         abierto: false,
@@ -31,16 +42,8 @@ document.addEventListener("alpine:init", () => {
             }
             const ancla = this.$refs.disparador.getBoundingClientRect();
             Object.assign(menu.style, { maxHeight: "", overflowY: "" });
-            const ancho = menu.offsetWidth;
-            const alto = menu.offsetHeight;
             const limite = window.visualViewport?.height ?? window.innerHeight;
-            const debajo = ancla.bottom + SEPARACION_MENU;
-            const encima = ancla.top - SEPARACION_MENU - alto;
-            const cabeDebajo = debajo + alto <= limite - MARGEN_MENU;
-            const subir = !cabeDebajo && encima >= MARGEN_MENU;
-            const ninguno = !cabeDebajo && !subir;
-            const izquierda = Math.max(MARGEN_MENU, Math.min(ancla.right - ancho, document.documentElement.clientWidth - ancho - MARGEN_MENU));
-            const arriba = ninguno ? Math.max(MARGEN_MENU, Math.min(debajo, limite - MARGEN_MENU - alto)) : subir ? encima : debajo;
+            const { izquierda, arriba, subir, ninguno } = posicionDelMenu(ancla, menu.offsetWidth, menu.offsetHeight, limite);
             Object.assign(menu.style, {
                 position: "fixed",
                 left: `${Math.round(izquierda)}px`,

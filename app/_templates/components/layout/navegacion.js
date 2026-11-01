@@ -90,15 +90,12 @@ const formaDe = (ruta) => {
     return partes.length === 1 ? "ficha" : "";
 };
 
-const navegaAOtraVista = (evento, enlace) => {
-    if (evento.defaultPrevented || evento.button !== 0 || evento.metaKey || evento.ctrlKey || evento.shiftKey || evento.altKey) {
-        return false;
-    }
-    if (enlace.target || enlace.hasAttribute("download") || enlace.origin !== location.origin || /\.[a-z0-9]+$/i.test(enlace.pathname)) {
-        return false;
-    }
-    return enlace.pathname !== location.pathname || enlace.search !== location.search;
-};
+const clicSimple = (evento) => !evento.defaultPrevented && evento.button === 0 && !(evento.metaKey || evento.ctrlKey || evento.shiftKey || evento.altKey);
+
+const enlaceDeVista = (enlace) => !enlace.target && !enlace.hasAttribute("download") && enlace.origin === location.origin && !/\.[a-z0-9]+$/i.test(enlace.pathname);
+
+const navegaAOtraVista = (evento, enlace) =>
+    clicSimple(evento) && enlaceDeVista(enlace) && (enlace.pathname !== location.pathname || enlace.search !== location.search);
 
 const barra = () => document.body.classList.add("navegando");
 
@@ -166,6 +163,11 @@ const marcarDestino = (destino) => {
     enlaces.filter((enlace) => coincide(enlace) && enlace.pathname.length === largo).forEach((enlace) => enlace.setAttribute("data-destino", ""));
 };
 
+const textoDeCarga = (destino, titulo) => {
+    const seccion = destino === raizAdmin ? "" : document.querySelector("#nav-sidebar a.lateral-enlace[data-destino] > .truncate")?.textContent.trim();
+    return seccion ? `Cargando ${titulo} de ${seccion}…` : `Cargando ${titulo}…`;
+};
+
 const mostrarSilueta = (destino) => {
     const contenido = document.getElementById("content");
     const forma = formaDe(destino);
@@ -188,8 +190,7 @@ const mostrarSilueta = (destino) => {
     contenido.prepend(silueta);
     document.getElementById("contenido").setAttribute("aria-busy", "true");
     window.scrollTo(0, 0);
-    const seccion = destino === raizAdmin ? "" : document.querySelector("#nav-sidebar a.lateral-enlace[data-destino] > .truncate")?.textContent.trim();
-    anunciar(seccion ? `Cargando ${silueta.dataset.titulo} de ${seccion}…` : `Cargando ${silueta.dataset.titulo}…`);
+    anunciar(textoDeCarga(destino, silueta.dataset.titulo));
 };
 
 const avisarDemora = () => {
@@ -199,7 +200,7 @@ const avisarDemora = () => {
         const aviso = document.createElement("p");
         aviso.className = "aviso-demora";
         aviso.textContent = texto;
-        (silueta.querySelector(".contenedor") || silueta).prepend(aviso);
+        silueta.prepend(aviso);
     }
     anunciar(texto);
 };

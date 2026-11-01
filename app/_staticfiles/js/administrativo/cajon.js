@@ -65,17 +65,13 @@ document.addEventListener(
     { passive: true },
 );
 
-const terminarArrastre = (evento) => {
-    const arrastre = arrastreCajon.activo;
-    arrastreCajon.activo = null;
-    if (!arrastre || arrastre.rumbo !== "cerrar") {
-        return;
-    }
-    const { lateral, velo } = arrastre;
-    const ancho = lateral.offsetWidth;
+const cierraConElGesto = (arrastre, ancho) => {
     const [[t0, x0], [t1, x1]] = [arrastre.muestras[0], arrastre.muestras.at(-1)];
     const velocidad = t1 > t0 ? (x1 - x0) / (t1 - t0) : 0;
-    const cierra = evento.type === "touchend" && (-arrastre.dx > ancho * 0.4 || velocidad < -0.3);
+    return -arrastre.dx > ancho * 0.4 || velocidad < -0.3;
+};
+
+const terminarConTransicion = (lateral, velo, cierra) => {
     const salida = cierra ? "--duracion-capa-salida" : "--duracion-capa-entrada";
     const curva = cierra ? "--ease-enfatizada-salida" : "--ease-enfatizada-entrada";
     const duracion = sinMovimiento.matches ? "0s" : `var(${salida})`;
@@ -83,6 +79,17 @@ const terminarArrastre = (evento) => {
     velo.style.transition = `opacity ${duracion} var(${curva})`;
     lateral.style.translate = cierra ? "-100% 0" : "0 0";
     velo.style.opacity = cierra ? "0" : "1";
+};
+
+const terminarArrastre = (evento) => {
+    const arrastre = arrastreCajon.activo;
+    arrastreCajon.activo = null;
+    if (!arrastre || arrastre.rumbo !== "cerrar") {
+        return;
+    }
+    const { lateral, velo } = arrastre;
+    const cierra = evento.type === "touchend" && cierraConElGesto(arrastre, lateral.offsetWidth);
+    terminarConTransicion(lateral, velo, cierra);
     if (cierra) {
         estadoRaiz()?.cerrarCajon();
     }

@@ -7,15 +7,20 @@ const leer = (clave) => {
         return null;
     }
 };
-const marcas = [];
-raiz.removeAttribute("x-cloak");
-if (!raiz.classList.contains("dark") && !raiz.classList.contains("light")) {
+const claseDelTema = () => {
     let tema = "auto";
     try {
         tema = JSON.parse(leer("adminTheme")) || "auto";
     } catch {}
-    const oscuro = tema === "dark" || (tema === "auto" && matchMedia("(prefers-color-scheme: dark)").matches);
-    const clase = oscuro ? "dark" : tema === "light" ? "light" : "";
+    if (tema === "dark" || (tema === "auto" && matchMedia("(prefers-color-scheme: dark)").matches)) {
+        return "dark";
+    }
+    return tema === "light" ? "light" : "";
+};
+const marcas = [];
+raiz.removeAttribute("x-cloak");
+if (!raiz.classList.contains("dark") && !raiz.classList.contains("light")) {
+    const clase = claseDelTema();
     if (clase) {
         raiz.classList.add(clase);
         marcas.push(clase);

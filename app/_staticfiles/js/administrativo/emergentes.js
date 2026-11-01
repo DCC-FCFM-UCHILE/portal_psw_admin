@@ -23,33 +23,39 @@ window.addEventListener(
     true,
 );
 
+const cerrarCapaMadre = () => {
+    try {
+        window.parent.Alpine.$data(window.parent.document.body).openModal = false;
+    } catch {}
+};
+
+const salirPorLosBordes = (evento) => {
+    const enfocables = tabulables(document);
+    if (!enfocables.length) {
+        return;
+    }
+    const extremo = evento.shiftKey ? enfocables[0] : enfocables.at(-1);
+    if (document.activeElement !== extremo && enfocables.includes(document.activeElement)) {
+        return;
+    }
+    evento.preventDefault();
+    const cerrar = window.parent.document.querySelector("#capa-emergente > button");
+    if (cerrar) {
+        cerrar.focus();
+    } else {
+        (evento.shiftKey ? enfocables.at(-1) : enfocables[0]).focus();
+    }
+};
+
 if (window.parent !== window && (new URLSearchParams(location.search).has("_popup") || document.querySelector('input[name="_popup"]'))) {
     window.addEventListener("keydown", (evento) => {
         if (evento.defaultPrevented) {
             return;
         }
         if (evento.key === "Escape") {
-            try {
-                window.parent.Alpine.$data(window.parent.document.body).openModal = false;
-            } catch {}
-            return;
-        }
-        if (evento.key !== "Tab") {
-            return;
-        }
-        const enfocables = tabulables(document);
-        if (!enfocables.length) {
-            return;
-        }
-        const extremo = evento.shiftKey ? enfocables[0] : enfocables.at(-1);
-        if (document.activeElement === extremo || !enfocables.includes(document.activeElement)) {
-            evento.preventDefault();
-            const cerrar = window.parent.document.querySelector("#capa-emergente > button");
-            if (cerrar) {
-                cerrar.focus();
-            } else {
-                (evento.shiftKey ? enfocables.at(-1) : enfocables[0]).focus();
-            }
+            cerrarCapaMadre();
+        } else if (evento.key === "Tab") {
+            salirPorLosBordes(evento);
         }
     });
 }

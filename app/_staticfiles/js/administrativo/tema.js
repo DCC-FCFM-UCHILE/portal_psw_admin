@@ -14,7 +14,10 @@ window.addEventListener(
     true,
 );
 
-window.administrativo = {};
+window.administrativo = {
+    clicSimple: (evento) => !evento.defaultPrevented && evento.button === 0 && !(evento.metaKey || evento.ctrlKey || evento.shiftKey || evento.altKey),
+    enlaceComun: (enlace) => !enlace.target && !enlace.hasAttribute("download") && !enlace.getAttribute("href").startsWith("#"),
+};
 
 let sinFoco = null;
 document.addEventListener("focusout", (evento) => {

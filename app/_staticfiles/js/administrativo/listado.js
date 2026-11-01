@@ -131,22 +131,26 @@ const quitarCarga = () => {
     });
 };
 
-const listar = (url, alcance, fuente, empujar = true, valores = null) => {
-    const zona = zonaListado();
+const nuevoPedido = (url, alcance, fuente, empujar, valores) => {
     const activo = document.activeElement;
     const panel = document.getElementById("changelist-filter");
-    const pedido = {
+    return {
         url,
         respaldo: valores ? location.href : url,
         metodo: valores ? "POST" : "GET",
         alcance,
         empujar,
         fuente,
-        objetivo: alcance === "pagina" ? document.getElementById("resultados-listado") : zona,
+        objetivo: alcance === "pagina" ? document.getElementById("resultados-listado") : zonaListado(),
         focoId: activo?.id || "",
         focoPanel: panel?.contains(activo) ? enfocables(panel).indexOf(activo) : -1,
     };
-    if (panel?.contains(fuente) && cerrarFiltros()) {
+};
+
+const listar = (url, alcance, fuente, empujar = true, valores = null) => {
+    const zona = zonaListado();
+    const pedido = nuevoPedido(url, alcance, fuente, empujar, valores);
+    if (document.getElementById("changelist-filter")?.contains(fuente) && cerrarFiltros()) {
         pedido.focoId = "abrir-filtros";
         pedido.focoPanel = -1;
     }
@@ -175,22 +179,50 @@ const listar = (url, alcance, fuente, empujar = true, valores = null) => {
 
 const esDelListado = (url) => url.origin === location.origin && url.pathname === location.pathname && "htmx" in window;
 
+const enlaceDelListado = (enlace) =>
+    enlace && zonaListado() && enlace.closest(contextoListado) && administrativo.enlaceComun(enlace) && esDelListado(new URL(enlace.href));
+
+const envioEnListado = (evento) =>
+    !evento.defaultPrevented && evento.target.id === "changelist-form" && evento.submitter?.hasAttribute("data-en-listado") && zonaListado() && "htmx" in window;
+
+const cerrarMenuDe = (boton) => {
+    const menu = boton.closest("nav[id]");
+    const disparador = menu && document.querySelector(`[aria-controls="${menu.id}"]`);
+    if (disparador) {
+        Alpine.$data(disparador).cerrar();
+    }
+};
+
+const respuestaDelListado = (detalle, final) => !detalle.isError && esDelListado(final) && !/<html/i.test(detalle.serverResponse.slice(0, 300));
+
+const focoTrasListar = (pedido) => {
+    const activo = document.activeElement;
+    const perdido = !activo || activo === document.body || !activo.isConnected;
+    if (pedido.alcance === "pagina") {
+        return destinoDelFoco();
+    }
+    if (!perdido) {
+        return null;
+    }
+    if (pedido.focoId && document.getElementById(pedido.focoId)) {
+        return document.getElementById(pedido.focoId);
+    }
+    if (pedido.focoPanel >= 0) {
+        const opciones = enfocables(document.getElementById("changelist-filter"));
+        return opciones[Math.min(pedido.focoPanel, opciones.length - 1)] || destinoDelFoco();
+    }
+    return pedido.empujar ? destinoDelFoco() : null;
+};
+
 document.addEventListener(
     "click",
     (evento) => {
         const enlace = evento.target.closest?.("a[href]");
-        if (!enlace || !zonaListado() || !enlace.closest(contextoListado) || enlace.getAttribute("href").startsWith("#")) {
-            return;
-        }
-        if (evento.defaultPrevented || evento.button !== 0 || evento.metaKey || evento.ctrlKey || evento.shiftKey || evento.altKey) {
-            return;
-        }
-        const url = new URL(enlace.href);
-        if (enlace.target || enlace.hasAttribute("download") || !esDelListado(url)) {
+        if (!administrativo.clicSimple(evento) || !enlaceDelListado(enlace)) {
             return;
         }
         evento.preventDefault();
-        listar(url.href, enlace.closest("#pie-listado, .paginacion-superior") ? "pagina" : "listado", enlace);
+        listar(new URL(enlace.href).href, enlace.closest("#pie-listado, .paginacion-superior") ? "pagina" : "listado", enlace);
     },
     true,
 );
@@ -216,21 +248,16 @@ document.addEventListener(
 document.addEventListener(
     "submit",
     (evento) => {
-        const formulario = evento.target;
-        const boton = evento.submitter;
-        if (evento.defaultPrevented || formulario.id !== "changelist-form" || !boton?.hasAttribute("data-en-listado") || !zonaListado() || !("htmx" in window)) {
+        if (!envioEnListado(evento)) {
             return;
         }
         evento.preventDefault();
         if (enCurso?.metodo === "POST") {
             return;
         }
-        const menu = boton.closest("nav[id]");
-        const disparador = menu && document.querySelector(`[aria-controls="${menu.id}"]`);
-        if (disparador) {
-            Alpine.$data(disparador).cerrar();
-        }
-        listar(boton.formAction || location.href, "listado", formulario, false, boton.name ? { [boton.name]: boton.value } : {});
+        const boton = evento.submitter;
+        cerrarMenuDe(boton);
+        listar(boton.formAction || location.href, "listado", evento.target, false, boton.name ? { [boton.name]: boton.value } : {});
     },
     true,
 );
@@ -257,7 +284,7 @@ document.addEventListener("htmx:beforeSwap", (evento) => {
         return;
     }
     const final = new URL(evento.detail.xhr.responseURL || pedido.url);
-    if (evento.detail.isError || !esDelListado(final) || /<html/i.test(evento.detail.serverResponse.slice(0, 300))) {
+    if (!respuestaDelListado(evento.detail, final)) {
         evento.detail.shouldSwap = false;
         enCurso = null;
         quitarCarga();
@@ -307,22 +334,14 @@ document.addEventListener("htmx:afterSettle", (evento) => {
     administrativo.olvidarSeleccion();
     administrativo.medirAlto(document.querySelector(".barra-acciones"), "--alto-barra");
 
-    const activo = document.activeElement;
-    const perdido = !activo || activo === document.body || !activo.isConnected;
     if (pedido.metodo === "POST") {
         enfocar(document.getElementById("avisos") || destinoDelFoco());
         anunciarListado("");
         return;
     }
-    if (pedido.alcance === "pagina") {
-        enfocar(destinoDelFoco());
-    } else if (perdido && pedido.focoId && document.getElementById(pedido.focoId)) {
-        enfocar(document.getElementById(pedido.focoId));
-    } else if (perdido && pedido.focoPanel >= 0) {
-        const opciones = enfocables(document.getElementById("changelist-filter"));
-        enfocar(opciones[Math.min(pedido.focoPanel, opciones.length - 1)] || destinoDelFoco());
-    } else if (perdido && pedido.empujar) {
-        enfocar(destinoDelFoco());
+    const destino = focoTrasListar(pedido);
+    if (destino) {
+        enfocar(destino);
     }
     anunciarListado(textoDelConteo());
 });
