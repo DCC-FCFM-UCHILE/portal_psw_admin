@@ -275,6 +275,11 @@ class FormulariosTests(BaseCompartida):
         self.assertContains(respuesta, 'type="checkbox" name="groups"')
         self.assertNotContains(respuesta, "SelectFilter")
 
+    def test_la_ficha_del_usuario_no_crea_grupos(self):
+        respuesta = self.client.get(reverse("admin:auth_user_change", args=[self.docente.pk]))
+        self.assertNotContains(respuesta, 'id="add_id_groups"')
+        self.assertNotContains(respuesta, 'aria-controls="related-widget-wrapper-groups"')
+
     def test_el_archivo_declara_sus_formatos(self):
         respuesta = self.client.get(reverse("admin:applications_application_add"))
         self.assertContains(respuesta, 'accept=".pdf"')

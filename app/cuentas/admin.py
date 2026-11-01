@@ -29,6 +29,12 @@ class UserAdmin(PermisosEnTabla, BaseUserAdmin, ModelAdmin):
     add_form = UserCreationForm
     change_password_form = AdminPasswordChangeForm
 
+    def formfield_for_dbfield(self, db_field, request, **kwargs):
+        campo = super().formfield_for_dbfield(db_field, request, **kwargs)
+        if db_field.name == "groups":
+            campo.widget.can_add_related = False
+        return campo
+
 
 @admin.register(Group)
 class GroupAdmin(PermisosEnTabla, BaseGroupAdmin, ModelAdmin):
