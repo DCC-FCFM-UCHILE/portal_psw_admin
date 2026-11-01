@@ -1,22 +1,19 @@
-# Git
 .git
 .gitignore
 .gitmodules
 
-# Docker
 .docker/data
 .docker/app/.env
 .docker/app/.env.test
 
-# Node
 **/node_modules
 **/npm-debug.log*
 
-# Python
 **/__pycache__
 **/*.pyc
 **/*.pyo
 **/*.pyd
+**/.pytest_cache
 .Python
 env/
 venv/
@@ -24,18 +21,17 @@ venv/
 pip-log.txt
 pip-delete-this-directory.txt
 
-# Media (Should be handled by volumes)
 app/_media
+app/_staticfiles/unfold
+app/_staticfiles/vendor
+app/_node/scss/unfold.css
 
-# Environment and Secrets
 .env
 .env.test
 
-# Databases
 *.db
 *.sqlite3
 
-# IDEs and OS
 .idea
 .vscode
 .DS_Store
