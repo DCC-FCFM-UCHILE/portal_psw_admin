@@ -173,6 +173,9 @@ window.addEventListener("submit", (evento) => {
         envios.delete(formulario);
         return;
     }
+    formulario.querySelectorAll(".campo-contrasena").forEach((marco) => {
+        mostrarContrasena(marco.querySelector("input"), marco.querySelector("button"), false);
+    });
     if (formulario.closest("#content")) {
         saliendo = true;
         vigilarSalida();
@@ -336,10 +339,4 @@ document.addEventListener("change", (evento) => {
         alternarClaves(evento.target.form);
     }
 });
-
-document.addEventListener("submit", (evento) => {
-    evento.target.querySelectorAll?.(".campo-contrasena").forEach((marco) => {
-        mostrarContrasena(marco.querySelector("input"), marco.querySelector("button"), false);
-    });
-}, true);
 })();
