@@ -282,6 +282,62 @@ input[type="checkbox"].appearance-none.rounded-full {
     outline: 2px solid CanvasText;
     outline-offset: -2px;
   }
+
+  input:is([type="checkbox"], [type="radio"]).appearance-none {
+    forced-color-adjust: none;
+    background-color: Canvas;
+    border: 1px solid ButtonText;
+    outline-color: Highlight;
+  }
+
+  input[type="checkbox"].appearance-none:not(.rounded-full)::after {
+    color: Canvas;
+  }
+
+  input[type="radio"].appearance-none::after {
+    background-color: Canvas;
+  }
+
+  input:is([type="checkbox"], [type="radio"]).appearance-none:is(:checked, :indeterminate),
+  .matriz-permisos input[type="checkbox"].appearance-none:indeterminate,
+  form:has(input[name="is_superuser"]:checked) .matriz-permisos tr[data-fila] input[type="checkbox"] {
+    background-color: Highlight;
+    border-color: Highlight;
+  }
+
+  input[type="checkbox"].appearance-none:not(.rounded-full):is(:checked, :indeterminate)::after,
+  .matriz-permisos input[type="checkbox"].appearance-none:indeterminate::after,
+  form:has(input[name="is_superuser"]:checked) .matriz-permisos tr[data-fila] input[type="checkbox"]::after {
+    color: HighlightText;
+  }
+
+  input[type="radio"].appearance-none:checked::after {
+    background-color: HighlightText;
+  }
+
+  input[type="checkbox"].appearance-none.rounded-full {
+    background-color: Canvas;
+
+    &::after {
+      background-color: ButtonText;
+    }
+
+    &:checked {
+      background-color: Highlight;
+    }
+
+    &:checked::after {
+      background-color: HighlightText;
+    }
+  }
+
+  input:is([type="checkbox"], [type="radio"]).appearance-none:disabled {
+    border-color: GrayText;
+  }
+
+  input:is([type="checkbox"], [type="radio"]).appearance-none:disabled:is(:checked, :indeterminate) {
+    background-color: GrayText;
+  }
 }
 
 .salto {
