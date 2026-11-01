@@ -317,4 +317,19 @@
   .lista-accesos > li > a {
     @apply flex min-h-11 items-center gap-3 px-5 py-2.5 text-sm font-medium text-gris-oscuro transition-colors hover:bg-gris-claro hover:text-rojo dark:text-white dark:hover:bg-base-800 dark:hover:text-red-300;
   }
+  .requisitos-clave {
+    @apply mt-1 flex flex-col gap-1;
+  }
+  .requisitos-clave > li {
+    @apply flex items-start gap-1.5 text-gris-medio dark:text-oscuro-suave;
+  }
+  .requisitos-clave > li.cumple {
+    @apply font-medium text-green-800 dark:text-green-400;
+  }
+  .requisitos-clave > li.falla {
+    @apply font-medium text-rojo dark:text-oscuro-acento;
+  }
+  .requisitos-clave .material-symbols-outlined {
+    @apply select-none text-[18px] leading-[1.125rem];
+  }
 }

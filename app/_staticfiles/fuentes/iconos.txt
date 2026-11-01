@@ -87,6 +87,7 @@ open_in_new
 pending_actions
 person
 progress_activity
+radio_button_unchecked
 redo
 refresh
 remove

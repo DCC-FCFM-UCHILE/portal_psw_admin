@@ -7,6 +7,7 @@ from unittest import mock
 from django.contrib import admin
 from django.contrib.admin.models import ADDITION, LogEntry
 from django.contrib.auth.models import Group, Permission, User
+from django.contrib.auth.tokens import default_token_generator
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sessions.models import Session
 from django.contrib.staticfiles import finders
@@ -16,10 +17,13 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.encoding import force_bytes
 from django.utils.formats import date_format
+from django.utils.http import urlsafe_base64_encode
 
 from convenios.models import RulesApplications
 from cuentas.forms import NuevaClaveForm, RestablecerForm
+from cuentas.requisitos import NO_CUMPLE
 from interfaz.iconos import FUENTE, iconos_posibles, iconos_recortados
 from interfaz.management.commands.recortar_iconos import ligaduras
 from interfaz.politica import resumen
@@ -270,7 +274,7 @@ class DescripcionConSaltosTests(BaseCompartida):
 
 class ErroresDeContrasenaTests(BaseCompartida):
     def assertErroresEnLaPrimera(self, formulario, primera, segunda):
-        self.assertIn("La contraseña no puede tener solo números.", formulario.errors.get(primera, []))
+        self.assertEqual(formulario.errors.get(primera), [NO_CUMPLE])
         self.assertNotIn(segunda, formulario.errors)
 
     def test_nueva_contrasena(self):
@@ -355,6 +359,88 @@ class ErrorJuntoAlCampoTests(BaseCompartida):
         contenido = self.client.post(reverse("admin:password_change"), datos).content.decode()
         self.assertRegex(contenido, r'<ul class="errorlist" id="id_new_password1_error"><li><span [^>]*aria-hidden="true">warning</span>')
         self.assertLess(contenido.index('id="id_new_password1_error"'), contenido.index('id="id_new_password1_helptext"'))
+
+
+class RequisitosDeClaveTests(BaseCompartida):
+    TODOS = ["MinimumLengthValidator", "NumericPasswordValidator", "CommonPasswordValidator", "UserAttributeSimilarityValidator"]
+
+    def setUp(self):
+        super().setUp()
+        self.otra = User.objects.create_user("otra", "otra@dcc.uchile.cl", "clave-de-prueba", is_staff=True)
+
+    def enlace_de_recuperacion(self, usuario):
+        enlace = reverse(
+            "password_reset_confirm", args=[urlsafe_base64_encode(force_bytes(usuario.pk)), default_token_generator.make_token(usuario)]
+        )
+        return self.client.get(enlace)["Location"]
+
+    def consultar(self, url, **datos):
+        respuesta = self.client.post(url, {"_requisitos": "1", **datos})
+        self.assertEqual(respuesta["Content-Type"], "application/json")
+        return respuesta.json()["requisitos"]
+
+    def test_las_cuatro_paginas_muestran_los_requisitos(self):
+        paginas = {
+            "alta": reverse("admin:auth_user_add"),
+            "otra cuenta": reverse("admin:auth_user_password_change", args=[self.otra.pk]),
+            "propia": reverse("admin:password_change"),
+        }
+        for nombre, url in paginas.items():
+            with self.subTest(pagina=nombre):
+                contenido = self.client.get(url).content.decode()
+                self.assertEqual(contenido.count("data-requisito="), 4)
+                self.assertIn("Al menos 8 caracteres.", contenido)
+                self.assertNotIn("La contraseña debe tener al menos", contenido)
+        self.client.logout()
+        contenido = self.client.get(self.enlace_de_recuperacion(self.otra)).content.decode()
+        self.assertEqual(contenido.count("data-requisito="), 4)
+
+    def test_la_consulta_corre_los_validadores_de_django(self):
+        url = reverse("admin:password_change")
+        casos = {
+            "clave": {**dict.fromkeys(self.TODOS, True), "MinimumLengthValidator": False},
+            "123456789012": {**dict.fromkeys(self.TODOS, True), "NumericPasswordValidator": False},
+            "abcd1234": {**dict.fromkeys(self.TODOS, True), "CommonPasswordValidator": False},
+            "docente2026": {**dict.fromkeys(self.TODOS, True), "UserAttributeSimilarityValidator": False},
+            "un-cuaderno-azul-2026": dict.fromkeys(self.TODOS, True),
+            "": dict.fromkeys(self.TODOS),
+        }
+        for contrasena, esperado in casos.items():
+            with self.subTest(contrasena=contrasena):
+                self.assertEqual(self.consultar(url, new_password1=contrasena), esperado)
+
+    def test_el_alta_compara_con_el_usuario_escrito(self):
+        url = reverse("admin:auth_user_add")
+        self.assertFalse(self.consultar(url, username="anaperez2026", password1="anaperez2026")["UserAttributeSimilarityValidator"])
+        self.assertTrue(self.consultar(url, username="otro", password1="anaperez2026")["UserAttributeSimilarityValidator"])
+
+    def test_la_consulta_no_guarda_nada(self):
+        fuerte = "un-cuaderno-azul-2026"
+        self.consultar(reverse("admin:auth_user_add"), username="nueva", usable_password="true", password1=fuerte, password2=fuerte)
+        self.assertFalse(User.objects.filter(username="nueva").exists())
+        self.consultar(reverse("admin:auth_user_password_change", args=[self.otra.pk]), password1=fuerte, password2=fuerte)
+        self.consultar(reverse("admin:password_change"), old_password="clave-de-prueba", new_password1=fuerte, new_password2=fuerte)
+        self.client.logout()
+        url = self.enlace_de_recuperacion(self.otra)
+        self.consultar(url, new_password1=fuerte, new_password2=fuerte)
+        for usuario in (self.docente, self.otra):
+            usuario.refresh_from_db()
+            self.assertTrue(usuario.check_password("clave-de-prueba"))
+        self.assertContains(self.client.get(url), "data-requisitos")
+
+    def test_la_consulta_respeta_la_sesion_y_los_permisos(self):
+        gestor = User.objects.create_user("gestor", password="clave-de-prueba", is_staff=True)
+        gestor.user_permissions.add(*Permission.objects.filter(content_type__app_label="auth", content_type__model="user"))
+        self.client.force_login(gestor)
+        url = reverse("admin:auth_user_password_change", args=[self.docente.pk])
+        self.assertEqual(self.client.post(url, {"_requisitos": "1", "password1": "x"}).status_code, 403)
+        self.client.logout()
+        respuesta = self.client.post(reverse("admin:auth_user_add"), {"_requisitos": "1", "password1": "x"})
+        self.assertEqual(respuesta.status_code, 302)
+        enlace = reverse("password_reset_confirm", args=[urlsafe_base64_encode(force_bytes(self.otra.pk)), "no-vale"])
+        respuesta = self.client.post(enlace, {"_requisitos": "1", "new_password1": "x"})
+        self.assertNotEqual(respuesta["Content-Type"], "application/json")
+        self.assertContains(respuesta, "El enlace ya se usó o venció.")
 
 
 class ConvocatoriaTests(BaseCompartida):
@@ -1102,20 +1188,35 @@ class TextosDeDjangoTests(BaseCompartida):
         self.assertContains(respuesta, "Escribe un correo válido")
         self.assertNotContains(respuesta, "Introduzca")
 
-    def test_los_errores_de_contrasena_tutean(self):
+    def test_al_enviar_la_lista_marca_lo_que_no_cumple(self):
         respuesta = self.client.post(
             reverse("admin:auth_user_password_change", args=[self.docente.pk]),
-            {"password1": "docente", "password2": "docente", "usable_password": "true"},
+            {"password1": "docente", "password2": "docente"},
         )
-        self.assertContains(respuesta, "La contraseña se parece demasiado a un dato de la cuenta (nombre de usuario).")
-        self.assertContains(respuesta, "La contraseña es muy corta: debe tener al menos 8 caracteres.")
-        respuesta = self.client.post(
-            reverse("admin:auth_user_password_change", args=[self.docente.pk]),
-            {"password1": "12345678", "password2": "12345678", "usable_password": "true"},
+        self.assertRegex(respuesta.content.decode(), rf'id="id_password1_error"><li><span [^>]*>warning</span>{NO_CUMPLE} </li></ul>')
+        contenido = respuesta.content.decode()
+        estados = dict(re.findall(r'data-requisito="(\w+)"(?: class="(\w+)")?', contenido))
+        self.assertEqual(
+            estados,
+            {
+                "MinimumLengthValidator": "falla",
+                "NumericPasswordValidator": "cumple",
+                "CommonPasswordValidator": "cumple",
+                "UserAttributeSimilarityValidator": "falla",
+            },
         )
-        self.assertContains(respuesta, "Es una contraseña de uso común. Elige otra.")
-        self.assertContains(respuesta, "La contraseña no puede tener solo números.")
+        self.assertNotContains(respuesta, "La contraseña es muy corta")
         self.assertNotContains(respuesta, "Esta contraseña")
+
+    def test_una_clave_solo_de_numeros_marca_ese_requisito(self):
+        respuesta = self.client.post(
+            reverse("admin:auth_user_password_change", args=[self.docente.pk]),
+            {"password1": "123456789012", "password2": "123456789012"},
+        )
+        contenido = respuesta.content.decode()
+        self.assertRegex(contenido, rf'id="id_password1_error"><li><span [^>]*>warning</span>{NO_CUMPLE} </li></ul>')
+        self.assertRegex(contenido, r'data-requisito="NumericPasswordValidator" class="falla"')
+        self.assertNotContains(respuesta, "numérica")
 
     def test_las_fechas_de_convocatoria_indican_el_formato(self):
         respuesta = self.client.get(reverse("admin:applications_announcement_add"))
@@ -1532,7 +1633,7 @@ class TraduccionesDeDjangoTests(BaseCompartida):
         self.assertContains(respuesta, "Ingreso con contraseña")
         self.assertContains(respuesta, "no puede ingresar ni recuperar la contraseña")
         self.assertNotContains(respuesta, "Single Sign-On")
-        self.assertContains(respuesta, "La contraseña no puede tener solo números.")
+        self.assertContains(respuesta, "Al menos 8 caracteres.")
         self.assertNotContains(respuesta, "Tu contraseña")
 
     def test_el_historial_dice_que_cambio(self):

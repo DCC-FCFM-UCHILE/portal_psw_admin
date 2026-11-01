@@ -7,12 +7,20 @@ from django.views import View
 from django.views.decorators.cache import never_cache
 
 from cuentas.forms import CambioClavePropiaForm, NuevaClaveForm, RestablecerForm
+from cuentas.requisitos import pide_requisitos, responder
 from cuentas.sesion import en_milisegundos, renovar
 
 
 class ConSitio:
     def get_context_data(self, **kwargs):
         return {**admin.site.each_context(self.request), **super().get_context_data(**kwargs)}
+
+
+class ConsultaDeRequisitos:
+    def post(self, request, *args, **kwargs):
+        if pide_requisitos(request):
+            return responder(self.get_form())
+        return super().post(request, *args, **kwargs)
 
 
 class RestablecerView(ConSitio, views.PasswordResetView):
@@ -24,7 +32,7 @@ class RestablecerEnviadoView(ConSitio, views.PasswordResetDoneView):
     pass
 
 
-class RestablecerConfirmarView(ConSitio, views.PasswordResetConfirmView):
+class RestablecerConfirmarView(ConsultaDeRequisitos, ConSitio, views.PasswordResetConfirmView):
     form_class = NuevaClaveForm
     success_url = reverse_lazy("password_reset_complete")
 
@@ -33,7 +41,7 @@ class RestablecerListoView(ConSitio, views.PasswordResetCompleteView):
     pass
 
 
-class CambiarClaveView(ConSitio, views.PasswordChangeView):
+class CambiarClaveView(ConsultaDeRequisitos, ConSitio, views.PasswordChangeView):
     form_class = CambioClavePropiaForm
     success_url = reverse_lazy("admin:password_change_done")
 

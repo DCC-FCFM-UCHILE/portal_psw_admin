@@ -1,8 +1,12 @@
 from django.contrib import admin, messages
+from django.contrib.admin.utils import unquote
 from django.contrib.auth.admin import GroupAdmin as BaseGroupAdmin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.admin import sensitive_post_parameters_m
 from django.contrib.auth.models import Group, User
+from django.core.exceptions import PermissionDenied
 from django.db.models import BooleanField, ExpressionWrapper, Q
+from django.http import Http404
 from django.shortcuts import redirect
 from django.utils.text import capfirst
 from unfold.admin import ModelAdmin
@@ -12,6 +16,7 @@ from core.busqueda import BusquedaSinTildes
 from core.ficha import SinGuardarYAgregarOtro
 from core.listado import ListadoParcial
 from cuentas.forms import AltaUsuarioForm, CambioClaveForm, FichaUsuarioForm, IngresoForm
+from cuentas.requisitos import pide_requisitos, responder
 from cuentas.widgets import CasillasDeGrupos, MatrizPermisos
 
 admin.site.login_form = IngresoForm
@@ -153,6 +158,25 @@ class UserAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, SinGuardarYAg
                 solo_lectura=ExpressionWrapper(solo_lectura, output_field=BooleanField()),
             )
         )
+
+    @sensitive_post_parameters_m
+    def add_view(self, request, form_url="", extra_context=None):
+        if pide_requisitos(request):
+            if not self.has_add_permission(request):
+                raise PermissionDenied
+            return responder(self.get_form(request)(request.POST))
+        return super().add_view(request, form_url, extra_context)
+
+    @sensitive_post_parameters_m
+    def user_change_password(self, request, id, form_url=""):
+        if pide_requisitos(request):
+            usuario = self.get_object(request, unquote(id))
+            if usuario is None:
+                raise Http404
+            if not self.has_change_permission(request, usuario):
+                raise PermissionDenied
+            return responder(self.change_password_form(usuario, request.POST))
+        return super().user_change_password(request, id, form_url)
 
     def has_change_permission(self, request, obj=None):
         if es_superusuario_ajeno(request, obj):
