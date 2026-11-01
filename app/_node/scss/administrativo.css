@@ -1207,3 +1207,7 @@ form:has(input[name="is_superuser"]:checked) .matriz-permisos tr[data-fila] inpu
 form:has(input[name="is_superuser"]:checked) .matriz-permisos-aviso {
   display: block;
 }
+
+form:has(input[name="is_superuser"]:disabled) .matriz-permisos-retorno {
+  display: none;
+}

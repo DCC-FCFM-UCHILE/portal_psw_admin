@@ -70,7 +70,13 @@ class PermisosEnTabla:
         return super().formfield_for_manytomany(db_field, request, **kwargs)
 
 
-ACCESO_PROPIO = ["is_active", "is_staff", "is_superuser", "groups", "user_permissions"]
+ACCESO_PROPIO = {
+    "is_active": "No puedes desactivar tu propia cuenta.",
+    "is_staff": "No puedes quitarte el acceso a la administración.",
+    "is_superuser": "No puedes quitarte el superusuario.",
+    "groups": "Tus grupos los cambia otra persona que administre las cuentas.",
+    "user_permissions": "Tus permisos los cambia otra persona que administre las cuentas.",
+}
 
 
 def es_superusuario_ajeno(request, obj):
@@ -112,10 +118,10 @@ class UserAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, PermisosEnTab
     def get_form(self, request, obj=None, **kwargs):
         formulario = super().get_form(request, obj, **kwargs)
         if obj is not None and obj.pk == request.user.pk:
-            for nombre in ACCESO_PROPIO:
+            for nombre, ayuda in ACCESO_PROPIO.items():
                 if nombre in formulario.base_fields:
                     formulario.base_fields[nombre].disabled = True
-                    formulario.base_fields[nombre].help_text = ""
+                    formulario.base_fields[nombre].help_text = ayuda
         elif not request.user.is_superuser and "is_superuser" in formulario.base_fields:
             formulario.base_fields["is_superuser"].disabled = True
             formulario.base_fields["is_superuser"].help_text = "Solo lo cambia un superusuario."
