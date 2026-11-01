@@ -9,6 +9,8 @@ from django.utils.html import strip_tags
 
 logger = logging.getLogger(__name__)
 
+LOGO = "https://dcc.uchile.cl/static/images/H-lg.png"
+
 
 def texto_plano(contenido):
     texto = re.sub(r"<br\s*/?>", "\n", contenido, flags=re.IGNORECASE)
@@ -18,7 +20,7 @@ def texto_plano(contenido):
 
 
 def enviar(correo, asunto, contenido):
-    html = render_to_string("postulaciones/correo/notificacion.html", {"asunto": asunto, "contenido": contenido})
+    html = render_to_string("postulaciones/correo/notificacion.html", {"asunto": asunto, "contenido": contenido, "logo": LOGO})
     mensaje = EmailMultiAlternatives(
         subject=asunto,
         body=texto_plano(contenido),

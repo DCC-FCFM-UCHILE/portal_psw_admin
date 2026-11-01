@@ -14,12 +14,12 @@
 <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="width:100%;background:#ffffff;border-radius:3px;">
 <tr>
 <td style="padding:20px;font-size:14px;vertical-align:top;color:#333333;">
-<img src="https://dcc.uchile.cl/static/images/H-lg.png" width="280" height="67" alt="Departamento de Ciencias de la Computación, Universidad de Chile" style="display:block;margin-bottom:15px;">
+<img src="{{ logo }}" width="280" height="67" alt="Departamento de Ciencias de la Computación, Universidad de Chile" style="display:block;margin-bottom:15px;">
 {% autoescape off %}{{ contenido }}{% endautoescape %}
 </td>
 </tr>
 </table>
-<p style="margin:10px 0;text-align:center;font-size:12px;color:#999999;">Departamento de Ciencias de la Computación, Facultad de Ciencias Físicas y Matemáticas<br>Universidad de Chile<br>Edificio Norte, Beauchef 851, Santiago</p>
+<p style="margin:10px 0;text-align:center;font-size:12px;color:#999999;">{% include "postulaciones/correo/pie.html" %}</p>
 </td>
 <td>&nbsp;</td>
 </tr>

@@ -10,7 +10,7 @@ from django.urls import reverse
 
 from convenios.models import RulesApplications
 from cuentas.forms import NuevaClaveForm, RestablecerForm
-from postulaciones import tablas_compartidas
+from postulaciones import correo, tablas_compartidas
 from postulaciones.models import Announcement, Application, ApprovedProject, Candidate, Organization, Unit
 
 
@@ -207,6 +207,15 @@ class CorreoTests(BaseCompartida):
                 self.assertContains(respuesta, "Estimado/a")
                 self.assertContains(respuesta, "Cecilia Bastarrica")
                 self.assertNotContains(respuesta, "no está aceptada ni rechazada")
+
+    def test_el_editor_muestra_el_membrete_y_el_pie_del_correo(self):
+        respuesta = self.client.get(self.url("contactar"))
+        self.assertContains(respuesta, f'<img src="{correo.LOGO}"')
+        self.assertContains(respuesta, "Edificio Norte, Beauchef 851")
+        self.client.post(self.url("contactar"), {"correo": "ana@ejemplo.cl", "asunto": "Reunión", "contenido": "<p>Hola</p>"})
+        html = mail.outbox[0].alternatives[0].content
+        self.assertIn(f'<img src="{correo.LOGO}"', html)
+        self.assertIn("Edificio Norte, Beauchef 851", html)
 
     def test_enviar_marca_notificada(self):
         respuesta = self.client.post(

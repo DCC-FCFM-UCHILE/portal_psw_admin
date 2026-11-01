@@ -312,6 +312,15 @@ html.cargando-vista:has([data-destino]) #ir-al-inicio[aria-current="page"]:not([
   .dark trix-editor:focus {
     outline-color: var(--color-white) !important;
   }
+
+  .hoja-correo > trix-editor {
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
+  }
+}
+
+.hoja-correo > trix-toolbar {
+  order: -1;
 }
 
 #menu-cuenta :where(a, button, input):focus-visible,
