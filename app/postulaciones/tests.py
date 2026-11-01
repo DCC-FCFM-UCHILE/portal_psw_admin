@@ -818,8 +818,16 @@ class GuionesDeUnfoldTests(BaseCompartida):
                 sincronos = re.findall(r"<script\b(?![^>]*\b(?:defer|async)\b)[^>]*\bsrc=\"([^\"]*)\"[^>]*>", cabecera)
                 self.assertTrue(guiones)
                 propios = [g.split("?")[0] for g in sincronos if "/admin/js/" not in g and not g.endswith("jsi18n/")]
-                self.assertEqual(propios, [])
+                self.assertEqual([g for g in propios if not g.endswith(("trix/trix.js", "trix.config.js"))], [])
                 self.assertIn("alpine/alpine.js", guiones[-1])
+
+    def test_trix_y_su_configuracion_corren_antes_del_editor(self):
+        pagina = self.client.get(self.urls()[3]).content.decode()
+        cabecera, cuerpo = pagina.split("</head>")
+        self.assertRegex(cabecera, r'<script src="[^"]*trix/trix\.js[^"]*"></script>\s*<script src="[^"]*trix\.config\.js[^"]*"></script>')
+        self.assertLess(cuerpo.index("parrafo.group = false"), cuerpo.index("<trix-editor"))
+        with open(finders.find("js/administrativo/formularios.js")) as archivo:
+            self.assertNotIn("trix-before-initialize", archivo.read())
 
 
 class IconosTests(BaseCompartida):

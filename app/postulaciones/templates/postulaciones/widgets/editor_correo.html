@@ -1,3 +1,4 @@
+{% load interfaz %}
 {% include "unfold/forms/helpers/toolbar.html" %}
 
 <input type="hidden" name="{{ widget.name }}" id="wysiwyg-{{ widget.name }}"{% if widget.value != None %} value="{{ widget.value }}"{% endif %} {% include "django/forms/widgets/attrs.html" %}>
@@ -6,6 +7,7 @@
     <div class="rounded-t-default border border-b-0 border-borde bg-white px-3 py-3 dark:border-oscuro-borde">
         <img src="{{ widget.logo }}" alt="Departamento de Ciencias de la Computación, Universidad de Chile" width="280" height="67" class="block h-auto max-w-full">
     </div>
+    <script>{% en_linea "postulaciones/widgets/parrafos_sin_agrupar.js" %}</script>
     <trix-editor input="wysiwyg-{{ widget.name }}" {% include "django/forms/widgets/attrs.html" %}></trix-editor>
     <p class="mt-2 text-xs text-font-subtle-light dark:text-font-subtle-dark">{% include "postulaciones/correo/pie.html" %}</p>
 </div>

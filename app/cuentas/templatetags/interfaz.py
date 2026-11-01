@@ -27,7 +27,7 @@ def iniciales(usuario):
 
 GUION = re.compile(r"<script\b[^>]*>")
 ORIGEN = re.compile(r'\bsrc="([^"]*)"')
-SIN_DIFERIR = re.compile(r"/admin/js/|jsi18n/$")
+SIN_DIFERIR = re.compile(r"/admin/js/|jsi18n/$|/unfold/forms/js/trix(/trix)?\.(config\.)?js$")
 
 
 @register.filter(is_safe=True)
@@ -54,6 +54,7 @@ def compactar(codigo):
 GUIONES_EN_LINEA = [
     "components/layout/arranque.js",
     "components/layout/navegacion.js",
+    "postulaciones/widgets/parrafos_sin_agrupar.js",
 ]
 
 
