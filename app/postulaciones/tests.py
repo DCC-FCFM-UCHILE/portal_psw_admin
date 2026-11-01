@@ -270,9 +270,12 @@ class ErroresDeContrasenaTests(BaseCompartida):
 
     def test_cambiar_la_contrasena_propia(self):
         url = reverse("admin:password_change")
+        actual = r'<input[^>]*name="old_password"[^>]*>'
+        self.assertIn("autofocus", re.search(actual, self.client.get(url).content.decode()).group())
         datos = {"old_password": "clave-de-prueba", "new_password1": "12345678", "new_password2": "12345678"}
         respuesta = self.client.post(url, datos)
         self.assertErroresEnLaPrimera(respuesta.context["form"], "new_password1", "new_password2")
+        self.assertNotIn("autofocus", re.search(actual, respuesta.content.decode()).group())
         datos["new_password1"] = datos["new_password2"] = "otra-clave-larga-2026"
         self.assertRedirects(self.client.post(url, datos), reverse("admin:password_change_done"))
         self.docente.refresh_from_db()

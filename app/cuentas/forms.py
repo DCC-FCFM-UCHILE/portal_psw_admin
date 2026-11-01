@@ -19,23 +19,31 @@ class ErroresEnLaPrimeraClave:
         super().validate_password_for_user(user, password_field_name=password_field_name.removesuffix("2") + "1", **kwargs)
 
 
+class SinAutofocoConErrores:
+    def full_clean(self):
+        super().full_clean()
+        if self.errors:
+            for campo in self.fields.values():
+                campo.widget.attrs.pop("autofocus", None)
+
+
 class RestablecerForm(ConClasesDeUnfold, forms.PasswordResetForm):
     pass
 
 
-class NuevaClaveForm(ErroresEnLaPrimeraClave, ConClasesDeUnfold, forms.SetPasswordForm):
+class NuevaClaveForm(SinAutofocoConErrores, ErroresEnLaPrimeraClave, ConClasesDeUnfold, forms.SetPasswordForm):
     pass
 
 
-class AltaUsuarioForm(ErroresEnLaPrimeraClave, UserCreationForm):
+class AltaUsuarioForm(SinAutofocoConErrores, ErroresEnLaPrimeraClave, UserCreationForm):
     pass
 
 
-class CambioClaveForm(ErroresEnLaPrimeraClave, AdminPasswordChangeForm):
+class CambioClaveForm(SinAutofocoConErrores, ErroresEnLaPrimeraClave, AdminPasswordChangeForm):
     pass
 
 
-class CambioClavePropiaForm(ErroresEnLaPrimeraClave, AdminOwnPasswordChangeForm):
+class CambioClavePropiaForm(SinAutofocoConErrores, ErroresEnLaPrimeraClave, AdminOwnPasswordChangeForm):
     pass
 
 
