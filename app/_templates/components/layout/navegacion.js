@@ -3,6 +3,7 @@ const raiz = document.documentElement;
 const imitar = !("onpagereveal" in window) && !matchMedia("(prefers-reduced-motion: reduce)").matches;
 const urlSiluetas = "{% url_siluetas %}";
 const raizAdmin = "{% url 'admin:index' %}";
+const listados = {% rutas_listado %};
 let esperas = [];
 let moldes = null;
 let ultimoCuadro = 0;
@@ -66,20 +67,18 @@ window.addEventListener("load", () => {
 });
 
 const formaDe = (ruta) => {
-    if (!ruta.startsWith(raizAdmin)) {
-        return "";
-    }
-    const partes = ruta.slice(raizAdmin.length).split("/").filter(Boolean);
-    if (!partes.length) {
+    if (ruta === raizAdmin) {
         return "inicio";
     }
-    if (partes.length === 2) {
+    const listado = listados.find((base) => ruta.startsWith(base));
+    if (!listado) {
+        return "";
+    }
+    const partes = ruta.slice(listado.length).split("/").filter(Boolean);
+    if (!partes.length) {
         return "listado";
     }
-    if ((partes.length === 3 && partes[2] === "add") || (partes.length === 4 && partes[3] === "change")) {
-        return "ficha";
-    }
-    return "";
+    return partes.length === 1 ? "ficha" : "";
 };
 
 const navegaAOtraVista = (evento, enlace) => {

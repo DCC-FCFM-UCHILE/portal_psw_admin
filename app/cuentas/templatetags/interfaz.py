@@ -1,12 +1,15 @@
 import hashlib
+import json
 import logging
 from functools import lru_cache
 
 from django import template
 from django.conf import settings
+from django.contrib import admin
 from django.contrib.admin.views.main import PAGE_VAR
 from django.template.loader import render_to_string
 from django.urls import NoReverseMatch, reverse
+from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
 
 register = template.Library()
@@ -71,6 +74,12 @@ def url_siluetas():
     except Exception:
         logger.exception("No se pudo armar la dirección de las siluetas")
         return ""
+
+
+@register.simple_tag
+def rutas_listado():
+    rutas = [reverse(f"admin:{m._meta.app_label}_{m._meta.model_name}_changelist") for m in admin.site._registry]
+    return mark_safe(json.dumps(rutas))
 
 
 @register.simple_tag
