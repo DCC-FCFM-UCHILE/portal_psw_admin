@@ -1,7 +1,7 @@
 import datetime
 from unittest import mock
 
-from django.contrib.auth.models import Permission, User
+from django.contrib.auth.models import Group, Permission, User
 from django.core import mail
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -233,6 +233,57 @@ class NavegacionTests(BaseCompartida):
                 self.assertContains(self.client.get(url), 'raiz.removeAttribute("x-cloak")')
         self.client.logout()
         self.assertContains(self.client.get(reverse("admin:login")), 'raiz.removeAttribute("x-cloak")')
+
+
+class FormulariosTests(BaseCompartida):
+    def test_cada_permiso_aparece_una_vez(self):
+        respuesta = self.client.get(reverse("admin:auth_group_add"))
+        valores = [f'value="{pk}"' for pk in Permission.objects.values_list("pk", flat=True)]
+        contenido = respuesta.content.decode()
+        self.assertEqual(contenido.count('name="permissions"'), len(valores))
+        for valor in valores:
+            with self.subTest(valor=valor):
+                self.assertEqual(contenido.count(valor), 1)
+
+    def test_los_permisos_van_por_seccion_del_menu(self):
+        respuesta = self.client.get(reverse("admin:auth_group_add"))
+        self.assertContains(respuesta, "<caption>Postulaciones</caption>", html=True)
+        self.assertContains(respuesta, "Ver organizaciones")
+        self.assertNotContains(respuesta, "permisos Disponibles")
+
+    def test_guardar_conserva_un_permiso_ajeno(self):
+        ajeno = Permission.objects.get(codename="view_session")
+        propio = Permission.objects.get(codename="view_application")
+        respuesta = self.client.post(reverse("admin:auth_group_add"), {"name": "Docentes", "permissions": [ajeno.pk, propio.pk]})
+        self.assertEqual(respuesta.status_code, 302)
+        grupo = Group.objects.get(name="Docentes")
+        self.assertEqual(set(grupo.permissions.all()), {ajeno, propio})
+        ficha = self.client.get(reverse("admin:auth_group_change", args=[grupo.pk]))
+        self.assertContains(ficha, "data-otros open")
+
+    def test_el_usuario_elige_grupos_con_casillas(self):
+        Group.objects.create(name="Docentes")
+        respuesta = self.client.get(reverse("admin:auth_user_change", args=[self.docente.pk]))
+        self.assertContains(respuesta, 'type="checkbox" name="groups"')
+        self.assertNotContains(respuesta, "SelectFilter")
+
+    def test_el_archivo_declara_sus_formatos(self):
+        respuesta = self.client.get(reverse("admin:applications_application_add"))
+        self.assertContains(respuesta, 'accept=".pdf"')
+        self.assertContains(respuesta, "Formato PDF")
+        self.assertContains(respuesta, "zona-archivo-destino")
+
+    def test_el_filtro_por_convocatoria_no_carga_select2(self):
+        Announcement.objects.create(
+            convenio=self.convocatoria.convenio,
+            inicio=datetime.date(2027, 3, 1),
+            cierre=datetime.date(2027, 4, 30),
+            semestre="FA",
+            anio=2027,
+        )
+        respuesta = self.client.get(reverse("admin:applications_application_changelist"))
+        self.assertContains(respuesta, 'name="convocatoria__id__exact"')
+        self.assertNotContains(respuesta, "select2")
 
 
 class RestablecerTests(TestCase):
