@@ -542,6 +542,7 @@ html:has(#listado[aria-busy="true"]) :is(#pie-listado, #conteo-cabecera) {
 
 html {
   scroll-padding-top: calc(var(--alto-cabecera, 4rem) + 1rem);
+  scroll-padding-bottom: 1rem;
 }
 
 @media (min-width: 1024px) {

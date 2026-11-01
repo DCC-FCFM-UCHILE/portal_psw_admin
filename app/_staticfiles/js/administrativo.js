@@ -610,6 +610,24 @@ document.addEventListener("formset:added", (evento) => {
     evento.target.querySelector('input:not([type="hidden"]), select, textarea')?.focus();
 });
 
+document.addEventListener("focusin", (evento) => {
+    const elemento = evento.target;
+    elemento.closest?.(".matriz-permisos-marco td, #nav-sidebar-apps a")?.scrollIntoView({ block: "nearest", inline: "nearest" });
+    if (!elemento.closest?.("#content") || !elemento.matches(":focus-visible")) {
+        return;
+    }
+    requestAnimationFrame(() => {
+        if (document.activeElement !== elemento) {
+            return;
+        }
+        const caja = elemento.getBoundingClientRect();
+        const techo = document.getElementById("cabecera")?.getBoundingClientRect().bottom ?? 0;
+        if (caja.height && (caja.top < techo || caja.bottom > innerHeight)) {
+            elemento.scrollIntoView({ block: "nearest" });
+        }
+    });
+});
+
 document.addEventListener("formset:removed", (evento) => {
     document.getElementById(`${evento.detail.formsetName}-group`)?.querySelector(".add-row")?.focus();
 });
