@@ -36,7 +36,7 @@
                     x-on:keydown.ctrl.enter.prevent="currentIndex > 0 && selectItem({% if command_show_history %}true{% else %}false{% endif %}, true)"
                     x-on:keydown.meta.k.prevent="handleOpen()"
                     x-on:keydown.ctrl.k.prevent="handleOpen()"
-                    x-on:keydown.enter.prevent="if (!$event.metaKey && !$event.ctrlKey && currentIndex > 0) selectItem({% if command_show_history %}true{% else %}false{% endif %}, false)"
+                    x-on:keydown.enter.prevent="if (!$event.metaKey && !$event.ctrlKey && currentIndex > 0) document.getElementById('resultado-busqueda-' + currentIndex)?.click()"
                     hx-get="{% url "admin:search" %}"
                     hx-trigger="keyup changed delay:500ms"
                     hx-select="#command-results-list"

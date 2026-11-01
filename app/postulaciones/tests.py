@@ -958,3 +958,14 @@ class CabeceraDeIntegrantesTests(BaseCompartida):
         self.assertContains(respuesta, '<thead class="relative">')
         self.assertNotContains(respuesta, "lg:table-header-group")
         self.assertContains(respuesta, '<span class="sr-only">Quitar</span>')
+
+
+class BuscadorComoEnlaceTests(BaseCompartida):
+    def test_el_enter_del_buscador_pasa_por_el_enlace(self):
+        respuesta = self.client.get(reverse("admin:index"))
+        self.assertContains(respuesta, "document.getElementById('resultado-busqueda-' + currentIndex)?.click()")
+
+    def test_los_resultados_del_buscador_navegan_como_enlaces(self):
+        respuesta = self.client.get(reverse("admin:search"), {"s": "Fundación"})
+        self.assertContains(respuesta, 'id="resultado-busqueda-1"')
+        self.assertNotContains(respuesta, "selectItem")
