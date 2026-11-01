@@ -4,10 +4,12 @@ const imitar = !("onpagereveal" in window) && !matchMedia("(prefers-reduced-moti
 const urlSiluetas = "{% url_siluetas %}";
 const raizAdmin = "{% url 'admin:index' %}";
 const listados = {% rutas_listado %};
+const anchoCajon = matchMedia("(max-width: 1280px)");
 let esperas = [];
 let moldes = null;
 let ultimoCuadro = 0;
 let focoAnterior = null;
+let nombrados = [];
 
 const sesion = (operar) => {
     try {
@@ -231,26 +233,64 @@ document.addEventListener("submit", (evento) => {
     esperas.push(setTimeout(barra, 300));
 });
 
-const nombrar = (transicion) => {
+const nombrar = (elemento, nombre, clase) => {
+    if (!elemento || !elemento.checkVisibility()) {
+        return;
+    }
+    elemento.style.setProperty("view-transition-name", nombre);
+    if (clase) {
+        elemento.style.setProperty("view-transition-class", clase);
+    }
+    nombrados.push(elemento);
+};
+
+const olvidarNombres = () => {
+    nombrados.forEach((elemento) => {
+        elemento.style.removeProperty("view-transition-name");
+        elemento.style.removeProperty("view-transition-class");
+    });
+    nombrados = [];
+};
+
+const capasAbiertas = () => {
+    const capas = [...document.querySelectorAll(".velo-lateral, #modal-overlay, #modal-content, [x-data='searchCommand()'], [aria-modal='true']")];
+    return [...new Set(capas.map((capa) => (capa.id === "modal-content" ? capa.closest(".fixed") : capa)))];
+};
+
+const nombrarVista = (fase) => {
+    const lateral = document.getElementById("nav-sidebar");
+    if (!anchoCajon.matches) {
+        nombrar(lateral, "lateral");
+    } else if (fase === "saliente") {
+        nombrar(lateral, "cajon", "capa");
+    }
+    nombrar(document.getElementById("cabecera"), "cabecera");
+    nombrar(document.getElementById("titulo-cabecera"), `titulo-${fase}`, "contenido");
+    document.querySelectorAll("#cabecera .ml-auto > .flex-row").forEach((acciones, indice) => nombrar(acciones, `acciones-${fase}-${indice}`, "contenido"));
+    if (fase === "saliente") {
+        capasAbiertas().forEach((capa, indice) => nombrar(capa, `capa-${indice}`, "capa"));
+        if (document.body.classList.contains("navegando")) {
+            nombrar(document.getElementById("barra-progreso"), "barra");
+        }
+    }
+};
+
+window.addEventListener("pageswap", (evento) => {
+    const transicion = evento.viewTransition;
+    if (transicion) {
+        transicion.ready.catch(() => {});
+        nombrarVista("saliente");
+    }
+});
+
+window.addEventListener("pagereveal", (evento) => {
+    const transicion = evento.viewTransition;
     if (!transicion) {
         return;
     }
-    raiz.classList.add("en-transicion");
-    const quitar = () => raiz.classList.remove("en-transicion");
-    transicion.finished.then(quitar, quitar);
-};
-
-const hayCapaAbierta = () => [...document.querySelectorAll(".velo-lateral, #modal-overlay, [aria-modal='true']")].some((capa) => capa.checkVisibility());
-
-window.addEventListener("pageswap", (evento) => {
-    evento.viewTransition?.ready.catch(() => {});
-    if (!hayCapaAbierta()) {
-        nombrar(evento.viewTransition);
-    }
-});
-window.addEventListener("pagereveal", (evento) => {
-    evento.viewTransition?.ready.catch(() => {});
-    nombrar(evento.viewTransition);
+    transicion.ready.catch(() => {});
+    nombrarVista("entrante");
+    transicion.finished.then(olvidarNombres, olvidarNombres);
 });
 
 window.addEventListener("pagehide", () => {
@@ -260,7 +300,7 @@ window.addEventListener("pageshow", (evento) => {
     soltar();
     if (evento.persisted) {
         sesion((almacen) => almacen.removeItem("transicion-vistas"));
-        raiz.classList.remove("en-transicion");
+        olvidarNombres();
         raiz.classList.remove("cajon-saliente");
         const estado = cajonAbierto();
         if (estado) {

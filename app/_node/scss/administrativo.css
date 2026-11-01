@@ -150,19 +150,34 @@ html[data-arranque="lateral-cerrada"] .envoltura-lateral {
   }
 }
 
-html.en-transicion #nav-sidebar { view-transition-name: lateral; }
-html.en-transicion #cabecera { view-transition-name: cabecera; }
-html.en-transicion #contenido { view-transition-name: contenido; }
-
-::view-transition-old(contenido) {
+::view-transition-old(root),
+::view-transition-old(*.contenido),
+::view-transition-old(*.capa) {
   animation: var(--animate-salida);
 }
 
-::view-transition-new(contenido) {
+::view-transition-new(root),
+::view-transition-new(*.contenido) {
   animation: var(--animate-entrada);
 }
 
-html.vista-saliente #contenido {
+::view-transition-group(*.capa) {
+  z-index: 1;
+}
+
+::view-transition-group(barra) {
+  z-index: 2;
+}
+
+::view-transition-old(barra) {
+  animation: desvanecer-barra var(--duracion-emergente-salida) var(--ease-estandar-salida) both;
+}
+
+@keyframes desvanecer-barra {
+  to { opacity: 0; }
+}
+
+html.vista-saliente :is(#contenido, #titulo-cabecera, #cabecera .ml-auto > .flex-row) {
   animation: var(--animate-salida);
 }
 
@@ -184,7 +199,7 @@ html.restaurada .envoltura-lateral * {
   animation: none !important;
 }
 
-html.vista-entrante #contenido {
+html.vista-entrante :is(#contenido, #titulo-cabecera, #cabecera .ml-auto > .flex-row) {
   animation: var(--animate-entrada);
 }
 
@@ -394,10 +409,10 @@ input[type="checkbox"].appearance-none.rounded-full {
 @media (prefers-reduced-motion: reduce) {
   #avisos,
   .silueta-vista.entrando,
-  html.vista-saliente #contenido,
+  html.vista-saliente :is(#contenido, #titulo-cabecera, #cabecera .ml-auto > .flex-row),
   html.vista-saliente .envoltura-lateral,
   html.cajon-saliente .envoltura-lateral,
-  html.vista-entrante #contenido {
+  html.vista-entrante :is(#contenido, #titulo-cabecera, #cabecera .ml-auto > .flex-row) {
     animation: none;
   }
 
