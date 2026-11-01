@@ -2,3 +2,4 @@ Django==5.2.18
 psycopg[binary]==3.3.6
 django-unfold==0.108.0
 nh3==0.3.7
+Pillow==13.0.0
