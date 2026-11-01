@@ -1,13 +1,7 @@
 {% firstof field.field.use_fieldset field.field.field.widget.widget.use_fieldset as agrupa %}
-{% if agrupa and not field.is_readonly %}
-    <div id="{{ field.field.auto_id }}_etiqueta" class="lg:min-w-56 lg:w-56 lg:h-[38px] lg:flex lg:items-center lg:self-start lg:leading-[38px] lg:*:m-0">
-        {{ field.label_tag }}
-    </div>
-{% else %}
-    <div class="lg:min-w-56 lg:w-56 lg:h-[38px] lg:flex lg:items-center lg:self-start lg:leading-[38px] lg:*:m-0">
-        {{ field.label_tag }}
-    </div>
-{% endif %}
+<div{% if field.field.auto_id %} id="{{ field.field.auto_id }}_etiqueta"{% endif %} class="lg:min-w-56 lg:w-56 lg:h-[38px] lg:flex lg:items-center lg:self-start lg:leading-[38px] lg:*:m-0">
+    {{ field.label_tag }}
+</div>
 
 <div class="grow relative"{% if agrupa and not field.is_readonly %} role="group" aria-labelledby="{{ field.field.auto_id }}_etiqueta"{% endif %}>
     {% if field.is_readonly %}
