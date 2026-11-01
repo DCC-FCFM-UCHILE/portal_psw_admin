@@ -1038,6 +1038,10 @@ input[type="checkbox"].appearance-none.rounded-full {
   .boton-primario {
     @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-rojo px-4 py-2 text-sm font-semibold text-white shadow-sm transition-[color,background-color,transform] hover:bg-rojo-oscuro active:scale-95 motion-reduce:active:scale-100;
   }
+  .boton-buscar {
+    @apply inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 border-l border-borde bg-gris-claro px-3 text-sm font-medium text-gris-oscuro transition-[color,background-color] hover:bg-base-100 focus-visible:-outline-offset-2 dark:border-oscuro-borde dark:bg-oscuro-elevada dark:text-oscuro-texto dark:hover:bg-base-700;
+  }
+
   .boton-secundario {
     @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border border-borde bg-white px-4 py-2 text-sm font-medium text-gris-oscuro transition-[color,background-color,border-color,transform] hover:bg-gray-50 active:scale-95 motion-reduce:active:scale-100 dark:border-oscuro-borde dark:bg-base-900 dark:text-white dark:hover:bg-base-800;
   }

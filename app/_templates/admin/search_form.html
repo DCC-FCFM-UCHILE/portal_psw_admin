@@ -3,12 +3,7 @@
 {% if cl.search_fields %}
     <div id="toolbar" class="sm:grow lg:grow-0">
         <form {% if not cl.is_dataset %}id="changelist-search"{% endif %} method="get" role="search" aria-label="Buscar en el listado">
-            <div class="buscador-listado bg-white border border-base-200 flex flex-row items-center px-3 rounded-default relative shadow-xs w-full focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-rojo lg:w-96 dark:focus-within:outline-oscuro-acento dark:bg-base-900 dark:border-base-700">
-                <button type="submit" class="-ml-1.5 flex size-8 shrink-0 cursor-pointer items-center justify-center rounded text-gris-medio hover:text-gris-oscuro dark:text-oscuro-suave dark:hover:text-oscuro-texto" id="searchbar-submit">
-                    <span class="material-symbols-outlined md-18" aria-hidden="true">search</span>
-                    <span class="sr-only">Buscar</span>
-                </button>
-
+            <div class="buscador-listado bg-white border border-base-200 flex flex-row items-stretch pl-3 rounded-default relative shadow-xs w-full overflow-hidden has-[input:focus]:outline-2 has-[input:focus]:-outline-offset-2 has-[input:focus]:outline-rojo lg:w-96 dark:has-[input:focus]:outline-oscuro-acento dark:bg-base-900 dark:border-base-700">
                 <label for="searchbar" class="sr-only">Buscar</label>
 
                 <input type="text"
@@ -17,6 +12,11 @@
                        value="{{ cl.query }}"
                        {% if not cl.is_dataset %}id="searchbar"{% endif %}
                        placeholder="{% if cl.search_help_text %}{{ cl.search_help_text }}{% else %}{% trans "Type to search" %}{% endif %}" />
+
+                <button type="submit" class="boton-buscar" id="searchbar-submit">
+                    <span class="material-symbols-outlined md-18" aria-hidden="true">search</span>
+                    <span class="max-sm:sr-only">Buscar</span>
+                </button>
             </div>
 
             {% for pair in cl.filter_params.items %}
