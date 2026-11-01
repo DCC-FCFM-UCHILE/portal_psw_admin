@@ -949,3 +949,12 @@ class MatricesDeshabilitadasTests(BaseCompartida):
         respuesta = self.client.get(reverse("admin:auth_user_change", args=[self.docente.pk]))
         self.assertContains(respuesta, 'role="region" tabindex="0" aria-labelledby="id_user_permissions_seccion_1"')
         self.assertContains(respuesta, '<caption id="id_user_permissions_seccion_1">')
+
+
+class CabeceraDeIntegrantesTests(BaseCompartida):
+    def test_la_cabecera_de_integrantes_se_ve_en_todos_los_anchos(self):
+        proyecto = ApprovedProject.objects.create(titulo="Riego", semestre="SP", anio=2026, tutor="Tutor")
+        respuesta = self.client.get(reverse("admin:applications_approvedproject_change", args=[proyecto.pk]))
+        self.assertContains(respuesta, '<thead class="relative">')
+        self.assertNotContains(respuesta, "lg:table-header-group")
+        self.assertContains(respuesta, '<span class="sr-only">Quitar</span>')
