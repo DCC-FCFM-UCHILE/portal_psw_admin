@@ -230,7 +230,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 window.addEventListener("load", () => {
-    const contenido = document.getElementById("content");
+    const contenido = document.getElementById("content") ?? document.getElementById("contenido");
     if (!contenido || document.getElementById("login-form")) {
         return;
     }
