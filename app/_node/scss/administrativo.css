@@ -514,6 +514,24 @@ html:has(#listado[aria-busy="true"]) :is(#pie-listado, #conteo-cabecera) {
   }
 }
 
+@layer base {
+  :where(input:not([type="hidden"]), select, textarea, trix-editor, .buscador-listado) {
+    outline: 0 solid transparent;
+    outline-offset: -2px;
+    transition-property: outline-color, outline-width;
+    transition-duration: 150ms;
+    transition-timing-function: var(--ease-out);
+
+    @media (prefers-reduced-motion: reduce) {
+      transition-property: outline-color;
+    }
+  }
+
+  :where(input[type="checkbox"], input[type="radio"]) {
+    outline-offset: 2px;
+  }
+}
+
 :where(a, button, summary, [tabindex]:not([tabindex="-1"]), input[type="checkbox"], input[type="radio"]):focus-visible {
   outline: 2px solid var(--color-rojo);
   outline-offset: 2px;
@@ -549,6 +567,10 @@ html:has(#listado[aria-busy="true"]) :is(#pie-listado, #conteo-cabecera) {
 }
 
 @layer base {
+  trix-editor:not(:focus) {
+    outline: 0 solid transparent !important;
+  }
+
   trix-editor {
     border-color: var(--color-borde) !important;
 
@@ -901,7 +923,9 @@ input[type="checkbox"].appearance-none.rounded-full {
     @apply flex flex-wrap items-center gap-x-3 gap-y-1 rounded-default border border-base-200 bg-base-50 px-3 py-2 text-sm text-gris-oscuro dark:border-oscuro-elevada dark:bg-oscuro-elevada dark:text-oscuro-texto;
   }
   .zona-archivo-destino {
-    @apply relative flex flex-wrap items-center gap-x-3 gap-y-2 rounded-default border-2 border-dashed border-borde bg-white px-4 py-4 text-sm transition-[border-color,background-color] duration-150 dark:border-oscuro-borde dark:bg-oscuro-fondo;
+    @apply relative flex flex-wrap items-center gap-x-3 gap-y-2 rounded-default border-2 border-dashed border-borde bg-white px-4 py-4 text-sm transition-[border-color,background-color,outline-color,outline-width] duration-150 dark:border-oscuro-borde dark:bg-oscuro-fondo motion-reduce:transition-[border-color,background-color,outline-color];
+    outline: 0 solid transparent;
+    outline-offset: 2px;
   }
   .zona-archivo-destino:hover,
   .zona-archivo-destino.encima {
