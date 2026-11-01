@@ -316,7 +316,7 @@ class FormulariosTests(BaseCompartida):
 
     def test_los_permisos_van_por_seccion_del_menu(self):
         respuesta = self.client.get(reverse("admin:auth_group_add"))
-        self.assertContains(respuesta, "<caption>Postulaciones</caption>", html=True)
+        self.assertContains(respuesta, '<caption id="id_permissions_seccion_1">Postulaciones</caption>', html=True)
         self.assertContains(respuesta, "Ver organizaciones")
         self.assertNotContains(respuesta, "permisos Disponibles")
 
@@ -942,3 +942,10 @@ class CamposDeFechaTests(BaseCompartida):
         respuesta = self.client.get(reverse("admin:auth_user_change", args=[otra.pk]))
         self.assertContains(respuesta, 'id="id_date_joined_etiqueta"')
         self.assertContains(respuesta, 'role="group" aria-labelledby="id_date_joined_etiqueta"')
+
+
+class MatricesDeshabilitadasTests(BaseCompartida):
+    def test_las_matrices_deshabilitadas_se_recorren_con_teclado(self):
+        respuesta = self.client.get(reverse("admin:auth_user_change", args=[self.docente.pk]))
+        self.assertContains(respuesta, 'role="region" tabindex="0" aria-labelledby="id_user_permissions_seccion_1"')
+        self.assertContains(respuesta, '<caption id="id_user_permissions_seccion_1">')

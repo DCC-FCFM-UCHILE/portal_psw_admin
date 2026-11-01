@@ -1,8 +1,8 @@
 <div class="matriz-permisos" x-data="matrizPermisos" x-on:change="cambio($event)">
     {% for seccion in widget.secciones %}
-        <div class="matriz-permisos-marco">
+        <div class="matriz-permisos-marco"{% if widget.attrs.disabled %} role="region" tabindex="0" aria-labelledby="{{ widget.attrs.id }}_seccion_{{ forloop.counter }}"{% endif %}>
             <table class="matriz-permisos-tabla">
-                <caption>{{ seccion.titulo }}</caption>
+                <caption id="{{ widget.attrs.id }}_seccion_{{ forloop.counter }}">{{ seccion.titulo }}</caption>
                 <thead>
                     <tr>
                         <td></td>
