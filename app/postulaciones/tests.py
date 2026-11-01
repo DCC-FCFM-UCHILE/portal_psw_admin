@@ -72,6 +72,10 @@ class ListadoTests(BaseCompartida):
         self.assertNotContains(self.client.get(reverse("admin:search"), {"s": "administradora"}), "Administradora")
         self.assertEqual(self.client.get(lista).status_code, 200)
 
+    def test_la_alta_no_se_enlaza_a_si_misma(self):
+        alta = reverse("admin:applications_organization_add")
+        self.assertNotContains(self.client.get(alta), f'href="{alta}"')
+
     def test_no_ofrece_borrar_en_bloque(self):
         respuesta = self.client.get(reverse("admin:applications_application_changelist"))
         self.assertNotContains(respuesta, 'value="delete_selected"')
