@@ -1065,3 +1065,10 @@ class AvisoDeErroresTests(BaseCompartida):
         self.assertContains(respuesta, "La fecha de inicio debe ser menor a la final")
         self.assertNotContains(respuesta, "que se indica")
         self.assertNotContains(respuesta, "que se indican")
+
+
+class TituloDeBorradoTests(BaseCompartida):
+    def test_el_titulo_nombra_lo_que_se_elimina(self):
+        otra = User.objects.create_user("otra", password="clave-de-prueba", is_staff=True)
+        respuesta = self.client.get(reverse("admin:auth_user_delete", args=[otra.pk]))
+        self.assertContains(respuesta, "Eliminar «otra»</h1>")
