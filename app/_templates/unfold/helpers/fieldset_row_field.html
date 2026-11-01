@@ -1,4 +1,5 @@
-{% if field.field.use_fieldset and not field.is_readonly %}
+{% firstof field.field.use_fieldset field.field.field.widget.widget.use_fieldset as agrupa %}
+{% if agrupa and not field.is_readonly %}
     <div id="{{ field.field.auto_id }}_etiqueta" class="lg:min-w-56 lg:w-56 lg:h-[38px] lg:flex lg:items-center lg:self-start lg:leading-[38px] lg:*:m-0">
         {{ field.label_tag }}
     </div>
@@ -8,7 +9,7 @@
     </div>
 {% endif %}
 
-<div class="grow relative"{% if field.field.use_fieldset and not field.is_readonly %} role="group" aria-labelledby="{{ field.field.auto_id }}_etiqueta"{% endif %}>
+<div class="grow relative"{% if agrupa and not field.is_readonly %} role="group" aria-labelledby="{{ field.field.auto_id }}_etiqueta"{% endif %}>
     {% if field.is_readonly %}
         {% include "unfold/helpers/field_readonly_value.html" %}
     {% else %}
