@@ -943,6 +943,7 @@ input[type="checkbox"].appearance-none.rounded-full {
   .matriz-permisos-marco {
     @apply overflow-x-auto rounded-default border border-base-200 bg-white dark:border-oscuro-elevada dark:bg-oscuro-superficie;
     scroll-padding-inline-start: 7rem;
+    container-type: inline-size;
   }
   .matriz-permisos-tabla {
     @apply w-full border-collapse text-sm;
@@ -975,6 +976,37 @@ input[type="checkbox"].appearance-none.rounded-full {
   }
   .matriz-permisos-celda {
     @apply flex min-h-11 cursor-pointer items-center justify-center hover:bg-base-50 dark:hover:bg-oscuro-elevada;
+  }
+  .matriz-permisos-vacia {
+    @apply cursor-default hover:bg-transparent dark:hover:bg-transparent;
+  }
+  .matriz-permisos-verbo {
+    @apply hidden;
+  }
+  @container (width < 20rem) {
+    .matriz-permisos-tabla,
+    .matriz-permisos-tabla tbody,
+    .matriz-permisos-tabla caption {
+      @apply block;
+    }
+    .matriz-permisos-tabla thead {
+      @apply sr-only;
+    }
+    .matriz-permisos-tabla tbody tr {
+      @apply grid grid-cols-5;
+    }
+    .matriz-permisos-tabla tbody th {
+      @apply static col-span-5 w-auto min-w-0 px-3 pt-2.5 pb-0;
+    }
+    .matriz-permisos-tabla tbody td {
+      @apply w-auto min-w-0;
+    }
+    .matriz-permisos-celda {
+      @apply min-h-14 flex-col gap-1;
+    }
+    .matriz-permisos-verbo {
+      @apply block text-[0.6875rem] text-gris-medio dark:text-oscuro-suave;
+    }
   }
   .matriz-permisos-nota,
   .matriz-permisos-aviso {

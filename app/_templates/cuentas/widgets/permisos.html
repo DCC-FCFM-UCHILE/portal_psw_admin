@@ -3,37 +3,44 @@
     <div x-ref="reserva" hidden></div>
     {% for seccion in widget.secciones %}
         <div class="matriz-permisos-marco"{% if widget.attrs.disabled %} role="region" tabindex="0" aria-labelledby="{{ widget.attrs.id }}_seccion_{{ forloop.counter }}"{% endif %}>
-            <table class="matriz-permisos-tabla">
+            <table class="matriz-permisos-tabla" role="table" aria-labelledby="{{ widget.attrs.id }}_seccion_{{ forloop.counter }}">
                 <caption id="{{ widget.attrs.id }}_seccion_{{ forloop.counter }}">{{ seccion.titulo }}</caption>
-                <thead>
-                    <tr>
-                        <td></td>
+                <thead role="rowgroup">
+                    <tr role="row">
+                        <td role="cell"></td>
                         {% for verbo in widget.acciones %}
-                            <th scope="col">{{ verbo }}</th>
+                            <th scope="col" role="columnheader">{{ verbo }}</th>
                         {% endfor %}
-                        <th scope="col" x-cloak>Todos</th>
+                        <th scope="col" role="columnheader" x-cloak>Todos</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody role="rowgroup">
                     {% for fila in seccion.filas %}
-                        <tr data-fila>
-                            <th scope="row">{{ fila.nombre }}</th>
-                            {% for opcion in fila.celdas %}
-                                <td>
-                                    {% if opcion %}
-                                        <label class="matriz-permisos-celda">
-                                            <input type="checkbox" name="{{ opcion.name }}" value="{{ opcion.value }}" id="{{ opcion.attrs.id }}" class="{{ widget.attrs.class }}"{% if opcion.selected %} checked{% endif %}{% if widget.attrs.disabled %} disabled{% endif %}>
-                                            <span class="sr-only">{{ opcion.etiqueta }}</span>
-                                        </label>
-                                    {% else %}
-                                        <span aria-hidden="true" class="text-gris-medio dark:text-oscuro-suave">·</span>
-                                        <span class="sr-only">No aplica</span>
-                                    {% endif %}
+                        <tr data-fila role="row">
+                            <th scope="row" role="rowheader">{{ fila.nombre }}</th>
+                            {% for celda in fila.celdas %}
+                                <td role="cell">
+                                    {% with opcion=celda.opcion %}
+                                        {% if opcion %}
+                                            <label class="matriz-permisos-celda">
+                                                <input type="checkbox" name="{{ opcion.name }}" value="{{ opcion.value }}" id="{{ opcion.attrs.id }}" class="{{ widget.attrs.class }}"{% if opcion.selected %} checked{% endif %}{% if widget.attrs.disabled %} disabled{% endif %}>
+                                                <span class="matriz-permisos-verbo" aria-hidden="true">{{ celda.verbo }}</span>
+                                                <span class="sr-only">{{ opcion.etiqueta }}</span>
+                                            </label>
+                                        {% else %}
+                                            <span class="matriz-permisos-celda matriz-permisos-vacia">
+                                                <span aria-hidden="true" class="text-gris-medio dark:text-oscuro-suave">·</span>
+                                                <span class="matriz-permisos-verbo" aria-hidden="true">{{ celda.verbo }}</span>
+                                                <span class="sr-only">No aplica</span>
+                                            </span>
+                                        {% endif %}
+                                    {% endwith %}
                                 </td>
                             {% endfor %}
-                            <td x-cloak>
+                            <td role="cell" x-cloak>
                                 <label class="matriz-permisos-celda">
                                     <input type="checkbox" data-todas class="{{ widget.attrs.class }}"{% if widget.attrs.disabled %} disabled{% endif %}>
+                                    <span class="matriz-permisos-verbo" aria-hidden="true">Todos</span>
                                     <span class="sr-only">Todos los permisos de {{ fila.nombre|lower }}</span>
                                 </label>
                             </td>

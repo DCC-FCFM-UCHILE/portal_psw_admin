@@ -44,8 +44,8 @@ def fila_de_permisos(nombre, modelo, opciones):
         opcion = opciones.pop((modelo._meta.app_label, modelo._meta.model_name, clave), None)
         if opcion:
             opcion["etiqueta"] = f"{verbo} {nombre.lower()}"
-        celdas.append(opcion)
-    return {"nombre": nombre, "celdas": celdas} if any(celdas) else None
+        celdas.append({"verbo": verbo, "opcion": opcion})
+    return {"nombre": nombre, "celdas": celdas} if any(celda["opcion"] for celda in celdas) else None
 
 
 class MatrizPermisos(forms.CheckboxSelectMultiple):
