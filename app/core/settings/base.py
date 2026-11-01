@@ -35,6 +35,7 @@ MIGRATION_MODULES = {
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "core.politica.PoliticaDeContenido",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",

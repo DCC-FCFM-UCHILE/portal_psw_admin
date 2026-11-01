@@ -18,8 +18,8 @@
             @view-transition { navigation: none; }
         }
     </style>
-    <script>{% filter compactar %}{% include "components/layout/arranque.js" %}{% endfilter %}</script>
-    <script>{% filter compactar %}{% include "components/layout/navegacion.js" %}{% endfilter %}</script>
+    <script>{% en_linea "components/layout/arranque.js" %}</script>
+    <script>{% en_linea "components/layout/navegacion.js" %}</script>
 {% endblock %}
 
 {% block base %}

@@ -24,9 +24,19 @@ def iniciales(usuario):
     return (nombre or usuario.get_username()[:2]).upper()
 
 
-@register.filter
 def compactar(codigo):
     return "\n".join(linea.strip() for linea in str(codigo).splitlines() if linea.strip())
+
+
+GUIONES_EN_LINEA = [
+    "components/layout/arranque.js",
+    "components/layout/navegacion.js",
+]
+
+
+@register.simple_tag
+def en_linea(plantilla):
+    return mark_safe(compactar(render_to_string(plantilla)))
 
 
 @register.filter

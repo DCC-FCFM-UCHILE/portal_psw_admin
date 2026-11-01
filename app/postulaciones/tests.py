@@ -1,4 +1,5 @@
 import datetime
+import re
 from types import SimpleNamespace
 from unittest import mock
 
@@ -14,6 +15,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from convenios.models import RulesApplications
+from core.politica import resumen
 from cuentas.forms import NuevaClaveForm, RestablecerForm
 from cuentas.templatetags.interfaz import paginas_cercanas
 from postulaciones import correo, tablas_compartidas
@@ -760,6 +762,23 @@ class ListadoParcialTests(BaseCompartida):
             for zona, plantilla in [("listado", "admin/listado_parcial.html"), ("resultados-listado", "admin/listado_resultados.html")]:
                 with self.subTest(url=url, zona=zona):
                     self.assertTemplateUsed(self.pedir(zona, url), plantilla)
+
+
+class PoliticaDeContenidoTests(BaseCompartida):
+    def revisar(self, respuesta):
+        politica = respuesta["Content-Security-Policy-Report-Only"]
+        guiones = re.findall(r"<script>(.*?)</script>", respuesta.content.decode(), re.DOTALL)
+        self.assertEqual(len(guiones), 2)
+        for guion in guiones:
+            self.assertIn(resumen(guion), politica)
+        self.assertNotIn("Content-Security-Policy", respuesta)
+
+    def test_los_guiones_en_linea_estan_en_la_politica(self):
+        self.revisar(self.client.get(reverse("admin:index")))
+
+    def test_tambien_sin_sesion(self):
+        self.client.logout()
+        self.revisar(self.client.get(reverse("admin:login")))
 
 
 class GuionesDeUnfoldTests(BaseCompartida):
