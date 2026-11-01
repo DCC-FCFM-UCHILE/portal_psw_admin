@@ -1,4 +1,4 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.contrib.auth import views
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
@@ -29,6 +29,15 @@ class RestablecerConfirmarView(ConSitio, views.PasswordResetConfirmView):
 
 class RestablecerListoView(ConSitio, views.PasswordResetCompleteView):
     pass
+
+
+class SalirView(views.LogoutView):
+    next_page = "admin:login"
+
+    def post(self, request, *args, **kwargs):
+        respuesta = super().post(request, *args, **kwargs)
+        messages.success(request, "Cerraste la sesión.")
+        return respuesta
 
 
 @method_decorator(cache_control(public=True, max_age=31536000, immutable=True), name="dispatch")
