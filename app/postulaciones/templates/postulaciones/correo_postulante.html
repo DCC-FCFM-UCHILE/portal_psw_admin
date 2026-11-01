@@ -22,6 +22,9 @@
 
     <form method="post" novalidate>
         {% csrf_token %}
+        {% if sin_resultado %}
+            {% include "unfold/helpers/messages/warning.html" with message="Esta postulación no está aceptada ni rechazada: el mensaje parte solo con el saludo y la firma." %}
+        {% endif %}
         {% component "unfold/components/card.html" %}
             {% for campo in form %}
                 {% include "unfold/helpers/field.html" with field=campo %}

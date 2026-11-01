@@ -25,9 +25,7 @@ class CorreoPostulanteView(UnfoldModelAdminViewMixin, FormView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_initial(self):
-        contenido = ""
-        if self.postulacion.estado != Application.Estado.CREADA:
-            contenido = render_to_string(f"postulaciones/correo/{self.tipo}.html", {"postulacion": self.postulacion})
+        contenido = render_to_string(f"postulaciones/correo/{self.tipo}.html", {"postulacion": self.postulacion})
         return {"correo": self.postulacion.postulante.correo, "contenido": contenido}
 
     def get_context_data(self, **kwargs):
@@ -39,7 +37,10 @@ class CorreoPostulanteView(UnfoldModelAdminViewMixin, FormView):
             ],
             "titulo": self.titulos[self.tipo],
         }
-        return super().get_context_data(postulacion=self.postulacion, cancelar=ficha, migas_vista=migas, **kwargs)
+        sin_resultado = self.tipo == "notificar" and self.postulacion.estado == Application.Estado.CREADA
+        return super().get_context_data(
+            postulacion=self.postulacion, cancelar=ficha, migas_vista=migas, sin_resultado=sin_resultado, **kwargs
+        )
 
     def form_valid(self, form):
         if not correo.enviar(form.cleaned_data["correo"], form.cleaned_data["asunto"], form.cleaned_data["contenido"]):

@@ -192,9 +192,21 @@ class CorreoTests(BaseCompartida):
         self.assertContains(respuesta, "ha sido aceptado")
         self.assertContains(respuesta, "ana@ejemplo.cl")
 
-    def test_notificar_creada_parte_vacio(self):
+    def test_notificar_creada_parte_con_saludo_y_firma(self):
         respuesta = self.client.get(self.url("notificar"))
         self.assertNotContains(respuesta, "ha sido")
+        self.assertContains(respuesta, "Estimado/a")
+        self.assertContains(respuesta, "Cecilia Bastarrica")
+        self.assertContains(respuesta, "no está aceptada ni rechazada")
+
+    def test_contactar_trae_saludo_y_firma_en_cualquier_estado(self):
+        for estado in Application.Estado.values:
+            Application.objects.filter(pk=self.postulacion.pk).update(estado=estado)
+            with self.subTest(estado=estado):
+                respuesta = self.client.get(self.url("contactar"))
+                self.assertContains(respuesta, "Estimado/a")
+                self.assertContains(respuesta, "Cecilia Bastarrica")
+                self.assertNotContains(respuesta, "no está aceptada ni rechazada")
 
     def test_enviar_marca_notificada(self):
         respuesta = self.client.post(

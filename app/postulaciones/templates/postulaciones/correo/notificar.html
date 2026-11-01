@@ -2,7 +2,9 @@
 {% if postulacion.estado == "AC" %}
 <p>Se le informa que el proyecto <strong>{{ postulacion.titulo }}</strong> ha sido aceptado para su realización en el curso de Proyecto de Software del Departamento de Ciencias de la Computación, de la Facultad de Ciencias Físicas y Matemáticas de la Universidad de Chile.</p>
 <p>En breve nos pondremos en contacto con usted.</p>
-{% else %}
+{% elif postulacion.estado == "RE" %}
 <p>Se le informa que el proyecto <strong>{{ postulacion.titulo }}</strong> ha sido rechazado para su realización en el curso de Proyecto de Software del Departamento de Ciencias de la Computación, de la Facultad de Ciencias Físicas y Matemáticas de la Universidad de Chile.</p>
+{% else %}
+<p></p>
 {% endif %}
 {% include "postulaciones/correo/firma.html" %}
