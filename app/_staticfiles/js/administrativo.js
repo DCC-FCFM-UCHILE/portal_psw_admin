@@ -33,7 +33,7 @@ document.addEventListener("alpine:init", () => {
         datos.esCajon = cajon.matches;
         datos.cerrarCajon = function () {
             this.sidebarOpen = false;
-            this.$nextTick(() => document.getElementById("alternar-menu")?.focus());
+            this.$nextTick(() => document.getElementById("alternar-menu")?.focus({ preventScroll: true }));
         };
         datos.init = function () {
             iniciar?.call(this);
