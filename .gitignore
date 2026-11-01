@@ -26,3 +26,4 @@ db.sqlite3
 .env.test
 
 .pytest_cache
+.coverage
