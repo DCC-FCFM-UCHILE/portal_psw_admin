@@ -565,6 +565,11 @@ html {
   }
 }
 
+.barra-acciones-seleccion .barra-acciones-boton {
+  white-space: normal;
+  text-align: left;
+}
+
 @media (max-height: 30rem) {
   #cabecera,
   .pie-paginacion {
