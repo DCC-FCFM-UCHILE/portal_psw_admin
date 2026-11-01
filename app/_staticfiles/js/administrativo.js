@@ -613,17 +613,28 @@ document.addEventListener("formset:removed", (evento) => {
 const icono = ".material-symbols-outlined:not([aria-hidden])";
 const asterisco = "label > span.text-red-600:not([aria-hidden])";
 const ayuda = ".help-tooltip[aria-label]:not([role])";
+const selectorDeFecha = 'a:is([id^="calendarlink"], [id^="clocklink"]):not([aria-label])';
+
+const nombrarSelectorDeFecha = (enlace) => {
+    const grupo = enlace.closest('[role="group"][aria-labelledby]');
+    const etiqueta = grupo ? document.getElementById(grupo.getAttribute("aria-labelledby")) : enlace.closest(".grow")?.previousElementSibling;
+    const nombre = etiqueta?.textContent.replace("*", "").replace(/\s+/g, " ").trim();
+    const tipo = enlace.id.startsWith("calendar") ? "Elegir la fecha" : "Elegir la hora";
+    enlace.setAttribute("aria-label", nombre ? `${tipo}: ${nombre}` : tipo);
+};
 
 const ajustar = (elemento) => {
     if (elemento.matches(`${icono}, ${asterisco}`)) {
         elemento.setAttribute("aria-hidden", "true");
     } else if (elemento.matches(ayuda)) {
         elemento.setAttribute("role", "img");
+    } else if (elemento.matches(selectorDeFecha)) {
+        nombrarSelectorDeFecha(elemento);
     }
 };
 
 const ajustarIconos = (raiz) => {
-    raiz.querySelectorAll(`${icono}, ${asterisco}, ${ayuda}`).forEach(ajustar);
+    raiz.querySelectorAll(`${icono}, ${asterisco}, ${ayuda}, ${selectorDeFecha}`).forEach(ajustar);
 };
 
 const capasModales = '#modal-overlay, .velo-lateral, [x-data="searchCommand()"], #changelist-filter, :has(> #modal-content), dialog[open]';
