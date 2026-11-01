@@ -1,5 +1,7 @@
 SHELL := /bin/bash
 
+.PHONY: migraciones migrar formato revisar seguridad test cobertura
+
 # Base de datos
 migraciones:
 	python manage.py makemigrations

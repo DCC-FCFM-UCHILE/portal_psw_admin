@@ -1,3 +1,5 @@
+.PHONY: levantar bajar logs consola migrar superusuario desplegar
+
 PROYECTO = portal-admin-psw
 
 levantar:
