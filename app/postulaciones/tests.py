@@ -794,14 +794,26 @@ class GuionesDeUnfoldTests(BaseCompartida):
             reverse("admin:applications_application_notificar_correo", args=[self.postulacion.pk]),
         ]
 
-    def test_no_carga_graficos_ni_ordenamiento(self):
+    def test_no_carga_graficos_ordenamiento_ni_anclas(self):
         for url in self.urls():
             with self.subTest(url=url):
                 respuesta = self.client.get(url)
                 self.assertNotContains(respuesta, "chart.js")
                 self.assertNotContains(respuesta, "alpine.sort.js")
+                self.assertNotContains(respuesta, "alpine.anchor.js")
                 self.assertNotContains(respuesta, "unfold/fonts/")
                 self.assertContains(respuesta, "alpine.focus.js")
+
+    def test_solo_los_guiones_de_django_bloquean_el_pintado(self):
+        for url in self.urls():
+            with self.subTest(url=url):
+                cabecera = self.client.get(url).content.decode().split("</head>")[0]
+                guiones = re.findall(r"<script\b[^>]*\bsrc=\"([^\"]*)\"[^>]*>", cabecera)
+                sincronos = re.findall(r"<script\b(?![^>]*\b(?:defer|async)\b)[^>]*\bsrc=\"([^\"]*)\"[^>]*>", cabecera)
+                self.assertTrue(guiones)
+                propios = [g.split("?")[0] for g in sincronos if "/admin/js/" not in g and not g.endswith("jsi18n/")]
+                self.assertEqual(propios, [])
+                self.assertIn("alpine/alpine.js", guiones[-1])
 
 
 class IconosTests(BaseCompartida):

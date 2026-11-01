@@ -1,6 +1,7 @@
 import hashlib
 import json
 import logging
+import re
 from functools import lru_cache
 from urllib.parse import parse_qs, urlsplit
 
@@ -22,6 +23,23 @@ logger = logging.getLogger(__name__)
 def iniciales(usuario):
     nombre = f"{usuario.first_name[:1]}{usuario.last_name[:1]}"
     return (nombre or usuario.get_username()[:2]).upper()
+
+
+GUION = re.compile(r"<script\b[^>]*>")
+ORIGEN = re.compile(r'\bsrc="([^"]*)"')
+SIN_DIFERIR = re.compile(r"/admin/js/|jsi18n/$")
+
+
+@register.filter(is_safe=True)
+def diferir(html):
+    def poner(etiqueta):
+        texto = etiqueta.group(0)
+        origen = ORIGEN.search(texto)
+        if not origen or re.search(r"\b(defer|async)\b", texto) or SIN_DIFERIR.search(origen.group(1).split("?")[0]):
+            return texto
+        return f"{texto[:-1]} defer>"
+
+    return GUION.sub(poner, str(html))
 
 
 def compactar(codigo):
