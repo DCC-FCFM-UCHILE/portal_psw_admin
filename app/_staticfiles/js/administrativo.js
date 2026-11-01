@@ -626,7 +626,7 @@ document.addEventListener("focusin", (evento) => {
         }
         const caja = elemento.getBoundingClientRect();
         const techo = document.getElementById("cabecera")?.getBoundingClientRect().bottom ?? 0;
-        if (caja.height && (caja.top < techo || caja.bottom > innerHeight)) {
+        if (caja.height && (caja.top < techo - 4 || caja.bottom > innerHeight + 4)) {
             elemento.scrollIntoView({ block: "nearest" });
         }
     });
