@@ -1,4 +1,10 @@
-from django.test import TestCase
+import os
+from unittest import mock
+
+from django.core.exceptions import ImproperlyConfigured
+from django.test import SimpleTestCase, TestCase
+
+from core.functions import get_env_variable
 
 
 class RutasAntiguasTests(TestCase):
@@ -17,3 +23,13 @@ class RutasAntiguasTests(TestCase):
                 destino = self.client.get(ruta)["Location"]
                 self.assertTrue(destino.startswith("/"))
                 self.assertFalse(destino.startswith(("//", "/\\")))
+
+
+class VariablesDeEntornoTests(SimpleTestCase):
+    def test_obligatoria_vacia_no_pasa(self):
+        with mock.patch.dict(os.environ, {"PRUEBA_OBLIGATORIA": ""}), self.assertRaises(ImproperlyConfigured):
+            get_env_variable("PRUEBA_OBLIGATORIA")
+
+    def test_opcional_vacia_toma_el_valor_por_omision(self):
+        with mock.patch.dict(os.environ, {"PRUEBA_OPCIONAL": ""}):
+            self.assertEqual(get_env_variable("PRUEBA_OPCIONAL", "por omisión"), "por omisión")
