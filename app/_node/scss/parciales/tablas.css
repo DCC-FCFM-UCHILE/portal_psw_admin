@@ -65,11 +65,13 @@
 
 .hay-antes #result_list :is(.action-checkbox + th, .action-checkbox-column + th),
 .hay-antes #result_list tr > th:first-child:not(.action-checkbox-column) {
-  box-shadow: inset -1px 0 var(--borde-celda-fija), 6px 0 6px -6px var(--sombra-celda-fija);
+  box-shadow: inset -1px 0 var(--borde-celda-fija), -12px 0 6px 12px var(--sombra-celda-fija);
+  clip-path: inset(0 -12px 0 0);
 }
 
 .hay-despues #result_list :is(.field-actions_holder, .columna-acciones) {
-  box-shadow: inset 1px 0 var(--borde-celda-fija), -6px 0 6px -6px var(--sombra-celda-fija);
+  box-shadow: inset 1px 0 var(--borde-celda-fija), 12px 0 6px 12px var(--sombra-celda-fija);
+  clip-path: inset(0 0 0 -12px);
 }
 
 @media (width < 40rem) {
