@@ -192,6 +192,18 @@ const mostrarSilueta = (destino) => {
     anunciar(seccion ? `Cargando ${silueta.dataset.titulo} de ${seccion}…` : `Cargando ${silueta.dataset.titulo}…`);
 };
 
+const avisarDemora = () => {
+    const texto = "Está tardando más de lo normal. Sigue cargando…";
+    const silueta = document.querySelector("#content > .silueta-vista");
+    if (silueta) {
+        const aviso = document.createElement("p");
+        aviso.className = "aviso-demora";
+        aviso.textContent = texto;
+        (silueta.querySelector(".contenedor") || silueta).prepend(aviso);
+    }
+    anunciar(texto);
+};
+
 const quitarSilueta = () => {
     raiz.classList.remove("vista-saliente", "cargando-vista");
     document.querySelectorAll("[data-destino]").forEach((enlace) => enlace.removeAttribute("data-destino"));
@@ -239,7 +251,7 @@ document.addEventListener("click", (evento) => {
     esperas.push(
         setTimeout(barra, 300),
         setTimeout(() => mostrarSilueta(enlace.pathname), 1000),
-        setTimeout(quitarSilueta, 10000),
+        setTimeout(avisarDemora, 10000),
     );
     requestAnimationFrame(contarCuadros);
     if (conMovimiento) {

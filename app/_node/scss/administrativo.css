@@ -466,13 +466,17 @@ html:has(#listado[aria-busy="true"]) :is(#pie-listado, #conteo-cabecera) {
   @apply bg-base-200 dark:bg-base-800;
 }
 
+.aviso-demora {
+  @apply mb-4 text-sm text-gris-medio dark:text-oscuro-suave;
+}
+
 @keyframes pulso {
   50% { opacity: 0.55; }
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .silueta-bloque {
-    animation: pulso 1.6s ease-in-out infinite;
+    animation: pulso 1.6s ease-in-out 3;
   }
 }
 
