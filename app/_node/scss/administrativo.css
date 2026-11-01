@@ -481,8 +481,11 @@ html:has(#listado[aria-busy="true"]) :is(#pie-listado, #conteo-cabecera) {
   outline-offset: 2px;
 }
 
-.dark :where(a, button, summary, [tabindex]:not([tabindex="-1"]), input[type="checkbox"], input[type="radio"]):focus-visible,
-:where(.lateral, .barra-oscura) :where(a, button, summary, [tabindex]:not([tabindex="-1"])):focus-visible {
+.dark :where(a, button, summary, [tabindex]:not([tabindex="-1"]), input[type="checkbox"], input[type="radio"]):focus-visible {
+  outline-color: var(--color-oscuro-acento);
+}
+
+:is(.lateral, .barra-oscura) :where(a, button, summary, [tabindex]:not([tabindex="-1"])):focus-visible {
   outline-color: #fff;
 }
 
@@ -496,7 +499,7 @@ html:has(#listado[aria-busy="true"]) :is(#pie-listado, #conteo-cabecera) {
 }
 
 .dark :is(input, select, textarea, [contenteditable="true"]):is(:focus, :focus-visible) {
-  outline-color: var(--color-white);
+  outline-color: var(--color-oscuro-acento);
 }
 
 @layer base {
@@ -517,7 +520,7 @@ html:has(#listado[aria-busy="true"]) :is(#pie-listado, #conteo-cabecera) {
   }
 
   .dark trix-editor:focus {
-    outline-color: var(--color-white) !important;
+    outline-color: var(--color-oscuro-acento) !important;
   }
 
   .hoja-correo > trix-editor {
@@ -535,7 +538,7 @@ html:has(#listado[aria-busy="true"]) :is(#pie-listado, #conteo-cabecera) {
   outline-color: var(--color-rojo);
 
   @variant dark {
-    outline-color: var(--color-white);
+    outline-color: var(--color-oscuro-acento);
   }
 }
 
@@ -666,7 +669,7 @@ input[type="checkbox"].appearance-none.rounded-full {
   outline-offset: 2px;
 
   @variant dark {
-    outline-color: var(--color-white);
+    outline-color: var(--color-oscuro-acento);
   }
 }
 
@@ -695,8 +698,8 @@ input[type="checkbox"].appearance-none.rounded-full {
       outline-offset: -2px;
 
       @variant dark {
-        border-color: var(--color-white);
-        outline-color: var(--color-white);
+        border-color: var(--color-oscuro-acento);
+        outline-color: var(--color-oscuro-acento);
       }
     }
 
@@ -771,7 +774,7 @@ input[type="checkbox"].appearance-none.rounded-full {
 
       @variant dark {
         background-color: var(--color-oscuro-elevada);
-        outline-color: var(--color-white);
+        outline-color: var(--color-oscuro-acento);
       }
     }
 
@@ -798,7 +801,7 @@ input[type="checkbox"].appearance-none.rounded-full {
   outline-offset: 2px;
 
   @variant dark {
-    outline-color: var(--color-white);
+    outline-color: var(--color-oscuro-acento);
   }
 }
 
