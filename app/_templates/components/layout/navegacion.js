@@ -236,17 +236,22 @@ const nombrar = (transicion) => {
         return;
     }
     raiz.classList.add("en-transicion");
-    transicion.finished.finally(() => raiz.classList.remove("en-transicion"));
+    const quitar = () => raiz.classList.remove("en-transicion");
+    transicion.finished.then(quitar, quitar);
 };
 
 const hayCapaAbierta = () => [...document.querySelectorAll(".velo-lateral, #modal-overlay, [aria-modal='true']")].some((capa) => capa.checkVisibility());
 
 window.addEventListener("pageswap", (evento) => {
+    evento.viewTransition?.ready.catch(() => {});
     if (!hayCapaAbierta()) {
         nombrar(evento.viewTransition);
     }
 });
-window.addEventListener("pagereveal", (evento) => nombrar(evento.viewTransition));
+window.addEventListener("pagereveal", (evento) => {
+    evento.viewTransition?.ready.catch(() => {});
+    nombrar(evento.viewTransition);
+});
 
 window.addEventListener("pagehide", () => {
     esperas.forEach(clearTimeout);
