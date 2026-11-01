@@ -76,10 +76,9 @@
                 <ul role="list" class="lista-accesos divide-y divide-base-200 dark:divide-base-800">
                     {% for acceso in accesos %}
                         <li>
-                            <a href="{{ acceso.enlace }}"{% if acceso.externo %} target="_blank" rel="noopener"{% endif %}>
+                            <a href="{{ acceso.enlace }}">
                                 <span class="material-symbols-outlined md-18 text-gris-medio dark:text-base-400" aria-hidden="true">{{ acceso.icono }}</span>
                                 {{ acceso.titulo }}
-                                {% if acceso.externo %}<span class="sr-only">(se abre en otra pestaña)</span><span class="material-symbols-outlined md-16 ml-auto" aria-hidden="true">open_in_new</span>{% endif %}
                             </a>
                         </li>
                     {% endfor %}

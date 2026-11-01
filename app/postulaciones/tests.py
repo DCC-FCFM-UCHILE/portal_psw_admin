@@ -421,3 +421,13 @@ class TextosTests(BaseCompartida):
         respuesta = self.client.post(lista, {**datos, "post": "yes"}, follow=True)
         self.assertContains(respuesta, "Se eliminó la selección: 1 organización.")
         self.assertNotContains(respuesta, "seleccionado/s")
+
+
+class SinPagosTests(BaseCompartida):
+    def test_no_hay_nada_del_portal_de_pagos(self):
+        from django.conf import settings
+
+        self.assertFalse(hasattr(settings, "URL_PORTAL_PAGOS"))
+        for url in [reverse("admin:index"), reverse("admin:applications_application_changelist")]:
+            with self.subTest(url=url):
+                self.assertNotContains(self.client.get(url), "pagos")

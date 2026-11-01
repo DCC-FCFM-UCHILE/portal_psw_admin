@@ -119,7 +119,6 @@ EMAIL_HOST_PASSWORD = get_env_variable("DJANGO_EMAIL_HOST_PASSWORD", "")
 DEFAULT_FROM_EMAIL = get_env_variable("DJANGO_DEFAULT_FROM_EMAIL", "no-reply@dcc.uchile.cl")
 EMAIL_TIMEOUT = 10
 
-URL_PORTAL_PAGOS = get_env_variable("DJANGO_URL_PORTAL_PAGOS", "")
 URL_PORTAL_PUBLICO = get_env_variable("DJANGO_URL_PORTAL_PUBLICO", "")
 
 
@@ -168,21 +167,6 @@ NAVEGACION = [
         ],
     },
 ]
-
-if URL_PORTAL_PAGOS:
-    NAVEGACION.append(
-        {
-            "title": "Pagos",
-            "items": [
-                {
-                    "title": "Portal de pagos",
-                    "icon": "payments",
-                    "link": URL_PORTAL_PAGOS,
-                    "link_attrs": {"target": "_blank", "rel": "noopener"},
-                }
-            ],
-        }
-    )
 
 UNFOLD = {
     "SITE_TITLE": "Portal PSW · Administración",

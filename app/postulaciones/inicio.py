@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.contrib.admin.models import ADDITION, CHANGE, DELETION, LogEntry
 from django.urls import reverse
 from django.utils import timezone
@@ -86,8 +85,6 @@ def indicadores(request, context):
         )
     if usuario.has_perm("auth.view_user"):
         accesos.append({"titulo": "Administrar usuarios", "enlace": reverse("admin:auth_user_changelist"), "icono": "person"})
-    if settings.URL_PORTAL_PAGOS:
-        accesos.append({"titulo": "Ir al portal de pagos", "enlace": settings.URL_PORTAL_PAGOS, "icono": "payments", "externo": True})
 
     context.update(
         {
