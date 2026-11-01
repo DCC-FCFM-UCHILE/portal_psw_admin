@@ -375,3 +375,7 @@ input[type="checkbox"].appearance-none.rounded-full {
 trix-editor.prose-sm {
   font-size: var(--text-sm);
 }
+
+.errorlist > li::before {
+  content: none;
+}

@@ -261,6 +261,10 @@ class DescripcionConSaltosTests(BaseCompartida):
         }
         respuesta = self.client.post(url, datos)
         self.assertContains(respuesta, "Tiene 201 caracteres y el máximo son 200.")
+        self.assertRegex(
+            respuesta.content.decode(),
+            r'<ul class="errorlist" id="id_descripcion_error"><li><span [^>]*aria-hidden="true">warning</span>Tiene',
+        )
         self.assertRegex(respuesta.content.decode(), r'<textarea name="descripcion"[^>]*>\s*x{201}</textarea>')
 
 
