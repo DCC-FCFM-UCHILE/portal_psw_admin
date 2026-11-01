@@ -446,7 +446,11 @@ const huella = (formulario) =>
     );
 
 const huellas = new WeakMap();
-const tomarHuellas = () => formulariosConDatos().forEach((formulario) => huellas.set(formulario, huella(formulario)));
+const conErrores = (formulario) => formulario.querySelector('.errornote, .errorlist, [aria-invalid="true"]');
+const tomarHuellas = () => {
+    formulariosConDatos().forEach((formulario) => huellas.set(formulario, conErrores(formulario) ? "" : huella(formulario)));
+    vigilarSalida();
+};
 const hayCambios = () => !saliendo && formulariosConDatos().some((formulario) => huellas.has(formulario) && huellas.get(formulario) !== huella(formulario));
 
 const retener = (evento) => {
@@ -465,7 +469,7 @@ const vigilarSalida = () => {
 window.addEventListener("load", tomarHuellas);
 document.addEventListener("trix-initialize", (evento) => {
     const formulario = evento.target.closest("form");
-    if (formulario && huellas.has(formulario) && !formulario.dataset.editado) {
+    if (formulario && huellas.has(formulario) && huellas.get(formulario) !== "" && !formulario.dataset.editado) {
         huellas.set(formulario, huella(formulario));
     }
 });
