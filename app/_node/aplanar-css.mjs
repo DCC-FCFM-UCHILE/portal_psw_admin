@@ -1,4 +1,3 @@
-//
 import { transform } from "lightningcss";
 import { readFileSync, writeFileSync } from "node:fs";
 
