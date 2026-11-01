@@ -639,3 +639,17 @@ class PaginacionTests(BaseCompartida):
         respuesta = self.client.get(reverse("admin:applications_application_changelist"))
         self.assertContains(respuesta, "1 postulación")
         self.assertNotContains(respuesta, 'aria-label="Paginación"')
+
+
+class OrdenTests(BaseCompartida):
+    def test_cada_encabezado_ordena_por_una_sola_columna(self):
+        respuesta = self.client.get(reverse("admin:applications_organization_changelist"), {"o": "2"})
+        self.assertContains(respuesta, 'aria-sort="ascending"', count=1)
+        self.assertContains(respuesta, '<a href="?o=-2" class="encabezado-orden" data-orden="ascendente" aria-describedby="orden-descendente">')
+        self.assertContains(respuesta, '<a href="?o=1" class="encabezado-orden" aria-describedby="orden-ascendente">')
+        self.assertContains(respuesta, '<span id="orden-descendente" hidden>Ordenar de forma descendente</span>')
+
+    def test_las_columnas_calculadas_no_se_ofrecen_para_ordenar(self):
+        respuesta = self.client.get(reverse("admin:applications_application_changelist"))
+        self.assertContains(respuesta, "<span>Título</span>")
+        self.assertNotContains(respuesta, "<span>Organización</span>")

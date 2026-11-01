@@ -8,6 +8,8 @@
 
 {% if results %}
     <div class="{% if cl.search_fields or cl.has_filters %}rounded-default lg:rounded-t-none lg:rounded-b-default{% else %}lg:rounded-default{% endif %} relative overflow-x-auto scrollbar-default border border-base-200 shadow-xs dark:border-base-800 bg-white dark:bg-base-900" tabindex="0" role="region" aria-label="{{ cl.opts.verbose_name_plural|capfirst }}">
+        <span id="orden-ascendente" hidden>Ordenar de forma ascendente</span>
+        <span id="orden-descendente" hidden>Ordenar de forma descendente</span>
         <table id="result_list" class="result-list border-spacing-none border-separate w-full" {% if cl.model_admin.ordering_field %}x-sort.ghost x-on:end="sortRecords" data-ordering-field="{{ cl.model_admin.ordering_field }}"{% endif %}>
             {% include 'unfold/helpers/change_list_headers.html' %}
 

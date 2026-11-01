@@ -2,11 +2,12 @@ import hashlib
 import json
 import logging
 from functools import lru_cache
+from urllib.parse import parse_qs, urlsplit
 
 from django import template
 from django.conf import settings
 from django.contrib import admin
-from django.contrib.admin.views.main import PAGE_VAR
+from django.contrib.admin.views.main import ORDER_VAR, PAGE_VAR
 from django.template.loader import render_to_string
 from django.urls import NoReverseMatch, reverse
 from django.utils.safestring import mark_safe
@@ -110,3 +111,9 @@ def paginas_cercanas(cl, vecinas=1, extremos=1):
     antes = [elipsis] if desde > extremos + 2 else [extremos + 1]
     despues = [elipsis] if hasta < total - extremos - 1 else [total - extremos]
     return [*range(1, extremos + 1), *antes, *range(desde, hasta + 1), *despues, *range(total - extremos + 1, total + 1)]
+
+
+@register.simple_tag
+def url_orden(cl, encabezado):
+    orden = parse_qs(urlsplit(encabezado["url_primary"]).query).get(ORDER_VAR, [""])[0]
+    return cl.get_query_string({ORDER_VAR: orden.split(".")[0]})

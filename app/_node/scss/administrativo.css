@@ -577,6 +577,10 @@ input[type="checkbox"].appearance-none.rounded-full {
   outline: none;
 }
 
+.encabezado-orden:focus-visible {
+  outline-offset: -2px;
+}
+
 @media (forced-colors: active) {
   .numero-pagina-actual {
     outline: 2px solid CanvasText;
@@ -814,6 +818,19 @@ input[type="checkbox"].appearance-none.rounded-full {
   }
   .numero-pagina-actual {
     @apply bg-rojo font-semibold text-white dark:text-white;
+  }
+  .encabezado-orden {
+    @apply flex w-full items-center gap-0.5 py-2 pl-3 pr-1 transition-colors hover:bg-base-100 hover:text-gris-oscuro dark:hover:bg-white/5 dark:hover:text-white;
+  }
+  .encabezado-orden-icono {
+    @apply shrink-0 text-gris-medio transition-colors dark:text-oscuro-suave;
+  }
+  .encabezado-orden:hover .encabezado-orden-icono {
+    @apply text-gris-oscuro dark:text-white;
+  }
+  .encabezado-orden[data-orden],
+  .encabezado-orden[data-orden] .encabezado-orden-icono {
+    @apply text-rojo dark:text-oscuro-acento;
   }
   .indicador {
     @apply flex items-center justify-between gap-4 rounded-xl border border-base-200 bg-white px-5 py-4 shadow-xs transition-[border-color,transform] hover:-translate-y-px hover:border-rojo motion-reduce:hover:translate-y-0 dark:border-base-800 dark:bg-base-900;
