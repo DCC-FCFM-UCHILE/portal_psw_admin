@@ -29,7 +29,7 @@
                     id="search-input-command"
                     x-ref="searchInputCommand"
                     hx-indicator="#command-submit"
-                    x-on:keydown.escape.prevent="handleClear()"
+                    x-on:keydown.escape.prevent="if ($refs.searchInputCommand.value) { handleClear(); document.getElementById('command-results').replaceChildren(); document.getElementById('command-results-note').replaceChildren(); totalItems = 0; currentIndex = 0; } else { handleClear(); }"
                     x-on:keydown.arrow-down.prevent="nextItem()"
                     x-on:keydown.arrow-up.prevent="prevItem()"
                     x-on:keydown.meta.enter.prevent="currentIndex > 0 && selectItem({% if command_show_history %}true{% else %}false{% endif %}, true)"
@@ -43,7 +43,7 @@
                     hx-select-oob="#command-results-note:innerHTML"
                     hx-target="#command-results">
 
-                <button type="button" class="flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-md text-icon-action" x-on:click="handleClear()" aria-label="Cerrar la búsqueda">
+                <button type="button" class="flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-md text-icon-action" x-on:click="$refs.searchInputCommand.value = ''; document.getElementById('command-results-note').replaceChildren(); handleClear()" aria-label="Cerrar la búsqueda">
                     <span class="material-symbols-outlined" aria-hidden="true">close</span>
                 </button>
             </div>
