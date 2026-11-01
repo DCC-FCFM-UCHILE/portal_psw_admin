@@ -298,6 +298,21 @@ class FormulariosTests(BaseCompartida):
         self.assertNotContains(respuesta, 'id="add_id_groups"')
         self.assertNotContains(respuesta, 'aria-controls="related-widget-wrapper-groups"')
 
+    def test_la_ficha_del_usuario_lleva_a_su_contrasena_sin_mostrar_el_hash(self):
+        respuesta = self.client.get(reverse("admin:auth_user_change", args=[self.docente.pk]))
+        self.assertContains(respuesta, f'href="{reverse("admin:auth_user_password_change", args=[self.docente.pk])}"')
+        self.assertContains(respuesta, "Cambiar la contraseña")
+        self.assertNotContains(respuesta, "../password/")
+        for dato in ["algoritmo", "iteraciones", "función resumen"]:
+            with self.subTest(dato=dato):
+                self.assertNotContains(respuesta, dato)
+
+    def test_a_un_usuario_sin_contrasena_se_le_puede_asignar(self):
+        externo = User.objects.create_user("externo")
+        respuesta = self.client.get(reverse("admin:auth_user_change", args=[externo.pk]))
+        self.assertContains(respuesta, "Sin contraseña")
+        self.assertContains(respuesta, f'href="{reverse("admin:auth_user_password_change", args=[externo.pk])}"')
+
     def test_el_archivo_declara_sus_formatos(self):
         respuesta = self.client.get(reverse("admin:applications_application_add"))
         self.assertContains(respuesta, 'accept=".pdf"')

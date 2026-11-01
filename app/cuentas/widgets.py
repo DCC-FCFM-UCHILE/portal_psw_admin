@@ -1,6 +1,8 @@
 from django import forms
 from django.conf import settings
 from django.contrib import admin
+from django.contrib.auth.forms import ReadOnlyPasswordHashWidget
+from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
 from django.urls import NoReverseMatch, reverse
 from django.utils.text import capfirst
 from unfold.widgets import CHECKBOX_CLASSES, UnfoldAdminCheckboxSelectMultipleWidget
@@ -82,3 +84,18 @@ class MatrizPermisos(forms.CheckboxSelectMultiple):
 
 class CasillasDeGrupos(UnfoldAdminCheckboxSelectMultipleWidget):
     template_name = "cuentas/widgets/grupos.html"
+
+
+class AccesoAContrasena(ReadOnlyPasswordHashWidget):
+    template_name = "cuentas/widgets/contrasena.html"
+
+    def __init__(self, enlace, attrs=None):
+        super().__init__(attrs)
+        self.enlace = enlace
+
+    def get_context(self, name, value, attrs):
+        contexto = forms.Widget.get_context(self, name, value, attrs)
+        contexto["widget"].update(
+            {"enlace": self.enlace, "tiene_contrasena": bool(value) and not value.startswith(UNUSABLE_PASSWORD_PREFIX)}
+        )
+        return contexto
