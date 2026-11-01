@@ -423,6 +423,40 @@ class TextosTests(BaseCompartida):
         self.assertNotContains(respuesta, "seleccionado/s")
 
 
+class HistorialTests(BaseCompartida):
+    def registros(self):
+        return LogEntry.objects.filter(object_id=str(self.postulacion.pk)).values_list("change_message", flat=True)
+
+    def test_aceptar_y_rechazar_quedan_en_el_historial(self):
+        for accion, mensaje, verbo in [("aceptar", "Aceptada.", "la aceptó"), ("rechazar", "Rechazada.", "la rechazó")]:
+            with self.subTest(accion=accion):
+                self.client.post(
+                    reverse("admin:applications_application_changelist"),
+                    {"action": accion, "index": "0", "_selected_action": [self.postulacion.pk]},
+                )
+                self.assertEqual(self.registros().first(), mensaje)
+                ficha = self.client.get(reverse("admin:applications_application_change", args=[self.postulacion.pk]))
+                self.assertContains(ficha, f"docente {verbo}")
+
+    def test_los_correos_enviados_quedan_en_el_historial(self):
+        for tipo, mensaje in [("notificar", "Notificada por correo: «Resultado»."), ("contactar", "Contactada por correo: «Resultado».")]:
+            with self.subTest(tipo=tipo):
+                self.client.post(
+                    reverse(f"admin:applications_application_{tipo}_correo", args=[self.postulacion.pk]),
+                    {"correo": "ana@ejemplo.cl", "asunto": "Resultado", "contenido": "<p>Hola</p>"},
+                )
+                self.assertEqual(self.registros().first(), mensaje)
+        self.assertContains(self.client.get(reverse("admin:index")), "escribió al postulante de")
+
+    def test_un_correo_que_no_sale_no_queda_en_el_historial(self):
+        with mock.patch("postulaciones.correo.EmailMultiAlternatives.send", side_effect=OSError("red caída")):
+            self.client.post(
+                reverse("admin:applications_application_notificar_correo", args=[self.postulacion.pk]),
+                {"correo": "ana@ejemplo.cl", "asunto": "Resultado", "contenido": "<p>x</p>"},
+            )
+        self.assertFalse(self.registros().exists())
+
+
 class SinPagosTests(BaseCompartida):
     def test_no_hay_nada_del_portal_de_pagos(self):
         from django.conf import settings

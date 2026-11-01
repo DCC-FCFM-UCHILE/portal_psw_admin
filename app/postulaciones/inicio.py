@@ -1,10 +1,9 @@
-from django.contrib.admin.models import ADDITION, CHANGE, DELETION, LogEntry
+from django.contrib.admin.models import DELETION, LogEntry
 from django.urls import reverse
 from django.utils import timezone
 
+from postulaciones import historial
 from postulaciones.models import Announcement, Application, ApprovedProject
-
-ACCIONES = {ADDITION: "agregó", CHANGE: "modificó", DELETION: "eliminó"}
 
 
 def convocatoria_actual():
@@ -23,7 +22,7 @@ def actividad_reciente(cantidad=6):
     return [
         {
             "quien": registro.user.get_full_name() or registro.user.get_username(),
-            "accion": ACCIONES.get(registro.action_flag, "modificó"),
+            "accion": historial.verbos(registro)[0],
             "tipo": registro.content_type.name if registro.content_type else "",
             "objeto": registro.object_repr,
             "enlace": registro.get_admin_url() if registro.action_flag != DELETION and sigue_existiendo(registro) else "",

@@ -45,9 +45,8 @@
                 <li class="text-gris-oscuro dark:text-base-200">Recibida el <time datetime="{{ original.creada_en|date:'c' }}">{{ original.creada_en|date:"j \d\e F \d\e Y" }}</time></li>
                 {% for registro in historial %}
                     <li class="text-gris-oscuro dark:text-base-200">
-                        {{ registro.user.get_full_name|default:registro.user.get_username }}
-                        {% if registro.is_addition %}la agregó{% elif registro.is_deletion %}la eliminó{% else %}la modificó{% endif %}
-                        el <time datetime="{{ registro.action_time|date:'c' }}">{{ registro.action_time|date:"j \d\e F" }}</time>
+                        {{ registro.quien }} {{ registro.verbo }}
+                        el <time datetime="{{ registro.cuando|date:'c' }}">{{ registro.cuando|date:"j \d\e F" }}</time>
                     </li>
                 {% endfor %}
             </ul>

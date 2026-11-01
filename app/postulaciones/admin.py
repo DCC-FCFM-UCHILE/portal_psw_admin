@@ -14,6 +14,7 @@ from unfold.contrib.filters.forms import DropdownForm
 from unfold.decorators import action, display
 from unfold.widgets import UnfoldAdminSelectWidget
 
+from postulaciones import historial
 from postulaciones.models import Announcement, Application, ApprovedProject, Candidate, Member, Organization, Unit
 from postulaciones.views import CorreoPostulanteView
 
@@ -120,11 +121,19 @@ class ApplicationAdmin(FormatosDeArchivo, ModelAdmin):
     def change_view(self, request, object_id, form_url="", extra_context=None):
         extra_context = extra_context or {}
         if object_id and str(object_id).isdigit():
-            extra_context["historial"] = (
+            registros = (
                 LogEntry.objects.filter(content_type=ContentType.objects.get_for_model(Application), object_id=str(object_id))
                 .select_related("user")
                 .order_by("-action_time")[:4]
             )
+            extra_context["historial"] = [
+                {
+                    "quien": registro.user.get_full_name() or registro.user.get_username(),
+                    "verbo": historial.verbos(registro)[1],
+                    "cuando": registro.action_time,
+                }
+                for registro in registros
+            ]
         return super().change_view(request, object_id, form_url, extra_context)
 
     def get_actions(self, request):
@@ -164,12 +173,16 @@ class ApplicationAdmin(FormatosDeArchivo, ModelAdmin):
 
     @action(description="Aceptar", permissions=["change"])
     def aceptar(self, request, queryset):
+        postulaciones = list(queryset)
         queryset.update(estado=Application.Estado.ACEPTADA, fue_notificada=False)
+        historial.registrar(request, postulaciones, historial.ACEPTADA)
         messages.success(request, "Postulaciones actualizadas a aceptadas.")
 
     @action(description="Rechazar", permissions=["change"])
     def rechazar(self, request, queryset):
+        postulaciones = list(queryset)
         queryset.update(estado=Application.Estado.RECHAZADA, fue_notificada=False)
+        historial.registrar(request, postulaciones, historial.RECHAZADA)
         messages.success(request, "Postulaciones actualizadas a rechazadas.")
 
     @action(description="Notificar", url_path="notificar", permissions=["change"], icon="mail")

@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.views.generic import FormView
 from unfold.views import UnfoldModelAdminViewMixin
 
-from postulaciones import correo
+from postulaciones import correo, historial
 from postulaciones.forms import CorreoForm
 from postulaciones.models import Application
 
@@ -48,6 +48,8 @@ class CorreoPostulanteView(UnfoldModelAdminViewMixin, FormView):
             return self.render_to_response(self.get_context_data(form=form))
         self.postulacion.fue_notificada = True
         self.postulacion.save(update_fields=["fue_notificada", "actualizada_en"])
+        motivo = historial.NOTIFICADA if self.tipo == "notificar" else historial.CONTACTADA
+        historial.registrar(self.request, [self.postulacion], f"{motivo}: «{form.cleaned_data['asunto']}».")
         messages.success(self.request, self.exitos[self.tipo])
         return redirect(reverse("admin:applications_application_changelist"))
 
