@@ -197,6 +197,30 @@ class SenalTests(BaseCompartida):
         self.assertFalse(ApprovedProject.objects.exists())
 
 
+class ProyectoSinPeriodoTests(BaseCompartida):
+    def test_se_publica_sin_semestre_anio_ni_tutor(self):
+        proyecto = ApprovedProject.objects.create(titulo="Proyecto antiguo", semestre=None, anio=None, tutor=None)
+        self.client.force_login(self.docente)
+        datos = {
+            "titulo": "Proyecto antiguo",
+            "descripcion": "",
+            "semestre": "",
+            "anio": "",
+            "tutor": "",
+            "es_visible": "on",
+            "integrantes-TOTAL_FORMS": "0",
+            "integrantes-INITIAL_FORMS": "0",
+            "integrantes-MIN_NUM_FORMS": "0",
+            "integrantes-MAX_NUM_FORMS": "1000",
+            "_save": "",
+        }
+        respuesta = self.client.post(reverse("admin:applications_approvedproject_change", args=[proyecto.pk]), datos)
+        self.assertEqual(respuesta.status_code, 302)
+        proyecto.refresh_from_db()
+        self.assertTrue(proyecto.es_visible)
+        self.assertEqual((proyecto.semestre, proyecto.anio, proyecto.tutor), (None, None, None))
+
+
 class ConvocatoriaTests(BaseCompartida):
     def test_rechaza_fechas_que_se_cruzan(self):
         otra = Announcement(

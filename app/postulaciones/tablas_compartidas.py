@@ -69,10 +69,11 @@ CREATE TABLE IF NOT EXISTS applications_approvedproject (
     updated_at timestamptz NOT NULL DEFAULT now(),
     title varchar(100) NOT NULL,
     description text NULL,
-    semester varchar(2) NOT NULL,
-    year integer NOT NULL,
-    aux varchar(100) NOT NULL,
+    semester varchar(10) NULL,
+    year integer NULL,
+    aux varchar(100) NULL,
     is_visible boolean NOT NULL DEFAULT false,
+    "order" integer NULL,
     application_id bigint NULL UNIQUE
 );
 
