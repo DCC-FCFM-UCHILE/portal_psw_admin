@@ -285,8 +285,7 @@ const nombreDelCampo = (campo) => {
 
 const mostrarContrasena = (campo, boton, visible) => {
     campo.type = visible ? "text" : "password";
-    boton.querySelector(".material-symbols-outlined").textContent = visible ? "visibility_off" : "visibility";
-    boton.querySelector(".texto").textContent = visible ? "Ocultar" : "Mostrar";
+    boton.dataset.visible = visible;
     boton.setAttribute("aria-label", `${visible ? "Ocultar" : "Mostrar"} ${nombreDelCampo(campo)}`);
 };
 
@@ -305,14 +304,17 @@ document.addEventListener("DOMContentLoaded", () => {
         boton.type = "button";
         boton.className = "boton-campo";
         boton.setAttribute("aria-controls", campo.id);
-        boton.innerHTML = '<span class="material-symbols-outlined md-18" aria-hidden="true">visibility</span><span class="texto"></span>';
+        boton.innerHTML =
+            '<span class="capas" aria-hidden="true"><span class="material-symbols-outlined md-18 si-oculta">visibility</span><span class="material-symbols-outlined md-18 si-visible">visibility_off</span></span>' +
+            '<span class="capas" aria-hidden="true"><span class="si-oculta">Mostrar</span><span class="si-visible">Ocultar</span></span>';
         campo.replaceWith(marco);
         marco.append(campo, boton);
         mostrarContrasena(campo, boton, false);
         boton.addEventListener("click", () => {
             const visible = campo.type === "password";
             mostrarContrasena(campo, boton, visible);
-            estadoContrasena.textContent = visible ? "Contraseña visible" : "Contraseña oculta";
+            const nombre = nombreDelCampo(campo);
+            estadoContrasena.textContent = `${nombre.charAt(0).toUpperCase()}${nombre.slice(1)} ${visible ? "visible" : "oculta"}`;
         });
     });
 });
