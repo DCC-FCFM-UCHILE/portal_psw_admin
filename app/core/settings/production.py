@@ -13,3 +13,8 @@ SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = "DENY"
+SESSION_COOKIE_PATH = CSRF_COOKIE_PATH = get_env_variable("DJANGO_COOKIE_PATH", "/")
+
+EMAIL_BACKEND = get_env_variable("DJANGO_EMAIL_BACKEND")
+if EMAIL_BACKEND == "django.core.mail.backends.smtp.EmailBackend":
+    EMAIL_HOST = get_env_variable("DJANGO_EMAIL_HOST")
