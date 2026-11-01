@@ -97,7 +97,7 @@ def ruta_nueva(antigua):
         return "recuperar-contrasena/" + antigua.removeprefix("reset/")
     for prefijo, nuevo in MODELOS.items():
         if antigua.startswith(prefijo):
-            resto = antigua[len(prefijo):]
+            resto = antigua[len(prefijo) :]
             for patron, reemplazo in ANTIGUAS:
                 if re.match(patron, resto):
                     return nuevo + re.sub(patron, reemplazo, resto)

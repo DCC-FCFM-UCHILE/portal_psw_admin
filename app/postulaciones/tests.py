@@ -688,7 +688,9 @@ class OrdenTests(BaseCompartida):
     def test_cada_encabezado_ordena_por_una_sola_columna(self):
         respuesta = self.client.get(reverse("admin:applications_organization_changelist"), {"o": "2"})
         self.assertContains(respuesta, 'aria-sort="ascending"', count=1)
-        self.assertContains(respuesta, '<a href="?o=-2" id="orden-3" class="encabezado-orden" data-orden="ascendente" aria-describedby="orden-descendente">')
+        self.assertContains(
+            respuesta, '<a href="?o=-2" id="orden-3" class="encabezado-orden" data-orden="ascendente" aria-describedby="orden-descendente">'
+        )
         self.assertContains(respuesta, '<a href="?o=1" id="orden-2" class="encabezado-orden" aria-describedby="orden-ascendente">')
         self.assertContains(respuesta, '<span id="orden-descendente" hidden>Ordenar de forma descendente</span>')
 
@@ -700,7 +702,9 @@ class OrdenTests(BaseCompartida):
 
 class ListadoParcialTests(BaseCompartida):
     def pedir(self, zona, url=None, **parametros):
-        return self.client.get(url or reverse("admin:applications_application_changelist"), parametros, HTTP_HX_REQUEST="true", HTTP_HX_TARGET=zona)
+        return self.client.get(
+            url or reverse("admin:applications_application_changelist"), parametros, HTTP_HX_REQUEST="true", HTTP_HX_TARGET=zona
+        )
 
     def test_htmx_recibe_solo_la_zona_del_listado(self):
         respuesta = self.pedir("listado")
@@ -1197,7 +1201,9 @@ class BusquedaSinTildesTests(BaseCompartida):
 
     def test_los_campos_que_no_son_texto_se_buscan_como_antes(self):
         respuesta = self.client.get(reverse("admin:applications_announcement_changelist"), {"q": "2026"})
-        self.assertContains(respuesta, f'{reverse("admin:applications_announcement_change", args=[self.convocatoria.pk])}?_changelist_filters=q%3D2026')
+        self.assertContains(
+            respuesta, f"{reverse('admin:applications_announcement_change', args=[self.convocatoria.pk])}?_changelist_filters=q%3D2026"
+        )
 
     def test_el_buscador_de_la_cabecera_tampoco_distingue_tildes(self):
         respuesta = self.client.get(reverse("admin:search"), {"s": "fundacion"})
@@ -1234,7 +1240,15 @@ class BorradoDeCuentasTests(BaseCompartida):
 
 class AvisoDeErroresTests(BaseCompartida):
     def datos(self, **cambios):
-        return {"convenio": self.convocatoria.convenio.pk, "inicio": "15/03/2027", "cierre": "01/04/2027", "semestre": "FA", "anio": "2027", "_save": "1", **cambios}
+        return {
+            "convenio": self.convocatoria.convenio.pk,
+            "inicio": "15/03/2027",
+            "cierre": "01/04/2027",
+            "semestre": "FA",
+            "anio": "2027",
+            "_save": "1",
+            **cambios,
+        }
 
     def test_un_campo_con_error_se_anuncia_en_singular(self):
         respuesta = self.client.post(reverse("admin:applications_announcement_add"), self.datos(anio="dos mil"))

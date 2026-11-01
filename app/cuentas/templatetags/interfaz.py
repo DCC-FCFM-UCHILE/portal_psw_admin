@@ -78,7 +78,12 @@ def migas(context):
         pass
     if context.get("cl"):
         return {"ruta": [], "titulo": listado["titulo"]}
-    if "deleted_objects" in context and context.get("object") is not None and not context.get("protected") and not context.get("perms_lacking"):
+    if (
+        "deleted_objects" in context
+        and context.get("object") is not None
+        and not context.get("protected")
+        and not context.get("perms_lacking")
+    ):
         return {"ruta": [listado], "titulo": f"Eliminar «{context['object']}»"}
     original = context.get("original")
     if original is not None and not isinstance(original, str) and context.get("change"):

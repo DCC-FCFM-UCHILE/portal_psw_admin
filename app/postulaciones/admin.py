@@ -198,7 +198,11 @@ class ApplicationAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, Format
         if iguales:
             partes.append(f"1 ya estaba {resultado} y no cambió." if iguales == 1 else f"{iguales} ya estaban {resultado}s y no cambiaron.")
         if notificadas:
-            partes.append("1 tenía la notificación enviada: hay que notificarla de nuevo." if notificadas == 1 else f"{notificadas} tenían la notificación enviada: hay que notificarlas de nuevo.")
+            partes.append(
+                "1 tenía la notificación enviada: hay que notificarla de nuevo."
+                if notificadas == 1
+                else f"{notificadas} tenían la notificación enviada: hay que notificarlas de nuevo."
+            )
         messages.success(request, " ".join(partes))
 
     @action(description="Aceptar", url_path="aceptar-fila", permissions=["change"], icon="check_circle", attrs={"formmethod": "post"})

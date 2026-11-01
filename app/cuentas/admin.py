@@ -159,7 +159,9 @@ class UserAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, PermisosEnTab
 
     def delete_view(self, request, object_id, extra_context=None):
         if str(object_id) == str(request.user.pk):
-            messages.warning(request, "Tu propia cuenta no se puede eliminar desde aquí. Pídeselo a otra persona que administre las cuentas.")
+            messages.warning(
+                request, "Tu propia cuenta no se puede eliminar desde aquí. Pídeselo a otra persona que administre las cuentas."
+            )
             return redirect("admin:auth_user_change", object_id)
         if not request.user.is_superuser and User.objects.filter(pk=object_id, is_superuser=True).exists():
             messages.warning(request, "Las cuentas de superusuario solo las elimina otro superusuario.")
