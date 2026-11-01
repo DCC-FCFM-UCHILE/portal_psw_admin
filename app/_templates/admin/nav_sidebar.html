@@ -3,7 +3,7 @@
 <div class="relative z-60">
     <div class="envoltura-lateral fixed min-[1281px]:relative {% element_classes 'navigation_wrapper' %}" x-show="sidebarOpen" x-transition:enter="capa-entra" x-transition:enter-start="lateral-fuera" x-transition:enter-end="" x-transition:leave="capa-sale" x-transition:leave-start="" x-transition:leave-end="lateral-fuera" x-bind:style="`width: ${sidebarWidth}px`">
         <div class="velo-lateral fixed inset-0 bg-velo min-[1281px]:hidden" x-on:click="cerrarCajon()" aria-hidden="true"></div>
-        <div id="nav-sidebar" class="lateral fixed bottom-0 top-0 max-h-screen {% element_classes 'navigation' %}" x-bind:style="`width: ${sidebarWidth}px`" x-trap.inert.noscroll.noautofocus.noreturn="sidebarOpen === true && esCajon" x-on:keydown.escape.window="if (sidebarOpen && esCajon) cerrarCajon()">
+        <div id="nav-sidebar" class="lateral fixed bottom-0 top-0 max-h-screen {% element_classes 'navigation' %}" x-bind:style="`width: ${sidebarWidth}px`" x-trap.inert.noautofocus.noreturn="sidebarOpen === true && esCajon" x-on:keydown.escape.window="if (sidebarOpen && esCajon) cerrarCajon()">
             {% include "unfold/helpers/navigation.html" %}
         </div>
     </div>

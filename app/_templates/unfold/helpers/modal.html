@@ -11,7 +11,7 @@
      x-show="openModal"
      x-transition:enter="capa-entra" x-transition:enter-start="capa-fuera" x-transition:enter-end=""
      x-transition:leave="capa-sale" x-transition:leave-start="" x-transition:leave-end="capa-fuera"
-     x-trap.noautofocus.noscroll="openModal"
+     x-trap.noautofocus="openModal"
      x-on:keydown.escape.window="openModal = false">
     <div id="modal-content" class="bg-white dark:bg-base-800 flex flex-col max-w-2xl min-h-0 mx-auto overflow-hidden rounded-default shadow-lg w-full" x-bind:class="modalContentClasses" x-on:click.outside="openModal = false"></div>
 </div>

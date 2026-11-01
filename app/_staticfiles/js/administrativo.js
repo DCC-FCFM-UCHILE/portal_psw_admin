@@ -279,6 +279,17 @@ const ajustarIconos = (raiz) => {
     raiz.querySelectorAll(`${icono}, ${ayuda}`).forEach(ajustar);
 };
 
+const capasModales = '#modal-overlay, .velo-lateral, [x-data="searchCommand()"], #changelist-filter, :has(> #modal-content)';
+
+const bloquearDesplazamiento = () => {
+    const raiz = document.documentElement;
+    const abierta = [...document.querySelectorAll(capasModales)].some((capa) => capa.getClientRects().length > 0 && getComputedStyle(capa).position === "fixed");
+    if (abierta && !raiz.classList.contains("sin-desplazamiento")) {
+        raiz.style.setProperty("--barra-oculta", `${window.innerWidth - raiz.clientWidth}px`);
+    }
+    raiz.classList.toggle("sin-desplazamiento", abierta);
+};
+
 document.addEventListener("DOMContentLoaded", () => {
     ajustarIconos(document);
     new MutationObserver((cambios) => {
@@ -291,6 +302,10 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
     }).observe(document.body, { childList: true, subtree: true });
+
+    const capas = new MutationObserver(bloquearDesplazamiento);
+    document.querySelectorAll(`${capasModales}, .envoltura-lateral`).forEach((capa) => capas.observe(capa, { attributes: true, attributeFilter: ["style"] }));
+    window.addEventListener("resize", bloquearDesplazamiento);
 
     const cabecera = document.getElementById("cabecera");
     if (cabecera && "ResizeObserver" in window) {

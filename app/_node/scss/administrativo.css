@@ -57,6 +57,15 @@ html {
   }
 }
 
+html.sin-desplazamiento {
+  overflow: hidden;
+  padding-right: var(--barra-oculta);
+}
+
+html.sin-desplazamiento .barra-acciones {
+  right: var(--barra-oculta);
+}
+
 html[data-arranque] #changelist-filter,
 html[data-arranque="lateral-cerrada"] .envoltura-lateral {
   display: none;
