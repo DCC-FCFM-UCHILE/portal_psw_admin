@@ -242,6 +242,27 @@ class DescripcionConSaltosTests(BaseCompartida):
         self.postulacion.refresh_from_db()
         self.assertEqual(self.postulacion.descripcion, "x" * 189 + "\n" + "y" * 10)
 
+    def test_la_descripcion_dice_su_limite_y_no_corta_lo_pegado(self):
+        url = reverse("admin:applications_application_change", args=[self.postulacion.pk])
+        ficha = self.client.get(url).content.decode()
+        area = re.search(r'<textarea name="descripcion"[^>]*>', ficha).group()
+        self.assertNotIn("maxlength", area)
+        self.assertIn('aria-describedby="id_descripcion_helptext"', area)
+        self.assertIn('id="id_descripcion_helptext"', ficha)
+        self.assertIn("Hasta 200 caracteres.", ficha)
+        datos = {
+            "postulante": self.postulacion.postulante_id,
+            "convocatoria": self.convocatoria.pk,
+            "unidad": self.postulacion.unidad_id,
+            "titulo": "Sistema de riego",
+            "descripcion": "x" * 201,
+            "estado": "CR",
+            "_save": "",
+        }
+        respuesta = self.client.post(url, datos)
+        self.assertContains(respuesta, "Tiene 201 caracteres y el máximo son 200.")
+        self.assertRegex(respuesta.content.decode(), r'<textarea name="descripcion"[^>]*>\s*x{201}</textarea>')
+
 
 class ErroresDeContrasenaTests(BaseCompartida):
     def assertErroresEnLaPrimera(self, formulario, primera, segunda):

@@ -2,6 +2,8 @@ from django import forms
 from django.core.validators import FileExtensionValidator
 from django.db import models
 
+DEMASIADO_LARGO = "Tiene %(show_value)d caracteres y el máximo son %(limit_value)d."
+
 
 class FormatosDeArchivo:
     def formfield_for_dbfield(self, db_field, request, **kwargs):

@@ -19,7 +19,7 @@ from core.busqueda import BusquedaSinTildes
 from core.ficha import SinGuardarYAgregarOtro
 from core.listado import ListadoParcial, zona_pedida
 from postulaciones import historial
-from postulaciones.admin.comun import FormatosDeArchivo, TextoConSaltos
+from postulaciones.admin.comun import DEMASIADO_LARGO, FormatosDeArchivo, TextoConSaltos
 from postulaciones.models import Application
 from postulaciones.views import CorreoPostulanteView
 
@@ -74,7 +74,15 @@ class ApplicationAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, SinGua
 
     def formfield_for_dbfield(self, db_field, request, **kwargs):
         if db_field.name == "descripcion":
-            kwargs.update(form_class=TextoConSaltos, widget=UnfoldAdminTextareaWidget(attrs={"rows": 3}))
+            kwargs.update(
+                form_class=TextoConSaltos,
+                widget=UnfoldAdminTextareaWidget(attrs={"rows": 3}),
+                help_text=f"Hasta {db_field.max_length} caracteres.",
+                error_messages={"max_length": DEMASIADO_LARGO},
+            )
+            campo = super().formfield_for_dbfield(db_field, request, **kwargs)
+            campo.widget.attrs.pop("maxlength", None)
+            return campo
         return super().formfield_for_dbfield(db_field, request, **kwargs)
 
     def changelist_view(self, request, extra_context=None):
