@@ -1,7 +1,7 @@
 {% load admin_list %}
 
 {% if actions_on_top and action_form %}
-    <div class="barra-acciones" {% if not is_popup %}x-bind:style="{left: sidebarOpen ? sidebarWidth + 'px' : '0px'}"{% endif %}>
+    <div class="barra-acciones" {% if not is_popup %}x-bind:style="{left: sidebarOpen && !esCajon ? sidebarWidth + 'px' : '0px'}"{% endif %}>
         <div id="changelist-actions-wrapper" class="changelist-actions">
             {% admin_actions %}
         </div>
