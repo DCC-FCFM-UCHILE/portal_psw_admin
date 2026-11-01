@@ -571,6 +571,10 @@ html {
   }
 }
 
+form:has(input[name="usable_password"][value="false"]:checked) :is(.field-password1, .field-password2) {
+  display: none;
+}
+
 .dark label > span.text-red-600 {
   color: var(--color-oscuro-acento);
 }
