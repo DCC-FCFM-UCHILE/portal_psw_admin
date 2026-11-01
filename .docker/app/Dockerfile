@@ -38,6 +38,4 @@ USER instalar
 
 FROM base AS develop
 
-ENV PYDEVD_DISABLE_FILE_VALIDATION=1
-
 RUN pip install -r _requirements/develop.txt

@@ -16,7 +16,6 @@ services:
             - ./data/logs:/logs:cached
         ports:
             - 8003:8000
-            - 5682:5678
         env_file: ./app/.env
 
     tailwind:
