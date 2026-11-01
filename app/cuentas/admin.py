@@ -30,6 +30,7 @@ class UserAdmin(AccionesDeFila, PermisosEnTabla, BaseUserAdmin, ModelAdmin):
     form = FichaUsuarioForm
     add_form = UserCreationForm
     change_password_form = AdminPasswordChangeForm
+    list_per_page = 10
 
     def formfield_for_dbfield(self, db_field, request, **kwargs):
         campo = super().formfield_for_dbfield(db_field, request, **kwargs)
