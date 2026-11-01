@@ -4,7 +4,7 @@ services:
             - nginx-proxy
         container_name: portal-admin-psw
         hostname: portal-admin-psw.apps.dcc.uchile.cl
-        build: 
+        build:
             context: ../
             dockerfile: .docker/app/Dockerfile
             target: production
@@ -19,6 +19,12 @@ services:
             - /etc/localtime:/etc/localtime:ro
         expose:
             - 8000
+        healthcheck:
+            test: [ "CMD", "python", "-c", "import os, urllib.request as u; u.urlopen(u.Request('http://127.0.0.1:8000/portal-admin/ingresar/', headers={'Host': os.environ['DJANGO_ALLOWED_HOSTS'].split(',')[0]}), timeout=5)" ]
+            interval: 30s
+            timeout: 10s
+            retries: 3
+            start_period: 30s
         env_file:
             - app/.env
         restart: always
