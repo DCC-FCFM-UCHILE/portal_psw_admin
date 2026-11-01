@@ -1150,3 +1150,13 @@ input[type="checkbox"].appearance-none.rounded-full {
     background-color: Highlight;
   }
 }
+
+.matriz-permisos input[type="checkbox"]:indeterminate {
+  background-color: var(--color-primary-600);
+  border-color: var(--color-primary-600);
+}
+
+.matriz-permisos input[type="checkbox"]:indeterminate::after {
+  content: "remove";
+  color: var(--color-white);
+}
