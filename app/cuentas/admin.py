@@ -107,6 +107,7 @@ class UserAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, PermisosEnTab
     form = FichaUsuarioForm
     add_form = UserCreationForm
     change_password_form = AdminPasswordChangeForm
+    readonly_fields = ("last_login", "date_joined")
     list_per_page = 10
 
     def formfield_for_dbfield(self, db_field, request, **kwargs):

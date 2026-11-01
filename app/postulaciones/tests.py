@@ -15,6 +15,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.formats import date_format
 
 from convenios.models import RulesApplications
 from core.politica import resumen
@@ -1233,11 +1234,19 @@ class AyudasTests(BaseCompartida):
 
 
 class CamposDeFechaTests(BaseCompartida):
-    def test_los_campos_de_fecha_y_hora_van_en_un_grupo_con_nombre(self):
+    def test_las_fechas_que_registra_el_sistema_son_de_solo_lectura(self):
         otra = User.objects.create_user("otra", password="clave-de-prueba", is_staff=True)
-        respuesta = self.client.get(reverse("admin:auth_user_change", args=[otra.pk]))
-        self.assertContains(respuesta, 'id="id_date_joined_etiqueta"')
-        self.assertContains(respuesta, 'role="group" aria-labelledby="id_date_joined_etiqueta"')
+        url = reverse("admin:auth_user_change", args=[otra.pk])
+        respuesta = self.client.get(url)
+        for nombre in ("last_login", "date_joined"):
+            self.assertNotContains(respuesta, f'name="{nombre}_0"')
+        self.assertContains(respuesta, "Último inicio de sesión")
+        self.assertContains(respuesta, date_format(timezone.localtime(otra.date_joined), "DATETIME_FORMAT"))
+        alta = otra.date_joined
+        datos = {"username": "otra", "is_active": "on", "is_staff": "on", "date_joined_0": "01/01/2020", "date_joined_1": "10:00:00"}
+        self.assertEqual(self.client.post(url, datos).status_code, 302)
+        otra.refresh_from_db()
+        self.assertEqual(otra.date_joined, alta)
 
 
 class MatricesDeshabilitadasTests(BaseCompartida):
