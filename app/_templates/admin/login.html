@@ -43,7 +43,7 @@
 
     {% block login_before %}{% endblock %}
 
-    <form action="{{ app_path }}" method="post" id="login-form">
+    <form action="{{ app_path }}" method="post" id="login-form" novalidate>
         {% csrf_token %}
 
         {% include "unfold/helpers/field.html" with field=form.username %}
