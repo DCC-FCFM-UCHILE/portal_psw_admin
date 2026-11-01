@@ -238,6 +238,7 @@ window.addEventListener("load", () => {
     const general = contenido.querySelector("div.errornote");
     if (campo) {
         campo.focus();
+        document.getElementById(`${campo.id}_error`)?.scrollIntoView({ block: "nearest" });
     } else if (general) {
         general.setAttribute("tabindex", "-1");
         general.focus();
