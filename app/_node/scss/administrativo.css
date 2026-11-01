@@ -873,6 +873,7 @@ input[type="checkbox"].appearance-none.rounded-full {
   }
   .matriz-permisos-marco {
     @apply overflow-x-auto rounded-default border border-base-200 bg-white dark:border-oscuro-elevada dark:bg-oscuro-superficie;
+    scroll-padding-inline-start: 7rem;
   }
   .matriz-permisos-tabla {
     @apply w-full border-collapse text-sm;
