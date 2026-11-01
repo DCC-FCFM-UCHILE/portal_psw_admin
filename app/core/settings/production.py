@@ -9,6 +9,9 @@ CSRF_TRUSTED_ORIGINS = get_env_variable("DJANGO_CSRF_TRUSTED_ORIGINS").split(","
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 USE_X_FORWARDED_HOST = True
 
+# La redirección a HTTPS y HSTS las pone el proxy; sin eso, quitar esta línea.
+SILENCED_SYSTEM_CHECKS = ["security.W004", "security.W008"]
+
 DATABASES["default"] |= {"CONN_MAX_AGE": 60, "CONN_HEALTH_CHECKS": True}
 
 STORAGES = {
