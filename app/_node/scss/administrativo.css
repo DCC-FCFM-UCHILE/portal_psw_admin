@@ -207,8 +207,30 @@ html.vista-entrante :is(#contenido, #titulo-cabecera, #cabecera .ml-auto > .flex
   animation: var(--animate-entrada);
 }
 
-html.cargando-vista #content > :not(.silueta-vista) {
+html.cargando-vista :is(#content > :not(.silueta-vista), #avisos, #contenido ~ *, #titulo-cabecera > :not(.titulo-silueta)) {
   display: none;
+}
+
+html.cargando-vista #cabecera .ml-auto > .flex-row {
+  visibility: hidden;
+}
+
+.titulo-silueta {
+  display: none;
+}
+
+html.cargando-vista .titulo-silueta {
+  display: block;
+}
+
+html.cargando-vista:has([data-destino]) #ir-al-inicio[aria-current="page"]:not([data-destino]) {
+  background-color: transparent;
+  box-shadow: none;
+  color: var(--color-gris-medio);
+
+  @variant dark {
+    color: var(--color-base-300);
+  }
 }
 
 .silueta-vista.entrando {
@@ -436,16 +458,24 @@ input[type="checkbox"].appearance-none.rounded-full {
   .lateral-enlace {
     @apply flex min-h-10 items-center gap-3 rounded-md border-l-4 border-transparent px-3 py-2 text-sm text-gray-300 transition-[color,background-color] hover:bg-white/5 hover:text-white;
   }
-  .lateral-enlace[aria-current="page"] {
+  .lateral-enlace[aria-current="page"],
+  .lateral-enlace[data-destino] {
     @apply border-rojo bg-white/10 font-semibold text-white;
+  }
+  html.cargando-vista:has([data-destino]) .lateral-enlace[aria-current="page"]:not([data-destino]) {
+    @apply border-transparent bg-transparent font-normal text-gray-300;
   }
   .lateral-boton {
     @apply flex min-h-10 w-full cursor-pointer items-center gap-3 rounded-md px-3 py-2 text-left text-sm text-gray-300 transition-[color,background-color] hover:bg-white/5 hover:text-white;
   }
   @media (forced-colors: active) {
-    .lateral-enlace[aria-current="page"] {
+    .lateral-enlace[aria-current="page"],
+    .lateral-enlace[data-destino] {
       outline: 2px solid CanvasText;
       outline-offset: -2px;
+    }
+    html.cargando-vista:has([data-destino]) .lateral-enlace[aria-current="page"]:not([data-destino]) {
+      outline: none;
     }
   }
   .boton-cabecera {

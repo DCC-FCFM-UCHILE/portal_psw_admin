@@ -152,6 +152,13 @@ const despedirCajon = () => {
     }
 };
 
+const marcarDestino = (destino) => {
+    const enlaces = [...document.querySelectorAll("#nav-sidebar a.lateral-enlace, #ir-al-inicio")];
+    const coincide = (enlace) => enlace.pathname === destino || (enlace.pathname !== raizAdmin && destino.startsWith(enlace.pathname));
+    const largo = Math.max(0, ...enlaces.filter(coincide).map((enlace) => enlace.pathname.length));
+    enlaces.filter((enlace) => coincide(enlace) && enlace.pathname.length === largo).forEach((enlace) => enlace.setAttribute("data-destino", ""));
+};
+
 const mostrarSilueta = (destino) => {
     const contenido = document.getElementById("content");
     const forma = formaDe(destino);
@@ -165,6 +172,7 @@ const mostrarSilueta = (destino) => {
         document.getElementById("contenido").focus({ preventScroll: true });
     }
     despedirCajon();
+    marcarDestino(destino);
     raiz.classList.remove("vista-saliente");
     raiz.classList.add("cargando-vista");
     if (performance.now() - ultimoCuadro < 100) {
@@ -178,6 +186,7 @@ const mostrarSilueta = (destino) => {
 
 const quitarSilueta = () => {
     raiz.classList.remove("vista-saliente", "cargando-vista");
+    document.querySelectorAll("[data-destino]").forEach((enlace) => enlace.removeAttribute("data-destino"));
     const silueta = document.querySelector("#content > .silueta-vista");
     if (silueta) {
         silueta.remove();

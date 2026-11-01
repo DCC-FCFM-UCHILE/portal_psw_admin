@@ -10,7 +10,7 @@
 
     {% if not is_popup %}
         {% url 'admin:index' as inicio %}
-        <a href="{{ inicio }}" id="ir-al-inicio" class="flex size-10 shrink-0 items-center justify-center rounded-md text-gris-medio hover:bg-base-100 hover:text-gris-oscuro aria-[current=page]:bg-base-100 aria-[current=page]:text-gris-oscuro aria-[current=page]:shadow-[inset_0_-3px_0_var(--color-rojo)] dark:text-base-300 dark:hover:bg-base-800 dark:hover:text-white dark:aria-[current=page]:bg-base-800 dark:aria-[current=page]:text-white dark:aria-[current=page]:shadow-[inset_0_-3px_0_var(--color-primary-500)]"{% if request.path == inicio %} aria-current="page"{% endif %}>
+        <a href="{{ inicio }}" id="ir-al-inicio" class="flex size-10 shrink-0 items-center justify-center rounded-md text-gris-medio hover:bg-base-100 hover:text-gris-oscuro aria-[current=page]:bg-base-100 aria-[current=page]:text-gris-oscuro aria-[current=page]:shadow-[inset_0_-3px_0_var(--color-rojo)] dark:text-base-300 dark:hover:bg-base-800 dark:hover:text-white dark:aria-[current=page]:bg-base-800 dark:aria-[current=page]:text-white dark:aria-[current=page]:shadow-[inset_0_-3px_0_var(--color-primary-500)] data-destino:bg-base-100 data-destino:text-gris-oscuro data-destino:shadow-[inset_0_-3px_0_var(--color-rojo)] dark:data-destino:bg-base-800 dark:data-destino:text-white dark:data-destino:shadow-[inset_0_-3px_0_var(--color-primary-500)]"{% if request.path == inicio %} aria-current="page"{% endif %}>
             <span class="material-symbols-outlined" aria-hidden="true">home</span>
             <span class="sr-only">Inicio</span>
         </a>
@@ -23,6 +23,7 @@
 
     {% migas as migas %}
     <div id="titulo-cabecera" class="ml-1 flex min-w-0 items-center gap-2 text-sm leading-5 sm:ml-0 xl:text-base{% if adminform %} max-sm:order-last max-sm:ml-0 max-sm:basis-full{% endif %}">
+        <span class="titulo-silueta silueta-bloque h-5 w-40 max-w-full rounded" aria-hidden="true"></span>
         {% if migas.ruta %}
             <nav aria-label="Ruta" class="hidden shrink-0 md:block">
                 <ol role="list" class="flex items-center gap-2">
