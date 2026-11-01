@@ -1,6 +1,7 @@
 {% load interfaz %}(() => {
 const raiz = document.documentElement;
-const imitar = !("onpagereveal" in window) && !matchMedia("(prefers-reduced-motion: reduce)").matches;
+const conMovimiento = !matchMedia("(prefers-reduced-motion: reduce)").matches;
+const nativa = "onpagereveal" in window;
 const urlSiluetas = "{% url_siluetas %}";
 const raizAdmin = "{% url 'admin:index' %}";
 const listados = {% rutas_listado %};
@@ -19,17 +20,22 @@ const sesion = (operar) => {
     }
 };
 
-if (imitar) {
-    if (sesion((almacen) => almacen.getItem("transicion-vistas"))) {
-        sesion((almacen) => almacen.removeItem("transicion-vistas"));
-        raiz.classList.add("vista-entrante");
-    }
-    document.addEventListener("animationend", (evento) => {
-        if (evento.target.id === "contenido") {
-            raiz.classList.remove("vista-entrante");
-        }
-    });
+const vieneDeOtraVista = () => {
+    const marca = sesion((almacen) => almacen.getItem("transicion-vistas"));
+    sesion((almacen) => almacen.removeItem("transicion-vistas"));
+    return Boolean(marca) && conMovimiento;
+};
+
+const entrar = () => raiz.classList.add("vista-entrante");
+
+if (!nativa && vieneDeOtraVista()) {
+    entrar();
 }
+document.addEventListener("animationend", (evento) => {
+    if (evento.target.id === "contenido") {
+        raiz.classList.remove("vista-entrante");
+    }
+});
 
 const cargarMoldes = (html) => {
     const plantilla = document.createElement("template");
@@ -142,7 +148,7 @@ const despedirCajon = () => {
         };
         requestAnimationFrame(esperar);
     };
-    const yaFundido = raiz.classList.contains("vista-saliente") || matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const yaFundido = raiz.classList.contains("vista-saliente") || !conMovimiento;
     raiz.classList.add("cajon-saliente");
     if (yaFundido) {
         cerrar();
@@ -208,6 +214,13 @@ const soltar = () => {
     }
 };
 
+const olvidarMarca = () => sesion((almacen) => almacen.removeItem("transicion-vistas"));
+
+const cancelar = () => {
+    olvidarMarca();
+    soltar();
+};
+
 const contarCuadros = () => {
     ultimoCuadro = performance.now();
     if (esperas.length && !raiz.classList.contains("cargando-vista")) {
@@ -227,9 +240,11 @@ document.addEventListener("click", (evento) => {
         setTimeout(quitarSilueta, 10000),
     );
     requestAnimationFrame(contarCuadros);
-    if (imitar) {
+    if (conMovimiento) {
         sesion((almacen) => almacen.setItem("transicion-vistas", "1"));
-        raiz.classList.add("vista-saliente");
+        if (!nativa) {
+            raiz.classList.add("vista-saliente");
+        }
     }
 });
 
@@ -284,20 +299,28 @@ const nombrarVista = (fase) => {
     }
 };
 
+const atender = (transicion) => {
+    [transicion.ready, transicion.finished, transicion.updateCallbackDone].forEach((promesa) => promesa?.catch(() => {}));
+};
+
 window.addEventListener("pageswap", (evento) => {
     const transicion = evento.viewTransition;
     if (transicion) {
-        transicion.ready.catch(() => {});
+        atender(transicion);
         nombrarVista("saliente");
     }
 });
 
 window.addEventListener("pagereveal", (evento) => {
     const transicion = evento.viewTransition;
+    const venia = vieneDeOtraVista();
     if (!transicion) {
+        if (venia) {
+            entrar();
+        }
         return;
     }
-    transicion.ready.catch(() => {});
+    atender(transicion);
     nombrarVista("entrante");
     transicion.finished.then(olvidarNombres, olvidarNombres);
 });
@@ -308,9 +331,9 @@ window.addEventListener("pagehide", () => {
 window.addEventListener("pageshow", (evento) => {
     soltar();
     if (evento.persisted) {
-        sesion((almacen) => almacen.removeItem("transicion-vistas"));
+        olvidarMarca();
         olvidarNombres();
-        raiz.classList.remove("cajon-saliente");
+        raiz.classList.remove("cajon-saliente", "vista-entrante");
         const estado = cajonAbierto();
         if (estado) {
             raiz.classList.add("restaurada");
@@ -321,11 +344,11 @@ window.addEventListener("pageshow", (evento) => {
 });
 
 if (window.navigation) {
-    navigation.addEventListener("navigateerror", soltar);
+    navigation.addEventListener("navigateerror", cancelar);
 }
 window.addEventListener("keydown", (evento) => {
     if (evento.key === "Escape" && esperas.length) {
-        soltar();
+        cancelar();
     }
 });
 })();
