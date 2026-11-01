@@ -105,17 +105,12 @@ class ApplicationAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, Format
     def changelist_view(self, request, extra_context=None):
         respuesta = super().changelist_view(request, extra_context)
         if hasattr(respuesta, "context_data") and "cl" in respuesta.context_data and zona_pedida(request) != "resultados-listado":
-            respuesta.context_data["filtros_estado"] = self.filtros_estado(request)
+            respuesta.context_data["filtros_estado"] = self.filtros_estado(request, respuesta.context_data["cl"])
         return respuesta
 
-    def filtros_estado(self, request):
-        postulaciones = self.get_queryset(request)
-        convocatoria = request.GET.get("convocatoria__id__exact")
-        if convocatoria and convocatoria.isdigit():
-            postulaciones = postulaciones.filter(convocatoria_id=convocatoria)
-        busqueda = request.GET.get("q")
-        if busqueda:
-            postulaciones, _ = self.get_search_results(request, postulaciones, busqueda)
+    def filtros_estado(self, request, cl):
+        del_estado = next(filtro.expected_parameters() for filtro in cl.filter_specs if "estado__exact" in filtro.expected_parameters())
+        postulaciones = cl.get_queryset(request, exclude_parameters=del_estado)
         cantidades = dict(postulaciones.order_by().values_list("estado").annotate(total=Count("id")))
         actual = request.GET.get("estado__exact", "")
         parametros = request.GET.copy()

@@ -63,6 +63,22 @@ class ListadoTests(BaseCompartida):
         respuesta = self.client.get(url, {"convocatoria__id__exact": self.convocatoria.pk})
         self.assertContains(respuesta, "Sistema de riego")
 
+    def test_las_pestanas_cuentan_con_todos_los_filtros(self):
+        Application.objects.create(
+            postulante=self.postulacion.postulante,
+            convocatoria=self.convocatoria,
+            unidad=self.postulacion.unidad,
+            titulo="Bodega digital",
+            archivo=SimpleUploadedFile("perfil.pdf", b"%PDF-1.4"),
+            estado=Application.Estado.ACEPTADA,
+            fue_notificada=True,
+        )
+        url = reverse("admin:applications_application_changelist")
+        for consulta, esperado in [({}, 2), ({"notificacion": "notificada"}, 1), ({"q": "riego"}, 1), ({"estado__exact": "AC"}, 2)]:
+            with self.subTest(consulta=consulta):
+                filtros = self.client.get(url, consulta).context["filtros_estado"]
+                self.assertEqual(filtros[0]["total"], esperado)
+
     def test_todas_las_vistas_del_menu_responden(self):
         for modelo in ["application", "organization", "unit", "candidate", "approvedproject", "member", "announcement"]:
             with self.subTest(modelo=modelo):
