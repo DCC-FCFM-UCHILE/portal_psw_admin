@@ -561,3 +561,35 @@ class BorradoEnBloqueTests(BaseCompartida):
     def test_borrar_una_no_espera(self):
         respuesta = self.client.get(reverse("admin:applications_application_delete", args=[self.postulacion.pk]))
         self.assertNotContains(respuesta, "data-espera")
+
+
+class AccionesPorFilaTests(BaseCompartida):
+    def url(self, accion):
+        return reverse(f"admin:applications_application_{accion}_fila", args=[self.postulacion.pk])
+
+    def test_el_menu_acepta_y_rechaza_por_post(self):
+        respuesta = self.client.get(reverse("admin:applications_application_changelist"))
+        for accion in ["aceptar", "rechazar"]:
+            with self.subTest(accion=accion):
+                self.assertContains(respuesta, f'form="changelist-form" formaction="{self.url(accion)}" formmethod="post"')
+
+    def test_aceptar_desde_la_fila_vuelve_al_listado(self):
+        lista = reverse("admin:applications_application_changelist") + "?estado__exact=CR"
+        respuesta = self.client.post(self.url("aceptar"), HTTP_REFERER="http://testserver" + lista)
+        self.assertRedirects(respuesta, "http://testserver" + lista, fetch_redirect_response=False)
+        self.postulacion.refresh_from_db()
+        self.assertEqual(self.postulacion.estado, Application.Estado.ACEPTADA)
+        self.assertEqual(LogEntry.objects.get(object_id=str(self.postulacion.pk)).change_message, "Aceptada.")
+
+    def test_un_get_no_cambia_nada(self):
+        self.assertEqual(self.client.get(self.url("rechazar")).status_code, 405)
+        self.postulacion.refresh_from_db()
+        self.assertEqual(self.postulacion.estado, Application.Estado.CREADA)
+
+    def test_sin_permiso_de_edicion_no_acepta(self):
+        lector = User.objects.create_user("lector", password="clave-de-prueba", is_staff=True)
+        lector.user_permissions.add(Permission.objects.get(codename="view_application"))
+        self.client.force_login(lector)
+        self.assertEqual(self.client.post(self.url("aceptar")).status_code, 403)
+        self.postulacion.refresh_from_db()
+        self.assertEqual(self.postulacion.estado, Application.Estado.CREADA)

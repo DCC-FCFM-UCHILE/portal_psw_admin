@@ -86,7 +86,7 @@ document.addEventListener("alpine:init", () => {
 
         opciones() {
             const menu = document.getElementById(this.$refs.disparador.getAttribute("aria-controls"));
-            return menu ? [...menu.querySelectorAll("a[href]")] : [];
+            return menu ? [...menu.querySelectorAll("a[href], button")] : [];
         },
 
         enfocar(indice) {

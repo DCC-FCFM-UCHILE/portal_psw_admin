@@ -1,12 +1,15 @@
 from django.contrib import admin, messages
 from django.contrib.admin.models import LogEntry
+from django.contrib.admin.utils import unquote
 from django.contrib.contenttypes.models import ContentType
 from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.db.models import Count
+from django.http import Http404, HttpResponseNotAllowed
 from django.shortcuts import redirect
 from django.urls import path, reverse
 from django.utils.html import format_html
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.text import capfirst
 from unfold.admin import ModelAdmin, TabularInline
 from unfold.contrib.filters.admin import RelatedDropdownFilter
@@ -85,7 +88,7 @@ class ApplicationAdmin(AccionesDeFila, FormatosDeArchivo, ModelAdmin):
     list_select_related = ["convocatoria", "postulante", "unidad__organizacion"]
     list_per_page = 10
     actions = ["aceptar", "rechazar"]
-    actions_row = ["editar_fila", "notificar", "contactar", "eliminar_fila"]
+    actions_row = ["editar_fila", "aceptar_fila", "rechazar_fila", "notificar", "contactar", "eliminar_fila"]
     actions_detail = ["notificar", "contactar"]
     list_before_template = "postulaciones/admin/filtros_estado.html"
     change_form_before_template = "postulaciones/admin/resumen_postulacion.html"
@@ -161,7 +164,7 @@ class ApplicationAdmin(AccionesDeFila, FormatosDeArchivo, ModelAdmin):
         if not obj.archivo:
             return "Sin archivo"
         return format_html(
-            '<a href="{}" target="_blank" rel="noopener" class="enlace">Descargar<span class="sr-only">'
+            '<a href="{}" target="_blank" rel="noopener" class="enlace inline-flex min-h-6 items-center">Descargar<span class="sr-only">'
             " el perfil de {} (se abre en otra pestaña)</span></a>",
             obj.archivo.url,
             obj.titulo,
@@ -180,6 +183,32 @@ class ApplicationAdmin(AccionesDeFila, FormatosDeArchivo, ModelAdmin):
         queryset.update(estado=Application.Estado.RECHAZADA, fue_notificada=False)
         historial.registrar(request, postulaciones, historial.RECHAZADA)
         messages.success(request, "Postulaciones actualizadas a rechazadas.")
+
+    @action(description="Aceptar", url_path="aceptar-fila", permissions=["change"], icon="check_circle", attrs={"formmethod": "post"})
+    def aceptar_fila(self, request, object_id):
+        return self.resolver_fila(request, object_id, Application.Estado.ACEPTADA, historial.ACEPTADA)
+
+    @action(description="Rechazar", url_path="rechazar-fila", permissions=["change"], icon="cancel", attrs={"formmethod": "post"})
+    def rechazar_fila(self, request, object_id):
+        return self.resolver_fila(request, object_id, Application.Estado.RECHAZADA, historial.RECHAZADA)
+
+    def resolver_fila(self, request, object_id, estado, mensaje):
+        if request.method != "POST":
+            return HttpResponseNotAllowed(["POST"])
+        postulacion = self.get_object(request, unquote(object_id))
+        if postulacion is None:
+            raise Http404
+        resultado = Application.Estado(estado).label.lower()
+        if postulacion.estado == estado:
+            messages.info(request, f"La postulación «{postulacion}» ya estaba {resultado}.")
+        else:
+            Application.objects.filter(pk=postulacion.pk).update(estado=estado, fue_notificada=False)
+            historial.registrar(request, [postulacion], mensaje)
+            messages.success(request, f"La postulación «{postulacion}» quedó {resultado}.")
+        destino = request.META.get("HTTP_REFERER", "")
+        if not url_has_allowed_host_and_scheme(destino, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
+            destino = reverse("admin:applications_application_changelist")
+        return redirect(destino)
 
     @action(description="Notificar", url_path="notificar", permissions=["change"], icon="mail")
     def notificar(self, request, object_id):
