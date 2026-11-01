@@ -6,6 +6,7 @@ const urlSiluetas = "{% url_siluetas %}";
 const raizAdmin = "{% url 'admin:index' %}";
 const listados = {% rutas_listado %};
 const anchoCajon = matchMedia("(max-width: 1280px)");
+const ocultasConSilueta = "#content, #avisos, #contenido ~ *, #titulo-cabecera, #cabecera .ml-auto > .flex-row";
 let esperas = [];
 let moldes = null;
 let ultimoCuadro = 0;
@@ -173,7 +174,7 @@ const mostrarSilueta = (destino) => {
         return;
     }
     const silueta = molde.cloneNode(true);
-    if (contenido.contains(document.activeElement)) {
+    if (document.activeElement?.closest(ocultasConSilueta)) {
         focoAnterior = document.activeElement;
         document.getElementById("contenido").focus({ preventScroll: true });
     }
