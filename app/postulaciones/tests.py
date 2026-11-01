@@ -302,14 +302,13 @@ class NavegacionTests(BaseCompartida):
 
 
 class FormulariosTests(BaseCompartida):
-    def test_cada_permiso_aparece_una_vez(self):
-        respuesta = self.client.get(reverse("admin:auth_group_add"))
-        valores = [f'value="{pk}"' for pk in Permission.objects.values_list("pk", flat=True)]
-        contenido = respuesta.content.decode()
-        self.assertEqual(contenido.count('name="permissions"'), len(valores))
-        for valor in valores:
-            with self.subTest(valor=valor):
-                self.assertEqual(contenido.count(valor), 1)
+    def test_cada_permiso_del_portal_aparece_una_vez(self):
+        contenido = self.client.get(reverse("admin:auth_group_add")).content.decode()
+        for modelo in ["application", "organization", "unit", "candidate", "approvedproject", "member", "announcement"]:
+            for accion in ["view", "add", "change", "delete"]:
+                pk = Permission.objects.get(codename=f"{accion}_{modelo}").pk
+                with self.subTest(permiso=f"{accion}_{modelo}"):
+                    self.assertEqual(contenido.count(f'name="permissions" value="{pk}"'), 1)
 
     def test_los_permisos_van_por_seccion_del_menu(self):
         respuesta = self.client.get(reverse("admin:auth_group_add"))
@@ -325,7 +324,8 @@ class FormulariosTests(BaseCompartida):
         grupo = Group.objects.get(name="Docentes")
         self.assertEqual(set(grupo.permissions.all()), {ajeno, propio})
         ficha = self.client.get(reverse("admin:auth_group_change", args=[grupo.pk]))
-        self.assertContains(ficha, "data-otros open")
+        self.assertContains(ficha, f'<input type="hidden" name="permissions" value="{ajeno.pk}">')
+        self.assertContains(ficha, "Tiene 1 permiso que este portal no usa; se conserva al guardar.")
 
     def test_el_usuario_elige_grupos_con_casillas(self):
         Group.objects.create(name="Docentes")
@@ -465,3 +465,29 @@ class SinPagosTests(BaseCompartida):
         for url in [reverse("admin:index"), reverse("admin:applications_application_changelist")]:
             with self.subTest(url=url):
                 self.assertNotContains(self.client.get(url), "pagos")
+
+
+class PermisosAjenosTests(BaseCompartida):
+    def test_la_ficha_no_lista_permisos_de_otros_sistemas(self):
+        respuesta = self.client.get(reverse("admin:auth_user_change", args=[self.docente.pk]))
+        self.assertNotContains(respuesta, "Otros permisos")
+        self.assertNotContains(respuesta, "Sesiones")
+        self.assertNotContains(respuesta, "que este portal no usa")
+
+    def test_guardar_un_usuario_conserva_sus_permisos_ajenos(self):
+        ajeno = Permission.objects.get(codename="view_logentry")
+        propio = Permission.objects.get(codename="view_application")
+        externo = User.objects.create_user("externo", is_staff=True)
+        externo.user_permissions.add(ajeno)
+        ficha = self.client.get(reverse("admin:auth_user_change", args=[externo.pk])).content.decode()
+        self.assertIn(f'<input type="hidden" name="user_permissions" value="{ajeno.pk}">', ficha)
+        datos = {
+            "username": "externo",
+            "is_active": "on",
+            "is_staff": "on",
+            "user_permissions": [ajeno.pk, propio.pk],
+            "date_joined_0": "01/10/2026",
+            "date_joined_1": "10:00:00",
+        }
+        self.assertEqual(self.client.post(reverse("admin:auth_user_change", args=[externo.pk]), datos).status_code, 302)
+        self.assertEqual(set(externo.user_permissions.all()), {ajeno, propio})

@@ -42,23 +42,10 @@
         </div>
     {% endfor %}
 
-    {% if widget.otros %}
-        <details class="matriz-permisos-otros" data-otros{% if widget.otros_elegidos %} open{% endif %}>
-            <summary>
-                <span>Otros permisos</span>
-                <span class="matriz-permisos-cuenta">{{ widget.otros|length }} · <span x-text="otrosElegidos">{{ widget.otros_elegidos }}</span> elegidos</span>
-            </summary>
-            <p class="matriz-permisos-nota">No los usa este portal. Se conservan porque las cuentas se comparten con otros sistemas.</p>
-            <ul role="list">
-                {% for opcion in widget.otros %}
-                    <li>
-                        <label for="{{ opcion.attrs.id }}">
-                            <input type="checkbox" name="{{ opcion.name }}" value="{{ opcion.value }}" id="{{ opcion.attrs.id }}" class="{{ widget.attrs.class }}"{% if opcion.selected %} checked{% endif %}>
-                            <span>{{ opcion.etiqueta }}</span>
-                        </label>
-                    </li>
-                {% endfor %}
-            </ul>
-        </details>
+    {% for opcion in widget.ajenos %}
+        <input type="hidden" name="{{ opcion.name }}" value="{{ opcion.value }}">
+    {% endfor %}
+    {% if widget.ajenos %}
+        <p class="matriz-permisos-nota">Tiene {{ widget.ajenos|length }} permiso{{ widget.ajenos|pluralize }} que este portal no usa; se conserva{{ widget.ajenos|pluralize:"n" }} al guardar.</p>
     {% endif %}
 </div>

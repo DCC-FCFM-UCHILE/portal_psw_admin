@@ -531,10 +531,6 @@ input[type="checkbox"].appearance-none.rounded-full {
   }
 }
 
-.matriz-permisos-otros[open] > summary {
-  margin-bottom: 0;
-}
-
 .zona-archivo-destino:has(> input:focus-visible) {
   outline: 2px solid var(--color-rojo);
   outline-offset: 2px;
@@ -667,26 +663,8 @@ input[type="checkbox"].appearance-none.rounded-full {
   .matriz-permisos-celda {
     @apply flex min-h-11 cursor-pointer items-center justify-center hover:bg-base-50 dark:hover:bg-oscuro-elevada;
   }
-  .matriz-permisos-otros {
-    @apply rounded-default border border-base-200 text-sm dark:border-oscuro-elevada;
-  }
-  .matriz-permisos-otros summary {
-    @apply relative flex min-h-11 cursor-pointer list-none items-center gap-2 pl-3 pr-10 font-medium text-gris-oscuro hover:bg-base-50 dark:text-oscuro-texto dark:hover:bg-oscuro-elevada;
-  }
-  .matriz-permisos-otros summary::-webkit-details-marker {
-    display: none;
-  }
-  .matriz-permisos-cuenta {
-    @apply ml-auto text-xs font-normal text-gris-medio dark:text-oscuro-suave;
-  }
   .matriz-permisos-nota {
-    @apply border-t border-base-200 px-3 py-2 text-xs text-gris-medio dark:border-oscuro-elevada dark:text-oscuro-suave;
-  }
-  .matriz-permisos-otros ul {
-    @apply grid gap-x-4 border-t border-base-200 px-3 py-2 sm:grid-cols-2 dark:border-oscuro-elevada;
-  }
-  .matriz-permisos-otros label {
-    @apply flex min-h-9 cursor-pointer items-center gap-2 text-gris-oscuro dark:text-oscuro-texto;
+    @apply text-xs text-gris-medio dark:text-oscuro-suave;
   }
   .lateral-grupo {
     @apply mx-3 mb-1 mt-5 flex items-center gap-2 px-3 text-[0.6875rem] font-bold uppercase tracking-widest text-[#B0B6BF];

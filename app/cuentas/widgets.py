@@ -4,7 +4,6 @@ from django.contrib import admin
 from django.contrib.auth.forms import ReadOnlyPasswordHashWidget
 from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
 from django.urls import NoReverseMatch, reverse
-from django.utils.text import capfirst
 from unfold.widgets import CHECKBOX_CLASSES, UnfoldAdminCheckboxSelectMultipleWidget
 
 ACCIONES = {"view": "Ver", "add": "Agregar", "change": "Editar", "delete": "Eliminar"}
@@ -26,14 +25,6 @@ def secciones_del_menu():
 def accion(permiso):
     prefijo, _, resto = permiso.codename.partition("_")
     return prefijo if prefijo in ACCIONES and resto == permiso.content_type.model else None
-
-
-def nombre_suelto(permiso):
-    tipo = permiso.content_type
-    modelo = tipo.model_class()
-    sujeto = capfirst(modelo._meta.verbose_name_plural) if modelo else f"{tipo.app_label}.{tipo.model}"
-    clave = accion(permiso)
-    return f"{sujeto}: {ACCIONES[clave].lower() if clave else permiso.name}"
 
 
 class MatrizPermisos(forms.CheckboxSelectMultiple):
@@ -67,16 +58,11 @@ class MatrizPermisos(forms.CheckboxSelectMultiple):
             if tabla:
                 secciones.append({"titulo": titulo, "filas": tabla})
 
-        otros = sorted(opciones.values(), key=lambda opcion: nombre_suelto(opcion["permiso"]))
-        for opcion in otros:
-            opcion["etiqueta"] = nombre_suelto(opcion["permiso"])
-
         contexto["widget"].update(
             {
                 "secciones": secciones,
                 "acciones": ACCIONES.values(),
-                "otros": otros,
-                "otros_elegidos": sum(1 for opcion in otros if opcion["selected"]),
+                "ajenos": [opcion for opcion in opciones.values() if opcion["selected"]],
             }
         )
         return contexto

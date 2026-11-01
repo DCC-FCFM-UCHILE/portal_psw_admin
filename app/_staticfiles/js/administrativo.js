@@ -171,11 +171,8 @@ document.addEventListener("alpine:init", () => {
     }));
 
     Alpine.data("matrizPermisos", () => ({
-        otrosElegidos: 0,
-
         init() {
             this.$el.querySelectorAll("tr[data-fila]").forEach((fila) => this.sincronizar(fila));
-            this.contarOtros();
         },
 
         sincronizar(fila) {
@@ -184,10 +181,6 @@ document.addEventListener("alpine:init", () => {
             const marcadas = casillas.filter((casilla) => casilla.checked).length;
             todas.checked = casillas.length > 0 && marcadas === casillas.length;
             todas.indeterminate = marcadas > 0 && marcadas < casillas.length;
-        },
-
-        contarOtros() {
-            this.otrosElegidos = this.$el.querySelectorAll("[data-otros] input:checked").length;
         },
 
         cambio(evento) {
@@ -200,7 +193,6 @@ document.addEventListener("alpine:init", () => {
             if (fila) {
                 this.sincronizar(fila);
             }
-            this.contarOtros();
         },
     }));
 });
