@@ -168,11 +168,19 @@ html[data-arranque="lateral-cerrada"] .envoltura-lateral {
     visibility 0s;
 }
 
+@media (min-width: 1024px) {
+  body:has(#changelist-form input.action-select:checked) .pie-paginacion {
+    visibility: hidden;
+    transition: visibility 0s linear var(--duracion-capa-entrada);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   :is(.capa-entra, .capa-sale, .emergente-entra, .emergente-sale),
   :is(.capa-entra, .capa-sale) :is(.velo-lateral, #nav-sidebar),
   .barra-acciones,
-  #changelist-form:has(input.action-select:checked) .barra-acciones {
+  #changelist-form:has(input.action-select:checked) .barra-acciones,
+  body:has(#changelist-form input.action-select:checked) .pie-paginacion {
     transition: none;
   }
 }
