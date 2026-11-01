@@ -223,6 +223,10 @@ const marcarFormato = (evento) => {
 document.addEventListener("trix-initialize", marcarFormato);
 document.addEventListener("trix-selection-change", marcarFormato);
 
+document.addEventListener("formset:removed", (evento) => {
+    document.getElementById(`${evento.detail.formsetName}-group`)?.querySelector(".add-row")?.focus();
+});
+
 const icono = ".material-symbols-outlined:not([aria-hidden])";
 const ayuda = ".help-tooltip[aria-label]:not([role])";
 

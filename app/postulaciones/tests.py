@@ -11,7 +11,7 @@ from django.urls import reverse
 from convenios.models import RulesApplications
 from cuentas.forms import NuevaClaveForm, RestablecerForm
 from postulaciones import correo, tablas_compartidas
-from postulaciones.models import Announcement, Application, ApprovedProject, Candidate, Organization, Unit
+from postulaciones.models import Announcement, Application, ApprovedProject, Candidate, Member, Organization, Unit
 
 
 @override_settings(MEDIA_ROOT="/tmp/admin-pruebas-media")
@@ -333,6 +333,14 @@ class FormulariosTests(BaseCompartida):
         respuesta = self.client.get(reverse("admin:auth_user_change", args=[externo.pk]))
         self.assertContains(respuesta, "Sin contraseña")
         self.assertContains(respuesta, f'href="{reverse("admin:auth_user_password_change", args=[externo.pk])}"')
+
+    def test_quitar_un_integrante_es_una_casilla_con_nombre(self):
+        proyecto = ApprovedProject.objects.create(titulo="Riego", semestre="SP", anio=2026, tutor="Tutor")
+        Member.objects.create(proyecto=proyecto, nombre="Luis Soto")
+        respuesta = self.client.get(reverse("admin:applications_approvedproject_change", args=[proyecto.pk]))
+        self.assertContains(respuesta, 'class="delete sr-only" aria-label="Quitar Luis Soto"')
+        self.assertContains(respuesta, '<button type="button" class="delete-template')
+        self.assertContains(respuesta, "Quitar esta fila")
 
     def test_el_archivo_declara_sus_formatos(self):
         respuesta = self.client.get(reverse("admin:applications_application_add"))

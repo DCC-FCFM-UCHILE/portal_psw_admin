@@ -1,0 +1,15 @@
+{% if inline_admin_formset.formset.can_delete and inline_admin_formset.has_delete_permission %}
+    {% if inline_admin_form.original %}
+        <label class="relative z-[60] cursor-pointer flex h-[38px] w-[38px] items-center justify-center rounded-default select-none transition-[background-color] hover:bg-base-50 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-rojo dark:hover:bg-base-800 dark:has-[:focus-visible]:outline-white">
+            <span class="material-symbols-outlined md-18 text-red-600 dark:text-red-500" aria-hidden="true">delete</span>
+            {% with casilla=inline_admin_form.deletion_field.field %}
+                <input type="checkbox" name="{{ casilla.html_name }}" id="{{ casilla.auto_id }}" class="delete sr-only" aria-label="Quitar {{ inline_admin_form.original }}"{% if casilla.value %} checked{% endif %}>
+            {% endwith %}
+        </label>
+    {% else %}
+        <button type="button" class="delete-template cursor-pointer flex h-[38px] w-[38px] items-center justify-center rounded-default select-none transition-[background-color] hover:bg-base-50 dark:hover:bg-base-800">
+            <span class="material-symbols-outlined md-18 text-red-600 dark:text-red-500" aria-hidden="true">delete</span>
+            <span class="sr-only">Quitar esta fila</span>
+        </button>
+    {% endif %}
+{% endif %}
