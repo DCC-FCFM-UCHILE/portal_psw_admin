@@ -648,6 +648,21 @@ document.addEventListener("DOMContentLoaded", () => {
     document.fonts?.ready.then(marcarMatrices);
 });
 
+window.addEventListener("load", () => {
+    const contenido = document.getElementById("content");
+    if (!contenido || document.getElementById("login-form")) {
+        return;
+    }
+    const campo = [...contenido.querySelectorAll('[aria-invalid="true"]')].find((elemento) => elemento.type !== "hidden" && elemento.checkVisibility());
+    const general = contenido.querySelector("div.errornote");
+    if (campo) {
+        campo.focus();
+    } else if (general) {
+        general.setAttribute("tabindex", "-1");
+        general.focus();
+    }
+});
+
 document.addEventListener("formset:removed", (evento) => {
     document.getElementById(`${evento.detail.formsetName}-group`)?.querySelector(".add-row")?.focus();
 });
