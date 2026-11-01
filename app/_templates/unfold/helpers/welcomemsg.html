@@ -25,12 +25,12 @@
     <div id="titulo-cabecera" class="ml-1 flex min-w-0 items-center gap-2 text-sm leading-5 sm:ml-0 xl:text-base{% if adminform %} max-sm:order-last max-sm:ml-0 max-sm:basis-full{% endif %}">
         <span class="titulo-silueta silueta-bloque h-5 w-40 max-w-full rounded" aria-hidden="true"></span>
         {% if migas.ruta %}
-            <nav aria-label="Ruta" class="hidden shrink-0 md:block">
-                <ol role="list" class="flex items-center gap-2">
+            <nav aria-label="Ruta" class="hidden min-w-0 shrink-[20] md:block">
+                <ol role="list" class="flex min-w-0 items-center gap-2">
                     {% for miga in migas.ruta %}
-                        <li class="flex items-center gap-2">
-                            {% if miga.enlace %}<a href="{{ miga.enlace }}" class="rounded text-gris-medio hover:text-rojo hover:underline dark:text-base-400">{{ miga.titulo }}</a>{% else %}<span class="text-gris-medio">{{ miga.titulo }}</span>{% endif %}
-                            <span class="material-symbols-outlined md-18 text-base-400" aria-hidden="true">chevron_right</span>
+                        <li class="flex min-w-0 items-center gap-2">
+                            {% if miga.enlace %}<a href="{{ miga.enlace }}" class="min-w-0 truncate rounded text-gris-medio hover:text-rojo hover:underline dark:text-base-400">{{ miga.titulo }}</a>{% else %}<span class="min-w-0 truncate text-gris-medio">{{ miga.titulo }}</span>{% endif %}
+                            <span class="material-symbols-outlined md-18 shrink-0 text-base-400" aria-hidden="true">chevron_right</span>
                         </li>
                     {% endfor %}
                 </ol>

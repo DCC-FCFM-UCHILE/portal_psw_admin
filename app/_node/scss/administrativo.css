@@ -424,6 +424,10 @@ html:has(#listado[aria-busy="true"]) :is(#pie-listado, #conteo-cabecera) {
   }
 }
 
+:is(.delete-confirmation, .delete-selected-confirmation) #content :is(p, li) {
+  overflow-wrap: anywhere;
+}
+
 .silueta-bloque {
   @apply bg-base-200 dark:bg-base-800;
 }
