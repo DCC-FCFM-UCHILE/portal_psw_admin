@@ -976,7 +976,8 @@ input[type="checkbox"].appearance-none.rounded-full {
   .matriz-permisos-celda {
     @apply flex min-h-11 cursor-pointer items-center justify-center hover:bg-base-50 dark:hover:bg-oscuro-elevada;
   }
-  .matriz-permisos-nota {
+  .matriz-permisos-nota,
+  .matriz-permisos-aviso {
     @apply text-xs text-gris-medio dark:text-oscuro-suave;
   }
   .barra-acciones {
@@ -1177,4 +1178,32 @@ input[type="checkbox"].appearance-none.rounded-full {
 .matriz-permisos input[type="checkbox"]:indeterminate::after {
   content: "remove";
   color: var(--color-white);
+}
+
+form:has(input[name="is_superuser"]:checked) .matriz-permisos tr[data-fila] input[type="checkbox"] {
+  background-color: var(--color-primary-600);
+  border-color: var(--color-primary-600);
+}
+
+form:has(input[name="is_superuser"]:checked) .matriz-permisos tr[data-fila] input[type="checkbox"]::after {
+  content: "check_small";
+  color: var(--color-white);
+}
+
+.matriz-permisos input[type="checkbox"]:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.matriz-permisos-celda:has(input:disabled) {
+  cursor: not-allowed;
+  background-color: transparent;
+}
+
+.matriz-permisos-aviso {
+  display: none;
+}
+
+form:has(input[name="is_superuser"]:checked) .matriz-permisos-aviso {
+  display: block;
 }

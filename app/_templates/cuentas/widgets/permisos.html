@@ -1,4 +1,6 @@
 <div class="matriz-permisos" x-data="matrizPermisos" x-on:change="cambio($event)">
+    <p class="matriz-permisos-aviso">Un superusuario tiene todos los permisos. Al quitárselo, la tabla vuelve a los permisos que tenía marcados.</p>
+    <div x-ref="reserva" hidden></div>
     {% for seccion in widget.secciones %}
         <div class="matriz-permisos-marco"{% if widget.attrs.disabled %} role="region" tabindex="0" aria-labelledby="{{ widget.attrs.id }}_seccion_{{ forloop.counter }}"{% endif %}>
             <table class="matriz-permisos-tabla">

@@ -174,6 +174,42 @@ document.addEventListener("alpine:init", () => {
     Alpine.data("matrizPermisos", () => ({
         init() {
             this.$el.querySelectorAll("tr[data-fila]").forEach((fila) => this.sincronizar(fila));
+            this.superusuario = this.$el.closest("form")?.querySelector('input[name="is_superuser"]');
+            if (this.superusuario) {
+                this.superusuario.addEventListener("change", () => this.reflejarSuperusuario());
+                this.reflejarSuperusuario();
+            }
+        },
+
+        reflejarSuperusuario() {
+            const activo = this.superusuario.checked;
+            if (activo === this.$el.hasAttribute("data-superusuario")) {
+                return;
+            }
+            this.$el.toggleAttribute("data-superusuario", activo);
+            this.$refs.reserva.replaceChildren();
+            this.$el.querySelectorAll("tr[data-fila] input").forEach((casilla) => {
+                if (activo) {
+                    casilla.dataset.marcada = casilla.checked ? "si" : "";
+                    casilla.dataset.bloqueada = casilla.disabled ? "si" : "";
+                    if (casilla.name && casilla.checked && !casilla.disabled) {
+                        const guardada = document.createElement("input");
+                        guardada.type = "hidden";
+                        guardada.name = casilla.name;
+                        guardada.value = casilla.value;
+                        this.$refs.reserva.append(guardada);
+                    }
+                    casilla.checked = true;
+                    casilla.indeterminate = false;
+                    casilla.disabled = true;
+                } else {
+                    casilla.checked = casilla.dataset.marcada === "si";
+                    casilla.disabled = casilla.dataset.bloqueada === "si";
+                }
+            });
+            if (!activo) {
+                this.$el.querySelectorAll("tr[data-fila]").forEach((fila) => this.sincronizar(fila));
+            }
         },
 
         sincronizar(fila) {
