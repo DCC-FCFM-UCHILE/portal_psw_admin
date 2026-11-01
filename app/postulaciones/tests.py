@@ -758,6 +758,24 @@ class ListadoParcialTests(BaseCompartida):
                     self.assertTemplateUsed(self.pedir(zona, url), plantilla)
 
 
+class GuionesDeUnfoldTests(BaseCompartida):
+    def urls(self):
+        return [
+            reverse("admin:index"),
+            reverse("admin:applications_application_changelist"),
+            reverse("admin:applications_application_change", args=[self.postulacion.pk]),
+            reverse("admin:applications_application_notificar_correo", args=[self.postulacion.pk]),
+        ]
+
+    def test_no_carga_graficos_ni_ordenamiento(self):
+        for url in self.urls():
+            with self.subTest(url=url):
+                respuesta = self.client.get(url)
+                self.assertNotContains(respuesta, "chart.js")
+                self.assertNotContains(respuesta, "alpine.sort.js")
+                self.assertContains(respuesta, "alpine.focus.js")
+
+
 class MenusDeFilaTests(BaseCompartida):
     def test_los_menus_no_quedan_atados_mientras_estan_cerrados(self):
         respuesta = self.client.get(reverse("admin:applications_application_changelist"))
