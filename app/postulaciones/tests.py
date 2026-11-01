@@ -1,4 +1,5 @@
 import datetime
+from types import SimpleNamespace
 from unittest import mock
 
 from django.contrib.admin.models import ADDITION, LogEntry
@@ -12,6 +13,7 @@ from django.urls import reverse
 
 from convenios.models import RulesApplications
 from cuentas.forms import NuevaClaveForm, RestablecerForm
+from cuentas.templatetags.interfaz import paginas_cercanas
 from postulaciones import correo, tablas_compartidas
 from postulaciones.models import Announcement, Application, ApprovedProject, Candidate, Member, Organization, Unit
 
@@ -593,3 +595,47 @@ class AccionesPorFilaTests(BaseCompartida):
         self.assertEqual(self.client.post(self.url("aceptar")).status_code, 403)
         self.postulacion.refresh_from_db()
         self.assertEqual(self.postulacion.estado, Application.Estado.CREADA)
+
+
+class PaginacionTests(BaseCompartida):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        Organization.objects.bulk_create(Organization(rut=f"{n}-K", nombre=f"Organización {n:02}") for n in range(25))
+
+    def test_lleva_a_la_primera_la_anterior_la_siguiente_y_la_ultima(self):
+        respuesta = self.client.get(reverse("admin:applications_organization_changelist"), {"p": 2})
+        self.assertContains(respuesta, '<a href="?p=1" class="boton-secundario px-3" aria-label="Primera página">')
+        self.assertContains(respuesta, '<a href="?p=1" class="boton-secundario max-sm:px-3" rel="prev">')
+        self.assertContains(respuesta, '<a href="?p=3" class="boton-secundario max-sm:px-3" rel="next">')
+        self.assertContains(respuesta, '<a href="?p=3" class="boton-secundario px-3" aria-label="Última página">')
+        self.assertContains(respuesta, '<span class="whitespace-nowrap">11 a 20</span> de 26 organizaciones')
+
+    def test_en_los_extremos_los_botones_quedan_inactivos(self):
+        url = reverse("admin:applications_organization_changelist")
+        primera = self.client.get(url)
+        self.assertContains(primera, 'disabled aria-label="Primera página"')
+        self.assertNotContains(primera, 'aria-label="Última página" disabled')
+        ultima = self.client.get(url, {"p": 3})
+        self.assertContains(ultima, 'disabled aria-label="Última página"')
+        self.assertContains(ultima, '<span class="whitespace-nowrap">21 a 26</span> de 26 organizaciones')
+
+    def test_conserva_el_orden_y_la_busqueda_al_cambiar_de_pagina(self):
+        respuesta = self.client.get(reverse("admin:applications_organization_changelist"), {"o": "2", "q": "Organización"})
+        self.assertContains(respuesta, 'href="?o=2&amp;p=2&amp;q=Organizaci%C3%B3n"')
+
+    def test_la_cantidad_de_numeros_no_cambia_con_la_pagina(self):
+        for total in [8, 39, 100]:
+            for actual in range(1, total + 1):
+                with self.subTest(total=total, actual=actual):
+                    cl = SimpleNamespace(page_num=actual, paginator=SimpleNamespace(num_pages=total, ELLIPSIS="…"))
+                    paginas = paginas_cercanas(cl)
+                    self.assertEqual(len(paginas), 7)
+                    self.assertTrue({1, actual, total} <= set(paginas))
+        cl = SimpleNamespace(page_num=4, paginator=SimpleNamespace(num_pages=39, ELLIPSIS="…"))
+        self.assertEqual(paginas_cercanas(cl), [1, 2, 3, 4, 5, "…", 39])
+
+    def test_una_sola_pagina_muestra_solo_el_conteo(self):
+        respuesta = self.client.get(reverse("admin:applications_application_changelist"))
+        self.assertContains(respuesta, "1 postulación")
+        self.assertNotContains(respuesta, 'aria-label="Paginación"')

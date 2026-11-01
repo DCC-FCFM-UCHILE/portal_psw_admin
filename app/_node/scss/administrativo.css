@@ -565,6 +565,13 @@ input[type="checkbox"].appearance-none.rounded-full {
   outline: none;
 }
 
+@media (forced-colors: active) {
+  .numero-pagina-actual {
+    outline: 2px solid CanvasText;
+    outline-offset: -2px;
+  }
+}
+
 .salto {
   position: fixed;
   top: 0.5rem;
@@ -782,6 +789,19 @@ input[type="checkbox"].appearance-none.rounded-full {
   }
   .boton-secundario {
     @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border border-borde bg-white px-4 py-2 text-sm font-medium text-gris-oscuro transition-[color,background-color,border-color,transform] hover:bg-gray-50 active:scale-95 motion-reduce:active:scale-100 dark:border-oscuro-borde dark:bg-base-900 dark:text-white dark:hover:bg-base-800;
+  }
+  .boton-secundario:disabled {
+    @apply cursor-not-allowed border-base-200 bg-white text-gris-medio opacity-60 active:scale-100 dark:border-oscuro-elevada dark:bg-base-900 dark:text-oscuro-suave;
+  }
+  .numero-pagina {
+    @apply inline-flex min-h-10 items-center justify-center rounded-lg px-2 text-sm font-medium tabular-nums text-gris-oscuro dark:text-white;
+    min-width: max(2.5rem, calc(var(--cifras, 2) * 0.7em + 1rem));
+  }
+  a.numero-pagina {
+    @apply transition-colors hover:bg-base-100 hover:text-rojo dark:hover:bg-base-800 dark:hover:text-oscuro-acento;
+  }
+  .numero-pagina-actual {
+    @apply bg-rojo font-semibold text-white dark:text-white;
   }
   .indicador {
     @apply flex items-center justify-between gap-4 rounded-xl border border-base-200 bg-white px-5 py-4 shadow-xs transition-[border-color,transform] hover:-translate-y-px hover:border-rojo motion-reduce:hover:translate-y-0 dark:border-base-800 dark:bg-base-900;

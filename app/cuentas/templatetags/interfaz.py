@@ -93,3 +93,20 @@ def rutas_listado():
 @register.simple_tag
 def url_pagina(cl, numero):
     return cl.get_query_string({PAGE_VAR: numero})
+
+
+@register.simple_tag
+def pagina_del_listado(cl):
+    return cl.paginator.get_page(cl.page_num)
+
+
+@register.simple_tag
+def paginas_cercanas(cl, vecinas=1, extremos=1):
+    total, actual, elipsis = cl.paginator.num_pages, cl.page_num, cl.paginator.ELLIPSIS
+    if total <= 2 * (extremos + vecinas) + 3:
+        return list(range(1, total + 1))
+    desde = max(min(actual - vecinas, total - extremos - 2 * vecinas - 1), extremos + 2)
+    hasta = min(max(actual + vecinas, extremos + 2 * vecinas + 2), total - extremos - 1)
+    antes = [elipsis] if desde > extremos + 2 else [extremos + 1]
+    despues = [elipsis] if hasta < total - extremos - 1 else [total - extremos]
+    return [*range(1, extremos + 1), *antes, *range(desde, hasta + 1), *despues, *range(total - extremos + 1, total + 1)]

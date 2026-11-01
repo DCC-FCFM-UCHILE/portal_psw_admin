@@ -1,29 +1,50 @@
 {% load interfaz %}
 
-{% if pagination_required %}
-    <div class="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 py-2 pr-2">
-        {% for i in page_range %}
-            {% if i == cl.paginator.ELLIPSIS %}
-                <span class="inline-flex min-h-6 min-w-6 items-center justify-center">…</span>
-            {% elif i == cl.page_num %}
-                {% include "unfold/helpers/pagination_current_item.html" with number=i %}
-            {% else %}
-                <a href="{% url_pagina cl i %}" class="inline-flex min-h-6 min-w-6 items-center justify-center rounded hover:text-rojo dark:hover:text-oscuro-acento">{{ i }}</a>
-            {% endif %}
-        {% endfor %}
+{% paginas_cercanas cl as paginas %}
+<nav aria-label="Paginación" class="flex items-center justify-between gap-2 lg:justify-end">
+    <div class="flex shrink-0 gap-2">
+        {% if pagina.has_previous %}
+            <a href="{% url_pagina cl 1 %}" class="boton-secundario px-3" aria-label="Primera página">
+                {% include "components/iconos/primera.html" %}
+            </a>
+            <a href="{% url_pagina cl pagina.previous_page_number %}" class="boton-secundario max-sm:px-3" rel="prev">
+                {% include "components/iconos/anterior.html" %}
+                <span class="max-sm:sr-only">Anterior</span>
+            </a>
+        {% else %}
+            <button type="button" class="boton-secundario px-3" disabled aria-label="Primera página">{% include "components/iconos/primera.html" %}</button>
+            <button type="button" class="boton-secundario max-sm:px-3" disabled>{% include "components/iconos/anterior.html" %}<span class="max-sm:sr-only">Anterior</span></button>
+        {% endif %}
     </div>
-{% endif %}
 
-<div class="shrink-0 py-4">
-    {% if pagination_required %}
-        -
-    {% endif %}
+    <span class="min-w-0 flex-1 text-center text-sm text-gris-medio lg:hidden dark:text-oscuro-suave">Página <span class="whitespace-nowrap">{{ pagina.number }} de {{ pagina.paginator.num_pages }}</span></span>
 
-    {{ cl.result_count }}
+    <ul role="list" class="hidden items-center gap-1 lg:mx-1 lg:flex" style="--cifras: {{ pagina.paginator.num_pages|stringformat:"d"|length }}">
+        {% for numero in paginas %}
+            <li>
+                {% if numero == pagina.paginator.ELLIPSIS %}
+                    <span class="numero-pagina text-gris-medio dark:text-oscuro-suave">…</span>
+                {% elif numero == pagina.number %}
+                    {% include "unfold/helpers/pagination_current_item.html" with number=numero %}
+                {% else %}
+                    <a href="{% url_pagina cl numero %}" class="numero-pagina" aria-label="Página {{ numero }}">{{ numero }}</a>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
 
-    {% if cl.result_count == 1 %}
-        {{ cl.opts.verbose_name }}
-    {% else %}
-        {{ cl.opts.verbose_name_plural }}
-    {% endif %}
-</div>
+    <div class="flex shrink-0 gap-2">
+        {% if pagina.has_next %}
+            <a href="{% url_pagina cl pagina.next_page_number %}" class="boton-secundario max-sm:px-3" rel="next">
+                <span class="max-sm:sr-only">Siguiente</span>
+                {% include "components/iconos/siguiente.html" %}
+            </a>
+            <a href="{% url_pagina cl pagina.paginator.num_pages %}" class="boton-secundario px-3" aria-label="Última página">
+                {% include "components/iconos/ultima.html" %}
+            </a>
+        {% else %}
+            <button type="button" class="boton-secundario max-sm:px-3" disabled><span class="max-sm:sr-only">Siguiente</span>{% include "components/iconos/siguiente.html" %}</button>
+            <button type="button" class="boton-secundario px-3" disabled aria-label="Última página">{% include "components/iconos/ultima.html" %}</button>
+        {% endif %}
+    </div>
+</nav>
