@@ -23,6 +23,7 @@ urlpatterns = [
     path("recuperar-contrasena/<uidb64>/<token>/", views.RestablecerConfirmarView.as_view(), name="password_reset_confirm"),
     path("siluetas/", SiluetasView.as_view(), name="siluetas"),
     path("salir/", views.SalirView.as_view()),
+    path("cambiar-contrasena/", admin.site.admin_view(views.CambiarClaveView.as_view())),
     path("sesion/", views.SesionView.as_view(), name="sesion"),
     path("jsi18n/", admin.site.admin_view(catalogo, cacheable=True)),
 ]

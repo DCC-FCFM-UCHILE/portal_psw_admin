@@ -1,7 +1,7 @@
 from django.contrib.auth import forms
 from django.core.exceptions import ValidationError
 from django.urls import reverse
-from unfold.forms import AuthenticationForm, UserChangeForm
+from unfold.forms import AdminOwnPasswordChangeForm, AdminPasswordChangeForm, AuthenticationForm, UserChangeForm, UserCreationForm
 from unfold.widgets import BASE_INPUT_CLASSES
 
 from cuentas.widgets import AccesoAContrasena
@@ -14,11 +14,28 @@ class ConClasesDeUnfold:
             campo.widget.attrs["class"] = " ".join(BASE_INPUT_CLASSES)
 
 
+class ErroresEnLaPrimeraClave:
+    def validate_password_for_user(self, user, password_field_name="password2", **kwargs):
+        super().validate_password_for_user(user, password_field_name=password_field_name.removesuffix("2") + "1", **kwargs)
+
+
 class RestablecerForm(ConClasesDeUnfold, forms.PasswordResetForm):
     pass
 
 
-class NuevaClaveForm(ConClasesDeUnfold, forms.SetPasswordForm):
+class NuevaClaveForm(ErroresEnLaPrimeraClave, ConClasesDeUnfold, forms.SetPasswordForm):
+    pass
+
+
+class AltaUsuarioForm(ErroresEnLaPrimeraClave, UserCreationForm):
+    pass
+
+
+class CambioClaveForm(ErroresEnLaPrimeraClave, AdminPasswordChangeForm):
+    pass
+
+
+class CambioClavePropiaForm(ErroresEnLaPrimeraClave, AdminOwnPasswordChangeForm):
     pass
 
 

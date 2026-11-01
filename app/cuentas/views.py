@@ -6,7 +6,7 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.cache import never_cache
 
-from cuentas.forms import NuevaClaveForm, RestablecerForm
+from cuentas.forms import CambioClavePropiaForm, NuevaClaveForm, RestablecerForm
 from cuentas.sesion import en_milisegundos, renovar
 
 
@@ -31,6 +31,15 @@ class RestablecerConfirmarView(ConSitio, views.PasswordResetConfirmView):
 
 class RestablecerListoView(ConSitio, views.PasswordResetCompleteView):
     pass
+
+
+class CambiarClaveView(ConSitio, views.PasswordChangeView):
+    form_class = CambioClavePropiaForm
+    success_url = reverse_lazy("admin:password_change_done")
+
+    def dispatch(self, request, *args, **kwargs):
+        request.current_app = admin.site.name
+        return super().dispatch(request, *args, **kwargs)
 
 
 class SalirView(views.LogoutView):

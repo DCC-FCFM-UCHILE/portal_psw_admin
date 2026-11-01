@@ -243,6 +243,52 @@ class DescripcionConSaltosTests(BaseCompartida):
         self.assertEqual(self.postulacion.descripcion, "x" * 189 + "\n" + "y" * 10)
 
 
+class ErroresDeContrasenaTests(BaseCompartida):
+    def assertErroresEnLaPrimera(self, formulario, primera, segunda):
+        self.assertIn("La contraseña no puede tener solo números.", formulario.errors.get(primera, []))
+        self.assertNotIn(segunda, formulario.errors)
+
+    def test_nueva_contrasena(self):
+        formulario = NuevaClaveForm(self.docente, {"new_password1": "12345678", "new_password2": "12345678"})
+        self.assertFalse(formulario.is_valid())
+        self.assertErroresEnLaPrimera(formulario, "new_password1", "new_password2")
+
+    def test_alta_de_usuario(self):
+        respuesta = self.client.post(
+            reverse("admin:auth_user_add"),
+            {"username": "nueva", "usable_password": "true", "password1": "12345678", "password2": "12345678", "_save": "1"},
+        )
+        self.assertErroresEnLaPrimera(respuesta.context["adminform"].form, "password1", "password2")
+
+    def test_cambiar_la_contrasena_de_otra_cuenta(self):
+        otra = User.objects.create_user("otra", password="clave-de-prueba", is_staff=True)
+        respuesta = self.client.post(
+            reverse("admin:auth_user_password_change", args=[otra.pk]),
+            {"password1": "12345678", "password2": "12345678", "usable_password": "true"},
+        )
+        self.assertErroresEnLaPrimera(respuesta.context["form"], "password1", "password2")
+
+    def test_cambiar_la_contrasena_propia(self):
+        url = reverse("admin:password_change")
+        datos = {"old_password": "clave-de-prueba", "new_password1": "12345678", "new_password2": "12345678"}
+        respuesta = self.client.post(url, datos)
+        self.assertErroresEnLaPrimera(respuesta.context["form"], "new_password1", "new_password2")
+        datos["new_password1"] = datos["new_password2"] = "otra-clave-larga-2026"
+        self.assertRedirects(self.client.post(url, datos), reverse("admin:password_change_done"))
+        self.docente.refresh_from_db()
+        self.assertTrue(self.docente.check_password("otra-clave-larga-2026"))
+
+    def test_la_contrasena_propia_mantiene_el_sitio(self):
+        respuesta = self.client.get(reverse("admin:password_change"))
+        self.assertContains(respuesta, 'id="sesion"')
+        self.assertContains(respuesta, "Contraseña actual")
+        self.client.logout()
+        self.assertRedirects(
+            self.client.get(reverse("admin:password_change")),
+            f"{reverse('admin:login')}?next={reverse('admin:password_change')}",
+        )
+
+
 class ConvocatoriaTests(BaseCompartida):
     def test_rechaza_fechas_que_se_cruzan(self):
         otra = Announcement(

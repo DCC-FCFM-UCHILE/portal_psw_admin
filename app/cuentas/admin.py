@@ -6,13 +6,12 @@ from django.db.models import BooleanField, ExpressionWrapper, Q
 from django.shortcuts import redirect
 from django.utils.text import capfirst
 from unfold.admin import ModelAdmin
-from unfold.forms import AdminPasswordChangeForm, UserCreationForm
 
 from core.acciones import AccionesDeFila
 from core.busqueda import BusquedaSinTildes
 from core.ficha import SinGuardarYAgregarOtro
 from core.listado import ListadoParcial
-from cuentas.forms import FichaUsuarioForm, IngresoForm
+from cuentas.forms import AltaUsuarioForm, CambioClaveForm, FichaUsuarioForm, IngresoForm
 from cuentas.widgets import CasillasDeGrupos, MatrizPermisos
 
 admin.site.login_form = IngresoForm
@@ -106,8 +105,8 @@ def sin_relaciones_internas(modelo, borrados, cantidades):
 @admin.register(User)
 class UserAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, SinGuardarYAgregarOtro, PermisosEnTabla, BaseUserAdmin, ModelAdmin):
     form = FichaUsuarioForm
-    add_form = UserCreationForm
-    change_password_form = AdminPasswordChangeForm
+    add_form = AltaUsuarioForm
+    change_password_form = CambioClaveForm
     readonly_fields = ("last_login", "date_joined")
     list_per_page = 10
 
