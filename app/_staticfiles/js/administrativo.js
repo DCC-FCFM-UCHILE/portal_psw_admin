@@ -628,6 +628,26 @@ document.addEventListener("focusin", (evento) => {
     });
 });
 
+const marcarMatrices = () => {
+    document.querySelectorAll('.matriz-permisos-marco[role="region"]').forEach((marco) => {
+        if (marco.scrollWidth > marco.clientWidth + 1) {
+            marco.setAttribute("tabindex", "0");
+        } else {
+            marco.removeAttribute("tabindex");
+        }
+    });
+};
+
+const vigiaDeMatrices = new ResizeObserver(marcarMatrices);
+
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll('.matriz-permisos-marco[role="region"]').forEach((marco) => {
+        vigiaDeMatrices.observe(marco);
+        vigiaDeMatrices.observe(marco.firstElementChild);
+    });
+    document.fonts?.ready.then(marcarMatrices);
+});
+
 document.addEventListener("formset:removed", (evento) => {
     document.getElementById(`${evento.detail.formsetName}-group`)?.querySelector(".add-row")?.focus();
 });
