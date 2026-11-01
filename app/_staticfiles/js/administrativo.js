@@ -304,8 +304,11 @@ const verSeleccion = (estado) => {
         return;
     }
     acciones.querySelector("span.question")?.classList.toggle("hidden", estado !== "pagina");
-    acciones.querySelector("span.all")?.classList.toggle("hidden", estado !== "todas");
-    acciones.querySelector("span.action-counter")?.classList.toggle("hidden", estado === "todas");
+    const contador = acciones.querySelector("span.action-counter");
+    const todas = acciones.querySelector("span.all");
+    if (estado === "todas" && contador && todas) {
+        contador.textContent = todas.textContent.trim();
+    }
     acciones.querySelector("input.select-across").value = estado === "todas" ? 1 : 0;
 };
 
@@ -364,11 +367,31 @@ document.addEventListener("click", (evento) => {
     if (evento.target.closest("#changelist-form span.question a")) {
         evento.preventDefault();
         verSeleccion("todas");
+        evento.target.closest("form")?.querySelector("[data-accion]")?.focus();
         return;
     }
     const accion = evento.target.closest("[data-accion]");
     if (accion) {
         accion.form.elements.namedItem("action").value = accion.dataset.accion;
+        const todas = accion.form.querySelector("input.select-across")?.value === "1";
+        if (todas && ["aceptar", "rechazar"].includes(accion.dataset.accion) && !accion.dataset.confirmada) {
+            evento.preventDefault();
+            const verbo = accion.dataset.accion === "aceptar" ? "Aceptar" : "Rechazar";
+            const total = accion.form.querySelector("span.all")?.textContent.match(/\d+/)?.[0] || "";
+            confirmar({
+                titulo: `¿${verbo} ${total ? `las ${total} postulaciones` : "todas las postulaciones"}?`,
+                texto: "Incluye las que no están en esta página. Las que ya estaban en ese estado no cambian; las demás quedan sin notificar.",
+                si: total ? `${verbo} ${total}` : verbo,
+                no: "Cancelar",
+                principal: "si",
+            }).then((si) => {
+                if (si) {
+                    accion.dataset.confirmada = "1";
+                    accion.click();
+                    delete accion.dataset.confirmada;
+                }
+            });
+        }
         return;
     }
     if (evento.target.closest("[data-quitar-seleccion]")) {

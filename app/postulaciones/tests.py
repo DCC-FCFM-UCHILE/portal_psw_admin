@@ -132,7 +132,7 @@ class AccionesTests(BaseCompartida):
         self.postulacion.refresh_from_db()
         self.assertEqual(self.postulacion.estado, Application.Estado.ACEPTADA)
         self.assertFalse(self.postulacion.fue_notificada)
-        self.assertContains(respuesta, "Postulaciones actualizadas a aceptadas.")
+        self.assertContains(respuesta, "Se aceptó 1 postulación. 1 tenía la notificación enviada: hay que notificarla de nuevo.")
 
     def test_rechazar(self):
         self.aplicar("rechazar")
@@ -880,3 +880,36 @@ class CasillasDeFilaTests(BaseCompartida):
         respuesta = self.client.get(reverse("admin:applications_application_changelist"))
         self.assertContains(respuesta, 'aria-label="Seleccionar «Sistema de riego»"')
         self.assertNotContains(respuesta, 'aria-label="Seleccionar el registro"')
+
+
+class LoteTests(BaseCompartida):
+    def test_aceptar_en_lote_no_toca_las_que_ya_estaban_aceptadas(self):
+        otra = Application.objects.create(
+            postulante=self.postulacion.postulante,
+            convocatoria=self.convocatoria,
+            unidad=self.postulacion.unidad,
+            titulo="Inventario",
+            archivo=SimpleUploadedFile("otro.pdf", b"%PDF-1.4"),
+            estado=Application.Estado.ACEPTADA,
+            fue_notificada=True,
+        )
+        respuesta = self.client.post(
+            reverse("admin:applications_application_changelist"),
+            {"action": "aceptar", "_selected_action": [self.postulacion.pk, otra.pk]},
+            follow=True,
+        )
+        otra.refresh_from_db()
+        self.assertTrue(otra.fue_notificada)
+        self.assertContains(respuesta, "Se aceptó 1 postulación. 1 ya estaba aceptada y no cambió.")
+        self.assertEqual(LogEntry.objects.filter(object_id=str(otra.pk)).count(), 0)
+
+    def test_aceptar_solo_las_ya_aceptadas_no_cambia_nada(self):
+        Application.objects.filter(pk=self.postulacion.pk).update(estado=Application.Estado.ACEPTADA, fue_notificada=True)
+        respuesta = self.client.post(
+            reverse("admin:applications_application_changelist"),
+            {"action": "aceptar", "_selected_action": [self.postulacion.pk]},
+            follow=True,
+        )
+        self.postulacion.refresh_from_db()
+        self.assertTrue(self.postulacion.fue_notificada)
+        self.assertContains(respuesta, "Las postulaciones elegidas ya estaban aceptadas; no cambió nada.")

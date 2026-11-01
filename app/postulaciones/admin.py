@@ -179,17 +179,29 @@ class ApplicationAdmin(ListadoParcial, AccionesDeFila, FormatosDeArchivo, ModelA
 
     @action(description="Aceptar", permissions=["change"])
     def aceptar(self, request, queryset):
-        postulaciones = list(queryset)
-        queryset.update(estado=Application.Estado.ACEPTADA, fue_notificada=False)
-        historial.registrar(request, postulaciones, historial.ACEPTADA)
-        messages.success(request, "Postulaciones actualizadas a aceptadas.")
+        self.resolver_lote(request, queryset, Application.Estado.ACEPTADA, historial.ACEPTADA, ("aceptó", "aceptaron"))
 
     @action(description="Rechazar", permissions=["change"])
     def rechazar(self, request, queryset):
-        postulaciones = list(queryset)
-        queryset.update(estado=Application.Estado.RECHAZADA, fue_notificada=False)
-        historial.registrar(request, postulaciones, historial.RECHAZADA)
-        messages.success(request, "Postulaciones actualizadas a rechazadas.")
+        self.resolver_lote(request, queryset, Application.Estado.RECHAZADA, historial.RECHAZADA, ("rechazó", "rechazaron"))
+
+    def resolver_lote(self, request, queryset, estado, mensaje, verbos):
+        resultado = Application.Estado(estado).label.lower()
+        postulaciones = list(queryset.exclude(estado=estado))
+        iguales = queryset.filter(estado=estado).count()
+        if not postulaciones:
+            messages.info(request, f"Las postulaciones elegidas ya estaban {resultado}s; no cambió nada.")
+            return
+        notificadas = sum(1 for postulacion in postulaciones if postulacion.fue_notificada)
+        Application.objects.filter(pk__in=[postulacion.pk for postulacion in postulaciones]).update(estado=estado, fue_notificada=False)
+        historial.registrar(request, postulaciones, mensaje)
+        cantidad = len(postulaciones)
+        partes = [f"Se {verbos[0]} 1 postulación." if cantidad == 1 else f"Se {verbos[1]} {cantidad} postulaciones."]
+        if iguales:
+            partes.append(f"1 ya estaba {resultado} y no cambió." if iguales == 1 else f"{iguales} ya estaban {resultado}s y no cambiaron.")
+        if notificadas:
+            partes.append("1 tenía la notificación enviada: hay que notificarla de nuevo." if notificadas == 1 else f"{notificadas} tenían la notificación enviada: hay que notificarlas de nuevo.")
+        messages.success(request, " ".join(partes))
 
     @action(description="Aceptar", url_path="aceptar-fila", permissions=["change"], icon="check_circle", attrs={"formmethod": "post"})
     def aceptar_fila(self, request, object_id):
