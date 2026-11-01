@@ -1367,7 +1367,7 @@ document.addEventListener(
     { passive: true },
 );
 
-const terminarArrastre = () => {
+const terminarArrastre = (evento) => {
     const arrastre = arrastreCajon.activo;
     arrastreCajon.activo = null;
     if (!arrastre || arrastre.rumbo !== "cerrar") {
@@ -1377,7 +1377,7 @@ const terminarArrastre = () => {
     const ancho = lateral.offsetWidth;
     const [[t0, x0], [t1, x1]] = [arrastre.muestras[0], arrastre.muestras.at(-1)];
     const velocidad = t1 > t0 ? (x1 - x0) / (t1 - t0) : 0;
-    const cierra = -arrastre.dx > ancho * 0.4 || velocidad < -0.3;
+    const cierra = evento.type === "touchend" && (-arrastre.dx > ancho * 0.4 || velocidad < -0.3);
     const salida = cierra ? "--duracion-capa-salida" : "--duracion-capa-entrada";
     const curva = cierra ? "--ease-enfatizada-salida" : "--ease-enfatizada-entrada";
     const duracion = sinMovimiento.matches ? "0s" : `var(${salida})`;
