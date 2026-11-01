@@ -48,6 +48,7 @@
 @source "../../convenios";
 @source "../../postulaciones";
 @source "../../_staticfiles/js";
+@source inline("max-w-7xl");
 
 html {
   overflow-y: scroll;
