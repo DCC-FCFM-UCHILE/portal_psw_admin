@@ -11,6 +11,7 @@ from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.urls import reverse
+from django.utils import timezone
 
 from convenios.models import RulesApplications
 from cuentas.forms import NuevaClaveForm, RestablecerForm
@@ -766,3 +767,57 @@ class ArchivosTests(BaseCompartida):
     def test_el_error_del_archivo_queda_asociado_al_campo(self):
         respuesta = self.client.post(reverse("admin:commons_rulesapplications_add"), {"descripcion": "Formato", "_save": "1"})
         self.assertContains(respuesta, 'aria-describedby="id_perfil_de_proyecto_zona id_perfil_de_proyecto_error"')
+
+
+class CuentaPropiaTests(BaseCompartida):
+    def test_la_ficha_propia_no_deja_quitarse_el_acceso(self):
+        url = reverse("admin:auth_user_change", args=[self.docente.pk])
+        respuesta = self.client.get(url)
+        self.assertContains(respuesta, "Tu propio acceso lo cambia otra persona que administre las cuentas.")
+        self.client.post(
+            url,
+            {
+                "username": "docente",
+                "first_name": "Ana",
+                "last_name": "",
+                "email": "docente@dcc.uchile.cl",
+                "is_active": "",
+                "is_staff": "",
+                "is_superuser": "",
+                "date_joined_0": timezone.localtime(self.docente.date_joined).strftime("%d/%m/%Y"),
+                "date_joined_1": timezone.localtime(self.docente.date_joined).strftime("%H:%M:%S"),
+                "_save": "1",
+            },
+        )
+        self.docente.refresh_from_db()
+        self.assertEqual(self.docente.first_name, "Ana")
+        self.assertTrue(self.docente.is_active and self.docente.is_staff and self.docente.is_superuser)
+
+    def test_la_cuenta_propia_no_se_elimina(self):
+        respuesta = self.client.get(reverse("admin:auth_user_delete", args=[self.docente.pk]), follow=True)
+        self.assertRedirects(respuesta, reverse("admin:auth_user_change", args=[self.docente.pk]))
+        self.assertContains(respuesta, "Tu propia cuenta no se puede eliminar desde aquí.")
+        self.assertTrue(User.objects.filter(pk=self.docente.pk).exists())
+
+    def test_el_borrado_en_lote_con_la_cuenta_propia_se_detiene(self):
+        otra = User.objects.create_user("otra", password="clave-de-prueba")
+        respuesta = self.client.post(
+            reverse("admin:auth_user_changelist"), {"action": "delete_selected", "_selected_action": [self.docente.pk, otra.pk]}
+        )
+        self.assertContains(respuesta, "tu propia cuenta (quítala de la selección)")
+        self.client.post(
+            reverse("admin:auth_user_changelist"),
+            {"action": "delete_selected", "_selected_action": [self.docente.pk, otra.pk], "post": "yes"},
+        )
+        self.assertEqual(User.objects.filter(pk__in=[self.docente.pk, otra.pk]).count(), 2)
+
+    def test_el_menu_de_la_fila_propia_no_ofrece_eliminar(self):
+        otra = User.objects.create_user("otra", password="clave-de-prueba")
+        respuesta = self.client.get(reverse("admin:auth_user_changelist")).content.decode()
+        self.assertNotIn(reverse("admin:auth_user_eliminar_fila", args=[self.docente.pk]), respuesta)
+        self.assertIn(reverse("admin:auth_user_eliminar_fila", args=[otra.pk]), respuesta)
+
+    def test_otra_cuenta_conserva_el_acceso_editable(self):
+        otra = User.objects.create_user("otra", password="clave-de-prueba", is_staff=True)
+        respuesta = self.client.get(reverse("admin:auth_user_change", args=[otra.pk]))
+        self.assertNotContains(respuesta, "Tu propio acceso lo cambia otra persona")

@@ -33,7 +33,7 @@
 
                                             <span class="grow truncate">{{ action.title }}</span>
                                         </button>
-                                    {% elif action.display_in_dropdown %}
+                                    {% elif action.display_in_dropdown and not propia or action.display_in_dropdown and action.raw_path != "admin:auth_user_eliminar_fila" %}
                                         <a href="{% url action.raw_path instance_pk %}"
                                            {% if action.dialog %}
                                                hx-get="{% url action.raw_path instance_pk %}"

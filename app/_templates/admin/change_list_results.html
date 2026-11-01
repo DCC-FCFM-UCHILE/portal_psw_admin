@@ -45,7 +45,7 @@
                             {{ item }}
                         {% endfor %}
 
-                        {% include 'unfold/helpers/actions_row.html' with actions=actions_row instance_pk=result.instance.pk %}
+                        {% include 'unfold/helpers/actions_row.html' with actions=actions_row instance_pk=result.instance.pk propia=result.instance.es_propia %}
                     </tr>
 
                     {% if cl.model_admin.list_sections|length > 0 %}
