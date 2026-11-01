@@ -245,6 +245,141 @@ document.addEventListener(
     true,
 );
 
+const ESTADOS = { creada: "CR", rechazada: "RE", aceptada: "AC" };
+const SEGUNDOS_PARA_DESHACER = 10;
+let porDeshacer = null;
+let trasDeshacer = null;
+
+const leerFila = (fila) => ({
+    id: fila.querySelector("input.action-select")?.value,
+    url: fila.querySelector(".field-titulo a[href]")?.href,
+    estado: ESTADOS[fila.querySelector("td.field-mostrar_estado")?.textContent.trim().toLowerCase()],
+    notificada: fila.querySelector("td.field-fue_notificada [title]")?.getAttribute("title") === "Sí",
+});
+
+const anotarParaDeshacer = (formulario, boton) => {
+    porDeshacer = null;
+    const deFila = boton.formAction.match(/\/([^/]+)\/(aceptar|rechazar)-fila\/$/);
+    const accion = deFila?.[2] || (["aceptar", "rechazar"].includes(boton.dataset.accion) ? boton.dataset.accion : null);
+    if (!accion || !formulario.querySelector("td.field-mostrar_estado")) {
+        return;
+    }
+    const seleccion = [...formulario.querySelectorAll("input.action-select:checked")].map((casilla) => casilla.value);
+    if (!deFila && formulario.querySelector("input.select-across")?.value === "1") {
+        return;
+    }
+    const ids = deFila ? [deFila[1]] : seleccion;
+    const filas = [...formulario.querySelectorAll("input.action-select")].filter((casilla) => ids.includes(casilla.value)).map((casilla) => leerFila(casilla.closest("tr")));
+    if (!filas.length || filas.length !== ids.length || filas.some((fila) => !fila.url || !fila.estado)) {
+        return;
+    }
+    porDeshacer = { objetivo: accion === "aceptar" ? "AC" : "RE", filas, seleccion };
+};
+
+const devolver = async (fila) => {
+    const pagina = await fetch(fila.url, { credentials: "same-origin" });
+    if (!pagina.ok) {
+        throw new Error(pagina.status);
+    }
+    const documento = new DOMParser().parseFromString(await pagina.text(), "text/html");
+    const ficha = documento.querySelector('form[id$="_form"][method="post"]');
+    if (!ficha) {
+        throw new Error("sin formulario");
+    }
+    const datos = new FormData(ficha);
+    datos.set("estado", fila.estado);
+    if (fila.notificada) {
+        datos.set("fue_notificada", "on");
+    } else {
+        datos.delete("fue_notificada");
+    }
+    const respuesta = await fetch(fila.url, { method: "POST", body: datos, credentials: "same-origin" });
+    if (!respuesta.ok || new URL(respuesta.url).pathname === new URL(fila.url).pathname) {
+        throw new Error("no se guardó");
+    }
+};
+
+const deshacer = async (datos, cambiadas, boton) => {
+    boton.disabled = true;
+    boton.textContent = "Deshaciendo…";
+    const resultados = await Promise.allSettled(cambiadas.map(devolver));
+    const fallidas = resultados.filter((resultado) => resultado.status === "rejected").length;
+    const devueltas = cambiadas.length - fallidas;
+    const partes = [];
+    if (devueltas) {
+        partes.push(devueltas === 1 ? "Se deshizo: 1 postulación volvió a su estado anterior." : `Se deshizo: ${devueltas} postulaciones volvieron a su estado anterior.`);
+    }
+    if (fallidas) {
+        partes.push(fallidas === 1 ? "1 no se pudo devolver; revísala en su ficha." : `${fallidas} no se pudieron devolver; revísalas en su ficha.`);
+    }
+    const avisos = document.getElementById("avisos");
+    trasDeshacer = { seleccion: datos.seleccion, texto: partes.join(" "), avisos: avisos?.cloneNode(true) };
+    listar(location.href, "listado", zonaListado(), false);
+};
+
+const ofrecerDeshacer = () => {
+    const datos = porDeshacer;
+    porDeshacer = null;
+    const exito = document.querySelector("#avisos .aviso-exito");
+    if (!datos || !exito) {
+        return;
+    }
+    const cambiadas = datos.filas.filter((fila) => fila.estado !== datos.objetivo);
+    if (!cambiadas.length) {
+        return;
+    }
+    const boton = document.createElement("button");
+    boton.type = "button";
+    boton.className = "aviso-deshacer";
+    boton.textContent = "Deshacer";
+    exito.append(" ", boton);
+    let quedan = SEGUNDOS_PARA_DESHACER;
+    let enfocado = false;
+    const reloj = setInterval(() => {
+        if (!boton.isConnected || boton.disabled) {
+            clearInterval(reloj);
+            return;
+        }
+        if (enfocado) {
+            return;
+        }
+        quedan -= 1;
+        if (quedan <= 0) {
+            clearInterval(reloj);
+            const teniaFoco = document.activeElement === boton;
+            boton.remove();
+            if (teniaFoco) {
+                document.getElementById("avisos")?.focus();
+            }
+        }
+    }, 1000);
+    boton.addEventListener("focus", () => {
+        enfocado = boton.matches(":focus-visible");
+    });
+    boton.addEventListener("blur", () => {
+        enfocado = false;
+    });
+    boton.addEventListener("click", () => deshacer(datos, cambiadas, boton));
+};
+
+const mostrarDeshecho = () => {
+    const datos = trasDeshacer;
+    trasDeshacer = null;
+    administrativo.marcarSeleccion(datos.seleccion);
+    const contenedor = document.getElementById("zona-avisos");
+    if (!datos.avisos || !contenedor) {
+        return null;
+    }
+    const avisos = datos.avisos;
+    const caja = avisos.querySelector(".aviso-exito");
+    avisos.querySelectorAll("li").forEach((elemento) => elemento !== caja?.closest("li") && elemento.remove());
+    if (caja) {
+        caja.textContent = datos.texto;
+    }
+    contenedor.replaceChildren(avisos);
+    return avisos;
+};
+
 document.addEventListener(
     "submit",
     (evento) => {
@@ -256,6 +391,7 @@ document.addEventListener(
             return;
         }
         const boton = evento.submitter;
+        anotarParaDeshacer(evento.target, boton);
         cerrarMenuDe(boton);
         listar(boton.formAction || location.href, "listado", evento.target, false, boton.name ? { [boton.name]: boton.value } : {});
     },
@@ -335,7 +471,13 @@ document.addEventListener("htmx:afterSettle", (evento) => {
     administrativo.medirAlto(document.querySelector(".barra-acciones"), "--alto-barra");
 
     if (pedido.metodo === "POST") {
+        ofrecerDeshacer();
         enfocar(document.getElementById("avisos") || destinoDelFoco());
+        anunciarListado("");
+        return;
+    }
+    if (trasDeshacer) {
+        enfocar(mostrarDeshecho() || destinoDelFoco());
         anunciarListado("");
         return;
     }

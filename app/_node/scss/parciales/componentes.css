@@ -18,6 +18,9 @@
   .dark tr.form-row:has(.delete:checked) td.field-tabular:first-of-type .flex-col::after {
     color: var(--color-oscuro-acento);
   }
+  .aviso-deshacer {
+    @apply cursor-pointer rounded font-semibold underline underline-offset-2 hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current disabled:cursor-default disabled:no-underline;
+  }
   .campo-contrasena {
     @apply flex w-full max-w-2xl items-stretch gap-2;
   }

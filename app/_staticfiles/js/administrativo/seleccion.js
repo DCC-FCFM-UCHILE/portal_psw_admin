@@ -42,6 +42,11 @@ const marcar = (casillas, marcada) => {
     });
 };
 
+administrativo.marcarSeleccion = (valores) => {
+    marcar(casillasDeFila().filter((casilla) => valores.includes(casilla.value)), true);
+    contarSeleccion();
+};
+
 document.addEventListener("keydown", (evento) => {
     conMayuscula = evento.shiftKey;
 });
