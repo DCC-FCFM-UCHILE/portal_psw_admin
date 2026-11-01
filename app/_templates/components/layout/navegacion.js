@@ -188,7 +188,8 @@ const mostrarSilueta = (destino) => {
     contenido.prepend(silueta);
     document.getElementById("contenido").setAttribute("aria-busy", "true");
     window.scrollTo(0, 0);
-    anunciar(`Cargando ${silueta.dataset.titulo}…`);
+    const seccion = destino === raizAdmin ? "" : document.querySelector("#nav-sidebar a.lateral-enlace[data-destino] > .truncate")?.textContent.trim();
+    anunciar(seccion ? `Cargando ${silueta.dataset.titulo} de ${seccion}…` : `Cargando ${silueta.dataset.titulo}…`);
 };
 
 const quitarSilueta = () => {
