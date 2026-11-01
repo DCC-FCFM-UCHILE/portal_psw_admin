@@ -24,7 +24,9 @@
     {% endif %}
 
     <div class="zona-archivo-destino" x-bind:class="{ 'encima': encima, 'elegido': nombre }">
-        <input type="{{ widget.type }}" name="{{ widget.name }}" x-ref="entrada" x-bind="entrada" aria-describedby="{{ widget.attrs.id }}_zona"{% include "django/forms/widgets/attrs.html" %}>
+        {% with zona=widget.attrs.id|add:"_zona" %}
+            <input type="{{ widget.type }}" name="{{ widget.name }}" x-ref="entrada" x-bind="entrada"{% for nombre, valor in widget.attrs|describir_con:zona %}{% if valor is not False %} {{ nombre }}{% if valor is not True %}="{{ valor|stringformat:'s' }}"{% endif %}{% endif %}{% endfor %}>
+        {% endwith %}
 
         <span class="material-symbols-outlined zona-archivo-icono" aria-hidden="true" x-text="nombre ? 'task' : 'upload_file'">upload_file</span>
 

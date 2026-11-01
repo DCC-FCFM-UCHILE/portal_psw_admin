@@ -760,3 +760,9 @@ class UnidadesTests(BaseCompartida):
         self.assertEqual(respuesta.status_code, 200)
         self.assertContains(respuesta, "Este campo es obligatorio.")
         self.assertEqual(Unit.objects.count(), antes)
+
+
+class ArchivosTests(BaseCompartida):
+    def test_el_error_del_archivo_queda_asociado_al_campo(self):
+        respuesta = self.client.post(reverse("admin:commons_rulesapplications_add"), {"descripcion": "Formato", "_save": "1"})
+        self.assertContains(respuesta, 'aria-describedby="id_perfil_de_proyecto_zona id_perfil_de_proyecto_error"')
