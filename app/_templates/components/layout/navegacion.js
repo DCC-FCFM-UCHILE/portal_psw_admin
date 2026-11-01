@@ -195,12 +195,17 @@ const mostrarSilueta = (destino) => {
 
 const avisarDemora = () => {
     const texto = "Está tardando más de lo normal. Sigue cargando…";
-    const silueta = document.querySelector("#content > .silueta-vista");
+    const contenido = document.getElementById("content");
+    const silueta = contenido?.querySelector(":scope > .silueta-vista");
+    const aviso = document.createElement("p");
+    aviso.className = "aviso-demora";
+    aviso.textContent = texto;
     if (silueta) {
-        const aviso = document.createElement("p");
-        aviso.className = "aviso-demora";
-        aviso.textContent = texto;
         silueta.prepend(aviso);
+    } else if (contenido) {
+        raiz.classList.remove("vista-saliente");
+        aviso.setAttribute("aria-hidden", "true");
+        contenido.prepend(aviso);
     }
     anunciar(texto);
 };
@@ -212,11 +217,12 @@ const quitarSilueta = () => {
     if (silueta) {
         silueta.remove();
         document.getElementById("contenido").removeAttribute("aria-busy");
-        anunciar("");
         if (focoAnterior?.isConnected && document.activeElement === document.getElementById("contenido")) {
             focoAnterior.focus({ preventScroll: true });
         }
     }
+    document.querySelector(".aviso-demora")?.remove();
+    anunciar("");
     focoAnterior = null;
 };
 
