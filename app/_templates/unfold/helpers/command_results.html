@@ -11,7 +11,6 @@
                         hx-swap="beforeend"
                         hx-select="#command-results-list > *"
                         hx-target="#command-results-list"
-                        hx-indicator="#command-results-loading"
                     {% endif %}
                     x-bind:class="{'active': currentIndex === {{ page_counter|add:forloop.counter }}}"
                     x-on:mouseenter="currentIndex = {{ page_counter|add:forloop.counter }}">
