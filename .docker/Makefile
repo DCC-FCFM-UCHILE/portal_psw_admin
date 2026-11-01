@@ -1,7 +1,7 @@
 PROYECTO = portal-admin-psw
 
 levantar:
-	docker compose --env-file app/.env --project-name $(PROYECTO) up -d --build --force-recreate --remove-orphans
+	docker compose --env-file app/.env --project-name $(PROYECTO) up -d --build --remove-orphans
 	docker ps
 
 bajar:
