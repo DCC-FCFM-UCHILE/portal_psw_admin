@@ -258,9 +258,9 @@ window.addEventListener("pagehide", () => {
 });
 window.addEventListener("pageshow", (evento) => {
     soltar();
-    raiz.classList.remove("en-transicion");
     if (evento.persisted) {
         sesion((almacen) => almacen.removeItem("transicion-vistas"));
+        raiz.classList.remove("en-transicion");
         raiz.classList.remove("cajon-saliente");
         const estado = cajonAbierto();
         if (estado) {
