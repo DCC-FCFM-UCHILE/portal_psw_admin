@@ -611,10 +611,11 @@ document.addEventListener("formset:removed", (evento) => {
 });
 
 const icono = ".material-symbols-outlined:not([aria-hidden])";
+const asterisco = "label > span.text-red-600:not([aria-hidden])";
 const ayuda = ".help-tooltip[aria-label]:not([role])";
 
 const ajustar = (elemento) => {
-    if (elemento.matches(icono)) {
+    if (elemento.matches(`${icono}, ${asterisco}`)) {
         elemento.setAttribute("aria-hidden", "true");
     } else if (elemento.matches(ayuda)) {
         elemento.setAttribute("role", "img");
@@ -622,7 +623,7 @@ const ajustar = (elemento) => {
 };
 
 const ajustarIconos = (raiz) => {
-    raiz.querySelectorAll(`${icono}, ${ayuda}`).forEach(ajustar);
+    raiz.querySelectorAll(`${icono}, ${asterisco}, ${ayuda}`).forEach(ajustar);
 };
 
 const capasModales = '#modal-overlay, .velo-lateral, [x-data="searchCommand()"], #changelist-filter, :has(> #modal-content), dialog[open]';
