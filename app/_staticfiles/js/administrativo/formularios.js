@@ -1,0 +1,259 @@
+(() => {
+document.addEventListener("trix-before-initialize", () => {
+    const parrafo = window.Trix?.config.blockAttributes.p;
+    if (parrafo) {
+        parrafo.group = false;
+    }
+});
+
+const marcarFormato = (evento) => {
+    requestAnimationFrame(() => {
+        evento.target.toolbarElement?.querySelectorAll("button[data-trix-attribute]").forEach((boton) => {
+            boton.setAttribute("aria-pressed", boton.classList.contains("trix-active").toString());
+        });
+    });
+};
+
+document.addEventListener("trix-initialize", marcarFormato);
+document.addEventListener("trix-selection-change", marcarFormato);
+
+let envios = new WeakMap();
+let saliendo = false;
+
+const formulariosConDatos = () => [...document.querySelectorAll('#content form[method="post"]:not(#changelist-form)')];
+
+const huella = (formulario) =>
+    JSON.stringify(
+        [...new FormData(formulario)]
+            .filter(([nombre]) => nombre !== "csrfmiddlewaretoken")
+            .map(([nombre, valor]) => [nombre, valor instanceof File ? `${valor.name}:${valor.size}` : valor]),
+    );
+
+const huellas = new WeakMap();
+const conErrores = (formulario) => formulario.querySelector('.errornote, .errorlist, [aria-invalid="true"]');
+const tomarHuellas = () => {
+    formulariosConDatos().forEach((formulario) => huellas.set(formulario, conErrores(formulario) ? "" : huella(formulario)));
+    vigilarSalida();
+};
+const hayCambios = () => !saliendo && formulariosConDatos().some((formulario) => huellas.has(formulario) && huellas.get(formulario) !== huella(formulario));
+
+const retener = (evento) => {
+    evento.preventDefault();
+    evento.returnValue = true;
+};
+
+const vigilarSalida = () => {
+    if (hayCambios()) {
+        window.addEventListener("beforeunload", retener);
+    } else {
+        window.removeEventListener("beforeunload", retener);
+    }
+};
+
+window.addEventListener("load", tomarHuellas);
+document.addEventListener("trix-initialize", (evento) => {
+    const formulario = evento.target.closest("form");
+    if (formulario && huellas.has(formulario) && huellas.get(formulario) !== "" && !formulario.dataset.editado) {
+        huellas.set(formulario, huella(formulario));
+    }
+});
+["input", "change", "trix-change"].forEach((tipo) =>
+    document.addEventListener(tipo, (evento) => {
+        const formulario = evento.target.closest?.("form");
+        if (formulario && evento.isTrusted !== false) {
+            formulario.dataset.editado = "1";
+        }
+        vigilarSalida();
+    }),
+);
+
+const confirmar = ({ titulo, texto, si, no, principal = "no" }) =>
+    new Promise((responder) => {
+        let dialogo = document.getElementById("dialogo-confirmar");
+        if (!dialogo) {
+            dialogo = document.createElement("dialog");
+            dialogo.id = "dialogo-confirmar";
+            dialogo.setAttribute("aria-labelledby", "dialogo-confirmar-titulo");
+            dialogo.setAttribute("aria-describedby", "dialogo-confirmar-texto");
+            dialogo.className = "dialogo-confirmar rounded-lg border-base-200 text-gris-oscuro shadow-lg dark:border-oscuro-elevada dark:text-oscuro-texto";
+            dialogo.innerHTML = `<form method="dialog" class="flex flex-col gap-3">
+                <h2 id="dialogo-confirmar-titulo" class="text-lg font-semibold"></h2>
+                <p id="dialogo-confirmar-texto" class="text-sm text-gris-medio dark:text-oscuro-suave"></p>
+                <div class="mt-3 flex flex-wrap justify-end gap-2"></div>
+            </form>`;
+            dialogo.addEventListener("close", administrativo.bloquearDesplazamiento);
+            document.body.append(dialogo);
+        }
+        dialogo.querySelector("#dialogo-confirmar-titulo").textContent = titulo;
+        dialogo.querySelector("#dialogo-confirmar-texto").textContent = texto;
+        const botones = [
+            ["si", si],
+            ["no", no],
+        ].map(([valor, rotulo]) => {
+            const boton = document.createElement("button");
+            boton.type = "submit";
+            boton.value = valor;
+            boton.textContent = rotulo;
+            boton.className = valor === principal ? "boton-primario" : "boton-secundario";
+            boton.autofocus = valor === "no";
+            return boton;
+        });
+        dialogo.querySelector("div").replaceChildren(...(principal === "no" ? botones : botones.reverse()));
+        dialogo.returnValue = "";
+        let cerroCajon = false;
+        try {
+            const estado = Alpine.$data(document.documentElement);
+            if (estado.esCajon && estado.sidebarOpen === true) {
+                estado.sidebarOpen = false;
+                cerroCajon = true;
+            }
+        } catch {}
+        dialogo.addEventListener(
+            "close",
+            () => {
+                const activo = document.activeElement;
+                if (cerroCajon || !activo || activo === document.body || !activo.checkVisibility()) {
+                    document.getElementById("alternar-menu")?.focus({ preventScroll: true });
+                }
+                responder(dialogo.returnValue === "si");
+            },
+            { once: true },
+        );
+        dialogo.showModal();
+        administrativo.bloquearDesplazamiento();
+    });
+
+administrativo.confirmar = confirmar;
+
+const preguntarSalida = () =>
+    confirmar({ titulo: "Hay cambios sin guardar", texto: "Si sales de esta página, se pierden.", si: "Salir sin guardar", no: "Seguir editando" });
+
+document.addEventListener(
+    "click",
+    (evento) => {
+        const enlace = evento.target.closest?.("a[href]");
+        if (!enlace || evento.defaultPrevented || evento.button !== 0 || evento.metaKey || evento.ctrlKey || evento.shiftKey || evento.altKey) {
+            return;
+        }
+        if (enlace.target || enlace.hasAttribute("download") || enlace.getAttribute("href").startsWith("#") || enlace.matches(".related-widget-wrapper-link, [data-popup]")) {
+            return;
+        }
+        const destino = new URL(enlace.href, location.href);
+        if ((destino.pathname === location.pathname && destino.search === location.search) || !hayCambios()) {
+            return;
+        }
+        evento.preventDefault();
+        evento.stopPropagation();
+        preguntarSalida().then((salir) => {
+            if (salir) {
+                saliendo = true;
+                vigilarSalida();
+                enlace.click();
+            }
+        });
+    },
+    true,
+);
+
+document.addEventListener(
+    "submit",
+    (evento) => {
+        const formulario = evento.target;
+        if (formulario.method !== "post" || formulario.target) {
+            return;
+        }
+        const anterior = envios.get(formulario);
+        if (anterior !== undefined && performance.now() - anterior < 10000) {
+            evento.preventDefault();
+            evento.stopImmediatePropagation();
+            return;
+        }
+        envios.set(formulario, performance.now());
+    },
+    true,
+);
+
+window.addEventListener("submit", (evento) => {
+    const formulario = evento.target;
+    if (formulario.method !== "post" || formulario.target) {
+        return;
+    }
+    if (evento.defaultPrevented) {
+        envios.delete(formulario);
+        return;
+    }
+    if (formulario.closest("#content")) {
+        saliendo = true;
+        vigilarSalida();
+    }
+});
+
+window.addEventListener("pageshow", (evento) => {
+    envios = new WeakMap();
+    if (evento.persisted) {
+        saliendo = false;
+        vigilarSalida();
+    }
+});
+
+document.addEventListener("formset:added", (evento) => {
+    evento.target.querySelector('input:not([type="hidden"]), select, textarea')?.focus();
+});
+
+document.addEventListener("focusin", (evento) => {
+    const elemento = evento.target;
+    elemento.closest?.(".matriz-permisos-marco td, #nav-sidebar-apps a")?.scrollIntoView({ block: "nearest", inline: "nearest" });
+    if (!elemento.closest?.("#content") || !elemento.matches(":focus-visible")) {
+        return;
+    }
+    requestAnimationFrame(() => {
+        if (document.activeElement !== elemento) {
+            return;
+        }
+        const caja = elemento.getBoundingClientRect();
+        const techo = document.getElementById("cabecera")?.getBoundingClientRect().bottom ?? 0;
+        if (caja.height && (caja.top < techo - 4 || caja.bottom > innerHeight + 4)) {
+            elemento.scrollIntoView({ block: "nearest" });
+        }
+    });
+});
+
+const marcarMatrices = () => {
+    document.querySelectorAll('.matriz-permisos-marco[role="region"]').forEach((marco) => {
+        if (marco.scrollWidth > marco.clientWidth + 1) {
+            marco.setAttribute("tabindex", "0");
+        } else {
+            marco.removeAttribute("tabindex");
+        }
+    });
+};
+
+const vigiaDeMatrices = new ResizeObserver(marcarMatrices);
+
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll('.matriz-permisos-marco[role="region"]').forEach((marco) => {
+        vigiaDeMatrices.observe(marco);
+        vigiaDeMatrices.observe(marco.firstElementChild);
+    });
+    document.fonts?.ready.then(marcarMatrices);
+});
+
+window.addEventListener("load", () => {
+    const contenido = document.getElementById("content");
+    if (!contenido || document.getElementById("login-form")) {
+        return;
+    }
+    const campo = [...contenido.querySelectorAll('[aria-invalid="true"]')].find((elemento) => elemento.type !== "hidden" && elemento.checkVisibility());
+    const general = contenido.querySelector("div.errornote");
+    if (campo) {
+        campo.focus();
+    } else if (general) {
+        general.setAttribute("tabindex", "-1");
+        general.focus();
+    }
+});
+
+document.addEventListener("formset:removed", (evento) => {
+    document.getElementById(`${evento.detail.formsetName}-group`)?.querySelector(".add-row")?.focus();
+});
+})();

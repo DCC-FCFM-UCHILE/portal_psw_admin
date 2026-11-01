@@ -165,6 +165,8 @@ NAVEGACION = [
     },
 ]
 
+GUIONES = ["tema", "menus", "seleccion", "formularios", "capas", "emergentes", "tablas", "listado", "buscador", "cajon"]
+
 UNFOLD = {
     "SITE_TITLE": "Portal PSW · Administración",
     "SITE_HEADER": "Portal PSW",
@@ -178,7 +180,7 @@ UNFOLD = {
     "SHOW_VIEW_ON_SITE": False,
     "BORDER_RADIUS": "8px",
     "DASHBOARD_CALLBACK": "postulaciones.inicio.indicadores",
-    "SCRIPTS": [lambda request: static("js/administrativo.js")],
+    "SCRIPTS": [lambda request, nombre=nombre: static(f"js/administrativo/{nombre}.js") for nombre in GUIONES],
     "COLORS": {
         "base": {
             "50": "#f4f6fa",
