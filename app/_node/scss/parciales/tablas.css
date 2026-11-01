@@ -96,8 +96,16 @@
   @apply rounded font-medium text-rojo underline underline-offset-2 hover:text-rojo-oscuro dark:text-red-300 dark:hover:text-red-200;
 }
 
+table.formset td.field-tabular:not(:has(:is(input:not([type="checkbox"], [type="radio"], [type="hidden"]), select, textarea))) {
+  width: 1%;
+}
+
 @media (width >= 64rem) {
-  table.formset td.field-tabular:has(:is(input:not([type="checkbox"], [type="radio"], [type="hidden"]), select, textarea)) {
-    width: 43.25rem;
+  table.formset td.field-tabular :is(input:not([type="checkbox"], [type="radio"], [type="hidden"]), select, textarea) {
+    min-width: 42rem;
+  }
+
+  table.formset td.delete {
+    width: 100%;
   }
 }
