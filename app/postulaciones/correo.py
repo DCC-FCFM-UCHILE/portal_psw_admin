@@ -2,6 +2,7 @@ import logging
 import re
 from html import unescape
 
+import nh3
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
@@ -10,6 +11,19 @@ from django.utils.html import strip_tags
 logger = logging.getLogger(__name__)
 
 LOGO = "https://dcc.uchile.cl/static/images/H-lg.png"
+
+ETIQUETAS = {"p", "br", "div", "strong", "em", "u", "del", "a", "h1", "h2", "h3", "h4", "blockquote", "pre", "ul", "ol", "li"}
+
+
+def sanear(contenido):
+    return nh3.clean(
+        contenido,
+        tags=ETIQUETAS,
+        attributes={"a": {"href"}},
+        url_schemes={"http", "https", "mailto"},
+        link_rel="noopener noreferrer",
+    )
+
 
 
 def texto_plano(contenido):
@@ -20,6 +34,7 @@ def texto_plano(contenido):
 
 
 def enviar(correo, asunto, contenido):
+    contenido = sanear(contenido)
     html = render_to_string("postulaciones/correo/notificacion.html", {"asunto": asunto, "contenido": contenido, "logo": LOGO})
     mensaje = EmailMultiAlternatives(
         subject=asunto,

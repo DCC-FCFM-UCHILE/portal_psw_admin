@@ -287,6 +287,20 @@ class CorreoTests(BaseCompartida):
         self.postulacion.refresh_from_db()
         self.assertFalse(self.postulacion.fue_notificada)
 
+    def test_el_mensaje_se_sanea_antes_de_enviarse(self):
+        contenido = (
+            '<p onclick="x()">Hola <strong>Ana</strong></p><script>alert(1)</script><img src="https://ejemplo.cl/a.png">'
+            '<a href="javascript:alert(1)">uno</a><a href="https://ejemplo.cl" target="_blank">dos</a><!--block--><u>tres</u>'
+        )
+        self.client.post(self.url("contactar"), {"correo": "ana@ejemplo.cl", "asunto": "Reunión", "contenido": contenido})
+        html = mail.outbox[0].alternatives[0][0]
+        self.assertIn("<p>Hola <strong>Ana</strong></p>", html)
+        self.assertIn('<a href="https://ejemplo.cl" rel="noopener noreferrer">dos</a>', html)
+        self.assertIn("<u>tres</u>", html)
+        for resto in ("onclick", "<script", "alert(1)", '<img src="https://ejemplo.cl', "javascript:", "target=", "<!--block-->"):
+            self.assertNotIn(resto, html)
+        self.assertNotIn("alert", mail.outbox[0].body)
+
     def test_sin_mensaje_no_envia(self):
         respuesta = self.client.post(self.url("notificar"), {"correo": "ana@ejemplo.cl", "asunto": "Resultado", "contenido": ""})
         self.assertEqual(respuesta.status_code, 200)
