@@ -429,6 +429,10 @@ html:has(#listado[aria-busy="true"]) :is(#pie-listado, #conteo-cabecera) {
   overflow-wrap: anywhere;
 }
 
+:is(.delete-confirmation, .delete-selected-confirmation) #content li a {
+  @apply rounded font-medium text-rojo underline underline-offset-2 hover:text-rojo-oscuro dark:text-red-300 dark:hover:text-red-200;
+}
+
 .dialogo-confirmar {
   position: fixed;
   inset: 0;

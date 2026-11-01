@@ -1021,3 +1021,19 @@ class BusquedaSinTildesTests(BaseCompartida):
     def test_el_buscador_de_la_cabecera_tampoco_distingue_tildes(self):
         respuesta = self.client.get(reverse("admin:search"), {"s": "fundacion"})
         self.assertContains(respuesta, "Fundación Ejemplo")
+
+
+class BorradoBloqueadoTests(BaseCompartida):
+    def test_si_no_se_puede_eliminar_ofrece_volver(self):
+        organizacion = Organization.objects.get(nombre="Fundación Ejemplo")
+        respuesta = self.client.get(reverse("admin:applications_organization_delete", args=[organizacion.pk]))
+        self.assertContains(respuesta, "protegidos")
+        self.assertContains(respuesta, f'href="{reverse("admin:applications_organization_change", args=[organizacion.pk])}"')
+        self.assertContains(respuesta, "Volver")
+
+    def test_en_lote_ofrece_volver_al_listado(self):
+        organizacion = Organization.objects.get(nombre="Fundación Ejemplo")
+        lista = reverse("admin:applications_organization_changelist")
+        respuesta = self.client.post(lista, {"action": "delete_selected", "index": "0", "_selected_action": [organizacion.pk]})
+        self.assertContains(respuesta, "protegidos")
+        self.assertContains(respuesta, "Volver al listado")

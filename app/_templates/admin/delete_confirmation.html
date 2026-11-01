@@ -1,0 +1,13 @@
+{% extends "admin/delete_confirmation.html" %}
+{% load admin_urls unfold %}
+
+{% block content %}
+    {{ block.super }}
+
+    {% if perms_lacking or protected %}
+        {% url opts|admin_urlname:"change" object.pk|admin_urlquote as ficha %}
+        {% component "unfold/components/button.html" with href=ficha variant="default" class="mt-4 w-full lg:w-auto" %}
+            Volver
+        {% endcomponent %}
+    {% endif %}
+{% endblock %}

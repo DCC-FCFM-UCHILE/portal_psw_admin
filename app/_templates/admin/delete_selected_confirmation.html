@@ -1,0 +1,12 @@
+{% extends "admin/delete_selected_confirmation.html" %}
+{% load unfold %}
+
+{% block content %}
+    {{ block.super }}
+
+    {% if perms_lacking or protected %}
+        {% component "unfold/components/button.html" with href=request.get_full_path variant="default" class="mt-4 w-full lg:w-auto" %}
+            Volver al listado
+        {% endcomponent %}
+    {% endif %}
+{% endblock %}
