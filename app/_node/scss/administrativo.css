@@ -126,6 +126,13 @@ html[data-arranque="lateral-cerrada"] .envoltura-lateral {
   opacity: 0;
 }
 
+@media (max-width: 1280px) {
+  .velo-lateral,
+  #nav-sidebar {
+    touch-action: pan-y;
+  }
+}
+
 .lateral-fuera > .velo-lateral {
   opacity: 0;
 }
