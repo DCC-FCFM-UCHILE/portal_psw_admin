@@ -229,6 +229,37 @@ document.addEventListener("click", (evento) => {
     }
 });
 
+const temporizadores = new WeakMap();
+
+const esperarParaConfirmar = () => {
+    document.querySelectorAll("button[data-espera]").forEach((boton) => {
+        clearInterval(temporizadores.get(boton));
+        const cuenta = boton.querySelector("[data-cuenta]");
+        const aviso = document.getElementById(boton.getAttribute("aria-describedby"));
+        let restante = Number(boton.dataset.espera);
+        boton.disabled = true;
+        cuenta.hidden = false;
+        cuenta.textContent = `(${restante})`;
+        aviso.textContent = `Podrás confirmar en ${restante} segundos.`;
+        temporizadores.set(
+            boton,
+            setInterval(() => {
+                restante -= 1;
+                cuenta.textContent = `(${restante})`;
+                if (restante > 0) {
+                    return;
+                }
+                clearInterval(temporizadores.get(boton));
+                cuenta.hidden = true;
+                boton.disabled = false;
+                aviso.textContent = "Ya puedes confirmar.";
+            }, 1000),
+        );
+    });
+};
+
+window.addEventListener("pageshow", esperarParaConfirmar);
+
 document.addEventListener("formset:removed", (evento) => {
     document.getElementById(`${evento.detail.formsetName}-group`)?.querySelector(".add-row")?.focus();
 });

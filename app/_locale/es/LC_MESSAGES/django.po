@@ -577,3 +577,6 @@ msgstr "Editar %s"
 
 msgid "View %s"
 msgstr "Ver %s"
+
+msgid "Delete multiple objects"
+msgstr "Eliminar la selección"

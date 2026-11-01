@@ -137,11 +137,6 @@ class ApplicationAdmin(AccionesDeFila, FormatosDeArchivo, ModelAdmin):
             ]
         return super().change_view(request, object_id, form_url, extra_context)
 
-    def get_actions(self, request):
-        acciones = super().get_actions(request)
-        acciones.pop("delete_selected", None)
-        return acciones
-
     def get_urls(self):
         vistas = [
             path(

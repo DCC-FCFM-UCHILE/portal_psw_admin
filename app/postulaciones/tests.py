@@ -83,9 +83,9 @@ class ListadoTests(BaseCompartida):
         alta = reverse("admin:applications_organization_add")
         self.assertNotContains(self.client.get(alta), f'href="{alta}"')
 
-    def test_no_ofrece_borrar_en_bloque(self):
+    def test_ofrece_borrar_varias_postulaciones(self):
         respuesta = self.client.get(reverse("admin:applications_application_changelist"))
-        self.assertNotContains(respuesta, 'value="delete_selected"')
+        self.assertContains(respuesta, 'data-accion="delete_selected"')
 
     def test_los_buscadores_no_muestran_atajos_de_teclado(self):
         for url in [reverse("admin:index"), reverse("admin:applications_application_changelist")]:
@@ -525,3 +525,39 @@ class EmergentesTests(BaseCompartida):
         alta = reverse("admin:applications_organization_add")
         self.assertContains(self.client.get(alta), "@view-transition")
         self.assertNotContains(self.client.get(alta, {"_popup": "1", "_to_field": "id"}), "@view-transition")
+
+
+class BorradoEnBloqueTests(BaseCompartida):
+    def setUp(self):
+        super().setUp()
+        self.otra = Application.objects.create(
+            postulante=self.postulacion.postulante,
+            convocatoria=self.convocatoria,
+            unidad=self.postulacion.unidad,
+            titulo="Sistema de compras",
+            archivo=SimpleUploadedFile("perfil.pdf", b"%PDF-1.4"),
+        )
+
+    def borrar(self, postulaciones, **extra):
+        datos = {"action": "delete_selected", "index": "0", "_selected_action": [p.pk for p in postulaciones], **extra}
+        return self.client.post(reverse("admin:applications_application_changelist"), datos, follow=True)
+
+    def test_borrar_varias_espera_antes_de_confirmar(self):
+        respuesta = self.borrar([self.postulacion, self.otra])
+        self.assertContains(respuesta, "Eliminar la selección")
+        self.assertContains(respuesta, 'disabled data-espera="5"')
+        self.assertContains(respuesta, "Podrás confirmar en 5 segundos.")
+        self.assertEqual(Application.objects.filter(pk__in=[self.postulacion.pk, self.otra.pk]).count(), 2)
+
+    def test_borrar_una_marcada_no_espera(self):
+        respuesta = self.borrar([self.postulacion])
+        self.assertContains(respuesta, "Eliminar la selección")
+        self.assertNotContains(respuesta, "data-espera")
+
+    def test_confirmar_borra_las_postulaciones(self):
+        self.assertContains(self.borrar([self.postulacion, self.otra], post="yes"), "Se eliminó la selección: 2 postulaciones.")
+        self.assertFalse(Application.objects.filter(pk__in=[self.postulacion.pk, self.otra.pk]).exists())
+
+    def test_borrar_una_no_espera(self):
+        respuesta = self.client.get(reverse("admin:applications_application_delete", args=[self.postulacion.pk]))
+        self.assertNotContains(respuesta, "data-espera")

@@ -1,0 +1,18 @@
+{% load i18n unfold %}
+
+<div class="flex flex-col gap-3 items-center w-full lg:flex-row">
+    {% component "unfold/components/button.html" with href="#" variant="default" class="cancel-link w-full lg:mb-0 lg:w-auto" %}
+        {% trans "No, take me back" %}
+    {% endcomponent %}
+
+    {% if action_checkbox_name and queryset|length > 1 %}
+        <p id="espera-borrado" role="status" class="text-sm text-gris-medio lg:ml-auto dark:text-base-400">Podrás confirmar en 5 segundos.</p>
+        <button type="submit" disabled data-espera="5" aria-describedby="espera-borrado" class="boton-borrado-definitivo">
+            {% trans "Yes, I’m sure" %} <span data-cuenta>(5)</span>
+        </button>
+    {% else %}
+        {% component "unfold/components/button.html" with submit=1 variant="danger" class="w-full lg:ml-auto lg:w-auto" %}
+            {% trans "Yes, I’m sure" %}
+        {% endcomponent %}
+    {% endif %}
+</div>
