@@ -215,6 +215,20 @@ const marcarFormato = (evento) => {
 document.addEventListener("trix-initialize", marcarFormato);
 document.addEventListener("trix-selection-change", marcarFormato);
 
+document.addEventListener("click", (evento) => {
+    const accion = evento.target.closest("[data-accion]");
+    if (accion) {
+        accion.form.elements.namedItem("action").value = accion.dataset.accion;
+        return;
+    }
+    if (evento.target.closest("[data-quitar-seleccion]")) {
+        const todas = document.getElementById("action-toggle");
+        todas.checked = true;
+        todas.click();
+        todas.focus();
+    }
+});
+
 document.addEventListener("formset:removed", (evento) => {
     document.getElementById(`${evento.detail.formsetName}-group`)?.querySelector(".add-row")?.focus();
 });

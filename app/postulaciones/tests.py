@@ -493,6 +493,19 @@ class PermisosAjenosTests(BaseCompartida):
         self.assertEqual(set(externo.user_permissions.all()), {ajeno, propio})
 
 
+class BarraDeAccionesTests(BaseCompartida):
+    def test_la_barra_va_despues_de_la_tabla(self):
+        contenido = self.client.get(reverse("admin:applications_organization_changelist")).content.decode()
+        self.assertLess(contenido.index('id="result_list"'), contenido.index('class="barra-acciones"'))
+
+    def test_cada_accion_es_un_boton(self):
+        respuesta = self.client.get(reverse("admin:applications_application_changelist"))
+        self.assertContains(respuesta, 'data-accion="aceptar"')
+        self.assertContains(respuesta, 'data-accion="rechazar"')
+        self.assertContains(respuesta, "Quitar la selección")
+        self.assertNotContains(respuesta, '<select name="action"')
+
+
 class EmergentesTests(BaseCompartida):
     def test_las_emergentes_no_se_inscriben_en_la_transicion_entre_vistas(self):
         alta = reverse("admin:applications_organization_add")

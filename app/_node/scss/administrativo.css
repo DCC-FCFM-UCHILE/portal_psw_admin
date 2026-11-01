@@ -143,9 +143,27 @@ html[data-arranque="lateral-cerrada"] .envoltura-lateral {
   scale: 0.95;
 }
 
+.barra-acciones {
+  translate: 0 100%;
+  visibility: hidden;
+  transition:
+    translate var(--duracion-capa-salida) var(--ease-enfatizada-salida),
+    visibility 0s linear var(--duracion-capa-salida);
+}
+
+#changelist-form:has(input.action-select:checked) .barra-acciones {
+  translate: none;
+  visibility: visible;
+  transition:
+    translate var(--duracion-capa-entrada) var(--ease-enfatizada-entrada),
+    visibility 0s;
+}
+
 @media (prefers-reduced-motion: reduce) {
   :is(.capa-entra, .capa-sale, .emergente-entra, .emergente-sale),
-  :is(.capa-entra, .capa-sale) :is(.velo-lateral, #nav-sidebar) {
+  :is(.capa-entra, .capa-sale) :is(.velo-lateral, #nav-sidebar),
+  .barra-acciones,
+  #changelist-form:has(input.action-select:checked) .barra-acciones {
     transition: none;
   }
 }
@@ -347,23 +365,15 @@ html {
   html:has([name="_save"]) {
     scroll-padding-bottom: 5rem;
   }
+}
 
-  html:has(#changelist input.action-select:checked) {
-    scroll-padding-bottom: 9rem;
+@media (max-width: 1023.98px) {
+  html:has(input.action-select:checked) {
+    scroll-padding-bottom: 8rem;
   }
-}
 
-html:has(input.action-select:checked) {
-  scroll-padding-bottom: 8rem;
-}
-
-body:has(input.action-select:checked) {
-  padding-bottom: 8rem;
-}
-
-@media (min-width: 1024px) {
-  body:has(input.action-select:checked) .lg\:sticky.lg\:bottom-0 {
-    bottom: 64px;
+  body:has(input.action-select:checked) {
+    padding-bottom: 8rem;
   }
 }
 
@@ -665,6 +675,24 @@ input[type="checkbox"].appearance-none.rounded-full {
   }
   .matriz-permisos-nota {
     @apply text-xs text-gris-medio dark:text-oscuro-suave;
+  }
+  .barra-acciones {
+    @apply fixed right-0 bottom-0 z-50 border-t border-base-200 bg-white p-3 dark:border-base-800 dark:bg-base-900;
+  }
+  .barra-acciones-caja {
+    @apply flex w-full flex-wrap items-center gap-x-4 gap-y-2 rounded-default bg-primary-600 p-1.5 pl-3 text-sm text-white;
+  }
+  .barra-acciones-seleccion {
+    @apply flex min-h-10 flex-wrap items-center gap-x-3 gap-y-1 font-medium lg:min-h-7;
+  }
+  .barra-acciones-botones {
+    @apply ml-auto flex flex-wrap items-center gap-2;
+  }
+  .barra-acciones-boton {
+    @apply flex min-h-10 cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-default bg-white/20 px-3 font-medium text-white transition-[background-color] hover:bg-white/30 lg:min-h-7;
+  }
+  .barra-acciones-quitar {
+    @apply bg-transparent hover:bg-white/20;
   }
   .lateral-grupo {
     @apply mx-3 mb-1 mt-5 flex items-center gap-2 px-3 text-[0.6875rem] font-bold uppercase tracking-widest text-[#B0B6BF];
