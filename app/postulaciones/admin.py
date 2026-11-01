@@ -1,6 +1,8 @@
 from django.contrib import admin, messages
 from django.contrib.admin.models import LogEntry
 from django.contrib.contenttypes.models import ContentType
+from django.core.validators import FileExtensionValidator
+from django.db import models
 from django.db.models import Count
 from django.shortcuts import redirect
 from django.urls import path, reverse
@@ -33,6 +35,17 @@ class ConvocatoriaFilter(RelatedDropdownFilter):
     form_class = FormularioDesplegable
 
 
+class FormatosDeArchivo:
+    def formfield_for_dbfield(self, db_field, request, **kwargs):
+        campo = super().formfield_for_dbfield(db_field, request, **kwargs)
+        if isinstance(db_field, models.FileField) and campo is not None:
+            validadores = [validador for validador in db_field.validators if isinstance(validador, FileExtensionValidator)]
+            extensiones = [f".{extension}" for validador in validadores for extension in validador.allowed_extensions or []]
+            if extensiones:
+                campo.widget.attrs["accept"] = ",".join(extensiones)
+        return campo
+
+
 class NotificacionFilter(admin.SimpleListFilter):
     title = "notificación"
     parameter_name = "notificacion"
@@ -61,7 +74,7 @@ class AnnouncementAdmin(ModelAdmin):
 
 
 @admin.register(Application)
-class ApplicationAdmin(ModelAdmin):
+class ApplicationAdmin(FormatosDeArchivo, ModelAdmin):
     list_display = ["titulo", "convocatoria", "organizacion", "unidad", "postulante", "mostrar_estado", "fue_notificada", "perfil"]
     list_display_links = ["titulo"]
     list_filter = ["estado", NotificacionFilter, ("convocatoria", ConvocatoriaFilter)]
@@ -222,7 +235,7 @@ class OrganizationAdmin(ModelAdmin):
 
 
 @admin.register(Unit)
-class UnitAdmin(ModelAdmin):
+class UnitAdmin(FormatosDeArchivo, ModelAdmin):
     list_display = ["id", "nombre", "organizacion", "esta_vetada"]
     search_fields = ["nombre", "organizacion__nombre", "organizacion__rut"]
     list_select_related = ["organizacion"]

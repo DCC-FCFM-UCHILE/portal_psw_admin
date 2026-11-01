@@ -1,46 +1,43 @@
-{% load i18n %}
+{% load interfaz %}
 
-{% if widget.attrs.accept == 'image/*' and widget.is_initial %}
-    <div class="mb-4 max-w-48">
-        <a href="{{ widget.value.url }}" target="_blank" rel="noopener">
-            <img src="{{ widget.value.url }}" alt="Imagen actual (se abre en otra pestaña)" class="block rounded-default" />
-        </a>
-    </div>
-{% endif %}
+<div class="zona-archivo" x-data="zonaArchivo">
+    {% if widget.is_initial %}
+        <div class="zona-archivo-actual">
+            {% if widget.attrs.accept == 'image/*' %}
+                <img src="{{ widget.value.url }}" alt="" class="size-10 shrink-0 rounded-default object-cover">
+            {% else %}
+                <span class="material-symbols-outlined shrink-0 text-gris-medio dark:text-oscuro-suave" aria-hidden="true">description</span>
+            {% endif %}
 
-<div class="campo-archivo-unfold {{ widget.file_wrapper_class }}">
-    {% if widget.is_initial and not widget.required %}
-        <div class="bg-base-50 border-r border-base-200 flex flex-none items-center self-stretch px-3 dark:bg-white/[.02] dark:border-base-700 dark:text-font-default-dark">
-            <label for="{{ widget.checkbox_id }}" class="flex items-center">
-                <input type="checkbox"{% if widget.class %} class="{{ widget.class }}"{% endif %} name="{{ widget.checkbox_name }}" id="{{ widget.checkbox_id }}" />
+            <div class="min-w-0 grow">
+                <span class="block text-xs text-gris-medio dark:text-oscuro-suave">Archivo actual</span>
+                <a href="{{ widget.value.url }}" target="_blank" rel="noopener" class="enlace break-all">{{ widget.value|nombre_archivo }}<span class="sr-only"> (se abre en otra pestaña)</span></a>
+            </div>
 
-                <span class="ml-2">
-                    {{ widget.clear_checkbox_label }}
-                </span>
-            </label>
+            {% if not widget.required %}
+                <label for="{{ widget.checkbox_id }}" class="flex shrink-0 cursor-pointer items-center gap-2 py-1">
+                    <input type="checkbox"{% if widget.class %} class="{{ widget.class }}"{% endif %} name="{{ widget.checkbox_name }}" id="{{ widget.checkbox_id }}">
+                    <span>Quitar</span>
+                </label>
+            {% endif %}
         </div>
     {% endif %}
 
-    <label for="{{ widget.attrs.id }}" class="flex grow relative">
-        <input type="text" aria-label="{% trans 'Choose file to upload' %}" value="{% if widget.value %}{{ widget.value.url }}{% else %}{% trans 'Choose file to upload' %}{% endif %}" disabled class="grow font-medium min-w-0 px-3 py-2 text-ellipsis">
-        <span class="absolute cursor-pointer left-0 bottom-0 top-0 right-0"></span>
-    </label>
+    <div class="zona-archivo-destino" x-bind:class="{ 'encima': encima, 'elegido': nombre }">
+        <input type="{{ widget.type }}" name="{{ widget.name }}" x-ref="entrada" x-bind="entrada" aria-describedby="{{ widget.attrs.id }}_zona"{% include "django/forms/widgets/attrs.html" %}>
 
-    <div class="bg-white flex flex-none items-center leading-none self-stretch dark:bg-base-900">
-        <div class="opacity-0 overflow-hidden w-[0px]">
-            <input type="{{ widget.type }}" name="{{ widget.name }}" {% include "django/forms/widgets/attrs.html" %} />
-        </div>
+        <span class="material-symbols-outlined zona-archivo-icono" aria-hidden="true" x-text="nombre ? 'task' : 'upload_file'">upload_file</span>
 
-        {% if widget.is_initial %}
-            <a href="{{ widget.value.url }}" class="flex min-w-10 cursor-pointer items-center justify-center self-stretch border-r border-base-200 px-3 text-gris-medio hover:text-gris-oscuro dark:border-base-700 dark:text-oscuro-suave dark:hover:text-oscuro-texto" target="_blank" rel="noopener">
-                <span class="block material-symbols-outlined" aria-hidden="true">download</span>
-                <span class="sr-only">Descargar el archivo actual (se abre en otra pestaña)</span>
-            </a>
-        {% endif %}
+        <span class="zona-archivo-boton" aria-hidden="true" x-text="nombre ? 'Cambiar el archivo' : $el.dataset.texto" data-texto="{% if widget.is_initial %}Reemplazar el archivo{% else %}Elegir un archivo{% endif %}">{% if widget.is_initial %}Reemplazar el archivo{% else %}Elegir un archivo{% endif %}</span>
 
-        <label for="{{ widget.attrs.id }}" class="flex min-w-10 cursor-pointer items-center justify-center self-stretch px-3 text-gris-medio hover:text-gris-oscuro dark:text-oscuro-suave dark:hover:text-oscuro-texto">
-            <span class="block material-symbols-outlined" aria-hidden="true">upload</span>
-            <span class="sr-only">Elegir otro archivo</span>
-        </label>
+        <span id="{{ widget.attrs.id }}_zona" class="zona-archivo-texto">
+            <span x-show="!nombre">o arrástralo aquí</span>
+            <span x-show="nombre" x-cloak class="zona-archivo-nombre"><span class="sr-only">Archivo elegido: </span><span x-text="nombre"></span></span>
+            {% if widget.attrs.accept and widget.attrs.accept != 'image/*' %}
+                <span class="zona-archivo-formatos">{{ widget.attrs.accept|formatos_archivo }}</span>
+            {% endif %}
+        </span>
     </div>
+
+    <p class="sr-only" aria-live="polite" x-text="nombre ? 'Archivo elegido: ' + nombre : ''"></p>
 </div>

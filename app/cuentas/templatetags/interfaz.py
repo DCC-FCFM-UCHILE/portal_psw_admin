@@ -33,6 +33,14 @@ def nombre_archivo(archivo):
 
 
 @register.filter
+def formatos_archivo(accept):
+    formatos = [formato.strip().lstrip(".").upper() for formato in str(accept).split(",") if formato.strip()]
+    if len(formatos) < 2:
+        return f"Formato {''.join(formatos)}"
+    return f"Formatos {', '.join(formatos[:-1])} o {formatos[-1]}"
+
+
+@register.filter
 def sin_aplicacion(descripcion):
     return str(descripcion).split(" - ", 1)[-1]
 

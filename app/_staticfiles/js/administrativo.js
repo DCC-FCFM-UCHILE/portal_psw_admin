@@ -144,6 +144,32 @@ document.addEventListener("alpine:init", () => {
             },
         },
     }));
+
+    Alpine.data("zonaArchivo", () => ({
+        nombre: "",
+        encima: false,
+
+        init() {
+            this.$refs.entrada.hasChangeListener = true;
+        },
+
+        entrada: {
+            "@change"(evento) {
+                this.nombre = evento.target.files[0]?.name ?? "";
+                this.encima = false;
+            },
+            "@dragenter"() {
+                this.encima = true;
+            },
+            "@dragleave"() {
+                this.encima = false;
+            },
+            "@drop"() {
+                this.encima = false;
+            },
+        },
+    }));
+
 });
 
 document.addEventListener("trix-before-initialize", () => {
