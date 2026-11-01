@@ -683,15 +683,6 @@ input[type="checkbox"].appearance-none.rounded-full {
   }
 }
 
-.selector-filter input:focus-visible {
-  outline: 2px solid var(--color-rojo);
-  outline-offset: 2px;
-
-  @variant dark {
-    outline-color: var(--color-oscuro-acento);
-  }
-}
-
 @supports (appearance: base-select) {
   @media not (forced-colors: active) {
     .seleccion > select,

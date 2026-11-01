@@ -22,11 +22,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "django.contrib.humanize",
     "django.forms",
-]
-
-INSTALLED_APPS += [
     "cuentas",
     "convenios",
     "postulaciones",
@@ -66,7 +62,6 @@ TEMPLATES = [
     },
 ]
 
-# Base de datos
 
 DATABASES = {
     "default": {
