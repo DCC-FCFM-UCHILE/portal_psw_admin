@@ -1,6 +1,6 @@
 {% load unfold interfaz %}
 
-<div class="flex min-w-0 grow items-center gap-1 sm:gap-2{% if adminform %} max-sm:contents{% endif %}">
+<div class="@container flex min-w-0 grow items-center gap-1 sm:gap-2{% if adminform %} max-sm:contents{% endif %}">
     {% if is_nav_sidebar_enabled and not is_popup %}
         <button type="button" id="alternar-menu" class="flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-md text-gris-medio hover:bg-base-100 hover:text-gris-oscuro dark:text-base-300 dark:hover:bg-base-800" x-on:click="sidebarToggle(); if (sidebarOpen && esCajon) $nextTick(() => document.getElementById('cerrar-menu')?.focus())" aria-controls="nav-sidebar" x-bind:aria-expanded="sidebarOpen.toString()">
             <span class="material-symbols-outlined" aria-hidden="true">menu</span>
@@ -25,11 +25,11 @@
     <div id="titulo-cabecera" class="ml-1 flex min-w-0 items-center gap-2 text-sm leading-5 sm:ml-0 xl:text-base{% if adminform %} max-sm:order-last max-sm:ml-0 max-sm:basis-full{% endif %}">
         <span class="titulo-silueta silueta-bloque h-5 w-40 max-w-full rounded" aria-hidden="true"></span>
         {% if migas.ruta %}
-            <nav aria-label="Ruta" class="hidden min-w-0 shrink-[20] md:block">
+            <nav aria-label="Ruta" class="hidden shrink-0 @min-[30rem]:block">
                 <ol role="list" class="flex min-w-0 items-center gap-2">
                     {% for miga in migas.ruta %}
                         <li class="flex min-w-0 items-center gap-2">
-                            {% if miga.enlace %}<a href="{{ miga.enlace }}" class="min-w-0 truncate rounded text-gris-medio hover:text-rojo hover:underline dark:text-base-400">{{ miga.titulo }}</a>{% else %}<span class="min-w-0 truncate text-gris-medio">{{ miga.titulo }}</span>{% endif %}
+                            {% if miga.enlace %}<a href="{{ miga.enlace }}" class="max-w-[10rem] truncate rounded text-gris-medio hover:text-rojo hover:underline dark:text-base-400">{{ miga.titulo }}</a>{% else %}<span class="max-w-[10rem] truncate text-gris-medio">{{ miga.titulo }}</span>{% endif %}
                             <span class="material-symbols-outlined md-18 shrink-0 text-base-400" aria-hidden="true">chevron_right</span>
                         </li>
                     {% endfor %}
