@@ -1,0 +1,8 @@
+{% load interfaz %}
+
+{% if not is_popup and cl.paginator.num_pages > 1 %}
+    {% pagina_del_listado cl as pagina %}
+    <div class="paginacion-superior mb-4 lg:hidden">
+        {% include "unfold/helpers/pagination_default.html" with etiqueta="Paginación, inicio del listado" %}
+    </div>
+{% endif %}

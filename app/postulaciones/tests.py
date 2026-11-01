@@ -622,6 +622,13 @@ class PaginacionTests(BaseCompartida):
         self.assertContains(ultima, 'disabled aria-label="Última página"')
         self.assertContains(ultima, '<span class="whitespace-nowrap">21 a 26</span> de 26 organizaciones')
 
+    def test_repite_la_paginacion_arriba_solo_bajo_1024_px(self):
+        respuesta = self.client.get(reverse("admin:applications_organization_changelist"), {"p": 2})
+        self.assertContains(respuesta, '<div class="paginacion-superior mb-4 lg:hidden">', count=1)
+        self.assertContains(respuesta, 'aria-label="Paginación, inicio del listado"', count=1)
+        self.assertContains(respuesta, 'aria-label="Paginación, final del listado"', count=1)
+        self.assertContains(respuesta, 'rel="next"', count=2)
+
     def test_conserva_el_orden_y_la_busqueda_al_cambiar_de_pagina(self):
         respuesta = self.client.get(reverse("admin:applications_organization_changelist"), {"o": "2", "q": "Organización"})
         self.assertContains(respuesta, 'href="?o=2&amp;p=2&amp;q=Organizaci%C3%B3n"')
@@ -640,7 +647,8 @@ class PaginacionTests(BaseCompartida):
     def test_una_sola_pagina_muestra_solo_el_conteo(self):
         respuesta = self.client.get(reverse("admin:applications_application_changelist"))
         self.assertContains(respuesta, "1 postulación")
-        self.assertNotContains(respuesta, 'aria-label="Paginación"')
+        self.assertNotContains(respuesta, 'aria-label="Paginación')
+        self.assertNotContains(respuesta, "paginacion-superior")
 
 
 class OrdenTests(BaseCompartida):

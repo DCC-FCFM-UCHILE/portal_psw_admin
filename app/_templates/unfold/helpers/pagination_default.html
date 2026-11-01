@@ -1,7 +1,7 @@
 {% load interfaz %}
 
 {% paginas_cercanas cl as paginas %}
-<nav aria-label="Paginación" class="flex items-center justify-between gap-2 lg:justify-end">
+<nav aria-label="{{ etiqueta|default:"Paginación, final del listado" }}" class="flex items-center justify-between gap-2 lg:justify-end">
     <div class="flex shrink-0 gap-2">
         {% if pagina.has_previous %}
             <a href="{% url_pagina cl 1 %}" class="boton-secundario px-3" aria-label="Primera página">

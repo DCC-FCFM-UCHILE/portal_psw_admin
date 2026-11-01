@@ -1144,7 +1144,7 @@ document.addEventListener(
             return;
         }
         evento.preventDefault();
-        listar(url.href, enlace.closest("#pie-listado") ? "pagina" : "listado", enlace);
+        listar(url.href, enlace.closest("#pie-listado, .paginacion-superior") ? "pagina" : "listado", enlace);
     },
     true,
 );
