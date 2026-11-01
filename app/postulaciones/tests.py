@@ -873,3 +873,10 @@ class ActividadSinNombreTests(BaseCompartida):
         LogEntry.objects.log_actions(user_id=self.docente.pk, queryset=[unidad], action_flag=ADDITION)
         respuesta = self.client.get(reverse("admin:index"))
         self.assertContains(respuesta, "(sin nombre)</a>")
+
+
+class CasillasDeFilaTests(BaseCompartida):
+    def test_cada_casilla_nombra_su_fila(self):
+        respuesta = self.client.get(reverse("admin:applications_application_changelist"))
+        self.assertContains(respuesta, 'aria-label="Seleccionar «Sistema de riego»"')
+        self.assertNotContains(respuesta, 'aria-label="Seleccionar el registro"')
