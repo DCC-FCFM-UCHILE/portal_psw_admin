@@ -33,7 +33,7 @@
 
                                             <span class="grow truncate">{{ action.title }}</span>
                                         </button>
-                                    {% elif action.display_in_dropdown and not propia or action.display_in_dropdown and action.raw_path != "admin:auth_user_eliminar_fila" %}
+                                    {% elif action.display_in_dropdown and action.raw_path != "admin:auth_user_eliminar_fila" or action.display_in_dropdown and not propia and not solo_lectura %}
                                         {% if "eliminar_fila" in action.raw_path and not forloop.first %}
                                             <div class="my-1 border-t border-base-200 dark:border-base-700" aria-hidden="true"></div>
                                         {% endif %}
@@ -45,14 +45,18 @@
                                                x-on:htmx:after-on-load="openModal = true"
                                            {% endif %}
                                            class="flex items-center gap-2 mx-1 px-3 py-2 max-h-[30px] rounded-default hover:bg-base-100 dark:hover:bg-base-700 dark:hover:text-base-200"{% for attr_name, attr_value in action.attrs.items %} {{ attr_name }}="{{ attr_value }}"{% endfor %}>
-                                            {% if action.icon %}
+                                            {% if solo_lectura and action.raw_path == "admin:auth_user_editar_fila" %}
+                                                <span class="material-symbols-outlined">
+                                                    visibility
+                                                </span>
+                                            {% elif action.icon %}
                                                 <span class="material-symbols-outlined">
                                                     {{ action.icon }}
                                                 </span>
                                             {% endif %}
 
                                             <span class="grow truncate">
-                                                {{ action.title }}
+                                                {% if solo_lectura and action.raw_path == "admin:auth_user_editar_fila" %}Ver{% else %}{{ action.title }}{% endif %}
                                             </span>
                                         </a>
                                     {% endif %}

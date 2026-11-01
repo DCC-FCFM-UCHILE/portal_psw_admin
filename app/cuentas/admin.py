@@ -19,8 +19,47 @@ admin.site.unregister(User)
 admin.site.unregister(Group)
 
 
+def nombre_de_permiso(permiso):
+    return f"{permiso.content_type.app_label}.{permiso.codename}"
+
+
+def sin_dar_mas_de_lo_propio(formulario, usuario):
+    if usuario.is_superuser:
+        return formulario
+    propios = usuario.get_all_permissions()
+
+    class Formulario(formulario):
+        def agregados(self, nombre):
+            if nombre not in self.fields or self.fields[nombre].disabled or nombre not in self.cleaned_data:
+                return []
+            antes = set(getattr(self.instance, nombre).all()) if self.instance.pk else set()
+            return [elemento for elemento in self.cleaned_data[nombre] if elemento not in antes]
+
+        def clean(self):
+            datos = super().clean()
+            for nombre in ("permissions", "user_permissions"):
+                ajenos = [permiso for permiso in self.agregados(nombre) if nombre_de_permiso(permiso) not in propios]
+                if ajenos:
+                    lista = ", ".join(f"«{permiso.name}»" for permiso in ajenos)
+                    self.add_error(nombre, f"Solo puedes dar permisos que tu cuenta tiene. Quita {lista}.")
+            grupos = [
+                grupo
+                for grupo in self.agregados("groups")
+                if any(nombre_de_permiso(permiso) not in propios for permiso in grupo.permissions.select_related("content_type"))
+            ]
+            if grupos:
+                lista = ", ".join(f"«{grupo.name}»" for grupo in grupos)
+                self.add_error("groups", f"Solo puedes asignar grupos con permisos que tu cuenta tiene. Quita {lista}.")
+            return datos
+
+    return Formulario
+
+
 class PermisosEnTabla:
     filter_horizontal = ()
+
+    def get_form(self, request, obj=None, **kwargs):
+        return sin_dar_mas_de_lo_propio(super().get_form(request, obj, **kwargs), request.user)
 
     def formfield_for_manytomany(self, db_field, request, **kwargs):
         if db_field.name in ("permissions", "user_permissions"):
@@ -32,6 +71,10 @@ class PermisosEnTabla:
 
 
 ACCESO_PROPIO = ["is_active", "is_staff", "is_superuser", "groups", "user_permissions"]
+
+
+def es_superusuario_ajeno(request, obj):
+    return obj is not None and obj.is_superuser and not request.user.is_superuser
 
 
 def sin_relaciones_internas(modelo, borrados, cantidades):
@@ -73,10 +116,17 @@ class UserAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, PermisosEnTab
                 if nombre in formulario.base_fields:
                     formulario.base_fields[nombre].disabled = True
                     formulario.base_fields[nombre].help_text = ""
+        elif not request.user.is_superuser and "is_superuser" in formulario.base_fields:
+            formulario.base_fields["is_superuser"].disabled = True
+            formulario.base_fields["is_superuser"].help_text = "Solo lo cambia un superusuario."
+        formulario.cambia_contrasena = not es_superusuario_ajeno(request, obj)
         return formulario
 
     def get_fieldsets(self, request, obj=None):
         grupos = super().get_fieldsets(request, obj)
+        if es_superusuario_ajeno(request, obj):
+            (nombre, opciones), *resto = grupos
+            return [(nombre, {**opciones, "description": "Las cuentas de superusuario solo las cambia otro superusuario."}), *resto]
         if obj is None or obj.pk != request.user.pk:
             return grupos
         return [
@@ -87,10 +137,23 @@ class UserAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, PermisosEnTab
         ]
 
     def get_queryset(self, request):
-        return super().get_queryset(request).annotate(es_propia=ExpressionWrapper(Q(pk=request.user.pk), output_field=BooleanField()))
+        solo_lectura = Q(pk__in=[]) if request.user.is_superuser else Q(is_superuser=True)
+        return (
+            super()
+            .get_queryset(request)
+            .annotate(
+                es_propia=ExpressionWrapper(Q(pk=request.user.pk), output_field=BooleanField()),
+                solo_lectura=ExpressionWrapper(solo_lectura, output_field=BooleanField()),
+            )
+        )
+
+    def has_change_permission(self, request, obj=None):
+        if es_superusuario_ajeno(request, obj):
+            return False
+        return super().has_change_permission(request, obj)
 
     def has_delete_permission(self, request, obj=None):
-        if obj is not None and obj.pk == request.user.pk:
+        if obj is not None and obj.pk == request.user.pk or es_superusuario_ajeno(request, obj):
             return False
         return super().has_delete_permission(request, obj)
 
@@ -98,14 +161,20 @@ class UserAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, PermisosEnTab
         if str(object_id) == str(request.user.pk):
             messages.warning(request, "Tu propia cuenta no se puede eliminar desde aquí. Pídeselo a otra persona que administre las cuentas.")
             return redirect("admin:auth_user_change", object_id)
+        if not request.user.is_superuser and User.objects.filter(pk=object_id, is_superuser=True).exists():
+            messages.warning(request, "Las cuentas de superusuario solo las elimina otro superusuario.")
+            return redirect("admin:auth_user_change", object_id)
         return super().delete_view(request, object_id, extra_context)
 
     def get_deleted_objects(self, objs, request):
         borrados, cantidades, faltantes, protegidos = super().get_deleted_objects(objs, request)
         borrados, cantidades = sin_relaciones_internas(self.model, borrados, cantidades)
+        motivos = set()
         if any(obj.pk == request.user.pk for obj in objs):
-            faltantes = {"tu propia cuenta (quítala de la selección)"}
-        return borrados, cantidades, faltantes, protegidos
+            motivos.add("tu propia cuenta (quítala de la selección)")
+        if any(es_superusuario_ajeno(request, obj) for obj in objs):
+            motivos.add("las cuentas de superusuario (quítalas de la selección)")
+        return borrados, cantidades, motivos or faltantes, protegidos
 
 
 @admin.register(Group)

@@ -873,6 +873,102 @@ class CuentaPropiaTests(BaseCompartida):
         self.assertNotContains(respuesta, "Tu propio acceso lo cambia otra persona")
 
 
+class SuperusuariosAjenosTests(BaseCompartida):
+    def setUp(self):
+        self.gestor = User.objects.create_user("gestor", password="clave-de-prueba", is_staff=True)
+        self.gestor.user_permissions.add(*Permission.objects.filter(content_type__app_label="auth", content_type__model="user"))
+        self.otra = User.objects.create_user("otra", password="clave-de-prueba", is_staff=True)
+        self.client.force_login(self.gestor)
+
+    def datos(self, usuario, **cambios):
+        return {
+            "username": usuario.username,
+            "is_active": "on",
+            "is_staff": "on",
+            "date_joined_0": timezone.localtime(usuario.date_joined).strftime("%d/%m/%Y"),
+            "date_joined_1": timezone.localtime(usuario.date_joined).strftime("%H:%M:%S"),
+            "_save": "1",
+            **cambios,
+        }
+
+    def test_la_ficha_de_un_superusuario_es_de_solo_lectura(self):
+        url = reverse("admin:auth_user_change", args=[self.docente.pk])
+        respuesta = self.client.get(url)
+        self.assertContains(respuesta, "Las cuentas de superusuario solo las cambia otro superusuario.")
+        self.assertNotContains(respuesta, 'name="_save"')
+        self.assertNotContains(respuesta, reverse("admin:auth_user_password_change", args=[self.docente.pk]))
+        self.client.post(url, self.datos(self.docente, first_name="Otro", is_staff=""))
+        self.docente.refresh_from_db()
+        self.assertEqual(self.docente.first_name, "")
+        self.assertTrue(self.docente.is_staff)
+
+    def test_no_cambia_la_contrasena_de_un_superusuario(self):
+        url = reverse("admin:auth_user_password_change", args=[self.docente.pk])
+        self.assertEqual(self.client.get(url).status_code, 403)
+        self.client.post(url, {"password1": "otra-clave-larga-9", "password2": "otra-clave-larga-9"})
+        self.docente.refresh_from_db()
+        self.assertTrue(self.docente.check_password("clave-de-prueba"))
+
+    def test_no_elimina_un_superusuario(self):
+        respuesta = self.client.get(reverse("admin:auth_user_delete", args=[self.docente.pk]), follow=True)
+        self.assertRedirects(respuesta, reverse("admin:auth_user_change", args=[self.docente.pk]))
+        self.assertContains(respuesta, "Las cuentas de superusuario solo las elimina otro superusuario.")
+        datos = {"action": "delete_selected", "_selected_action": [self.docente.pk, self.otra.pk]}
+        self.assertContains(
+            self.client.post(reverse("admin:auth_user_changelist"), datos), "las cuentas de superusuario (quítalas de la selección)"
+        )
+        self.client.post(reverse("admin:auth_user_changelist"), {**datos, "post": "yes"})
+        self.assertEqual(User.objects.filter(pk__in=[self.docente.pk, self.otra.pk]).count(), 2)
+
+    def test_el_menu_del_superusuario_ofrece_ver_sin_eliminar(self):
+        respuesta = self.client.get(reverse("admin:auth_user_changelist")).content.decode()
+        self.assertNotIn(reverse("admin:auth_user_eliminar_fila", args=[self.docente.pk]), respuesta)
+        self.assertIn(reverse("admin:auth_user_eliminar_fila", args=[self.otra.pk]), respuesta)
+
+    def test_no_vuelve_superusuario_a_otra_cuenta(self):
+        url = reverse("admin:auth_user_change", args=[self.otra.pk])
+        self.assertContains(self.client.get(url), "Solo lo cambia un superusuario.")
+        self.assertEqual(self.client.post(url, self.datos(self.otra, is_superuser="on")).status_code, 302)
+        self.otra.refresh_from_db()
+        self.assertFalse(self.otra.is_superuser)
+
+    def test_solo_da_permisos_que_tiene(self):
+        url = reverse("admin:auth_user_change", args=[self.otra.pk])
+        ajeno = Permission.objects.get(codename="delete_application")
+        propio = Permission.objects.get(codename="view_user")
+        respuesta = self.client.post(url, self.datos(self.otra, user_permissions=[ajeno.pk]))
+        self.assertContains(respuesta, "Solo puedes dar permisos que tu cuenta tiene.")
+        self.assertFalse(self.otra.user_permissions.exists())
+        self.assertEqual(self.client.post(url, self.datos(self.otra, user_permissions=[propio.pk])).status_code, 302)
+        self.assertEqual(set(self.otra.user_permissions.all()), {propio})
+
+    def test_conserva_los_permisos_que_la_cuenta_ya_tenia(self):
+        ajeno = Permission.objects.get(codename="delete_application")
+        self.otra.user_permissions.add(ajeno)
+        url = reverse("admin:auth_user_change", args=[self.otra.pk])
+        self.assertEqual(self.client.post(url, self.datos(self.otra, first_name="Ana", user_permissions=[ajeno.pk])).status_code, 302)
+        self.assertEqual(set(self.otra.user_permissions.all()), {ajeno})
+
+    def test_solo_asigna_grupos_con_permisos_que_tiene(self):
+        grupo = Group.objects.create(name="Revisión")
+        grupo.permissions.add(Permission.objects.get(codename="delete_application"))
+        url = reverse("admin:auth_user_change", args=[self.otra.pk])
+        respuesta = self.client.post(url, self.datos(self.otra, groups=[grupo.pk]))
+        self.assertContains(respuesta, "Solo puedes asignar grupos con permisos que tu cuenta tiene.")
+        self.assertFalse(self.otra.groups.exists())
+
+    def test_un_superusuario_sigue_administrando_superusuarios(self):
+        self.client.force_login(self.docente)
+        otro = User.objects.create_superuser("otro", "otro@dcc.uchile.cl", "clave-de-prueba")
+        respuesta = self.client.get(reverse("admin:auth_user_change", args=[otro.pk]))
+        self.assertContains(respuesta, 'name="_save"')
+        self.assertNotContains(respuesta, "Solo lo cambia un superusuario.")
+        self.assertIn(
+            reverse("admin:auth_user_eliminar_fila", args=[otro.pk]),
+            self.client.get(reverse("admin:auth_user_changelist")).content.decode(),
+        )
+
+
 class IngresoTests(TestCase):
     def test_un_ingreso_fallido_muestra_un_solo_aviso_asociado_a_los_campos(self):
         User.objects.create_user("persona", password="clave-de-prueba", is_staff=True)

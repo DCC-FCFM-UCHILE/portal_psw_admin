@@ -23,12 +23,15 @@ class NuevaClaveForm(ConClasesDeUnfold, forms.SetPasswordForm):
 
 
 class FichaUsuarioForm(UserChangeForm):
+    cambia_contrasena = True
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         contrasena = self.fields.get("password")
         if contrasena and self.instance.pk:
             contrasena.help_text = ""
-            contrasena.widget = AccesoAContrasena(reverse("admin:auth_user_password_change", args=[self.instance.pk]))
+            enlace = reverse("admin:auth_user_password_change", args=[self.instance.pk]) if self.cambia_contrasena else None
+            contrasena.widget = AccesoAContrasena(enlace)
 
 
 class IngresoForm(AuthenticationForm):
