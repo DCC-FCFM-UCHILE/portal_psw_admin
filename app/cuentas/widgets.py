@@ -27,6 +27,27 @@ def accion(permiso):
     return prefijo if prefijo in ACCIONES and resto == permiso.content_type.model else None
 
 
+def opciones_por_permiso(grupos):
+    opciones = {}
+    for _, grupo, _ in grupos:
+        for opcion in grupo:
+            permiso = opcion["value"].instance
+            clave = accion(permiso)
+            opciones[(permiso.content_type.app_label, permiso.content_type.model, clave) if clave else permiso.pk] = opcion
+            opcion["permiso"] = permiso
+    return opciones
+
+
+def fila_de_permisos(nombre, modelo, opciones):
+    celdas = []
+    for clave, verbo in ACCIONES.items():
+        opcion = opciones.pop((modelo._meta.app_label, modelo._meta.model_name, clave), None)
+        if opcion:
+            opcion["etiqueta"] = f"{verbo} {nombre.lower()}"
+        celdas.append(opcion)
+    return {"nombre": nombre, "celdas": celdas} if any(celdas) else None
+
+
 class MatrizPermisos(forms.CheckboxSelectMultiple):
     template_name = "cuentas/widgets/permisos.html"
 
@@ -35,26 +56,10 @@ class MatrizPermisos(forms.CheckboxSelectMultiple):
 
     def get_context(self, name, value, attrs):
         contexto = super().get_context(name, value, attrs)
-        opciones = {}
-        for _, grupo, _ in contexto["widget"]["optgroups"]:
-            for opcion in grupo:
-                permiso = opcion["value"].instance
-                clave = accion(permiso)
-                opciones[(permiso.content_type.app_label, permiso.content_type.model, clave) if clave else permiso.pk] = opcion
-                opcion["permiso"] = permiso
-
+        opciones = opciones_por_permiso(contexto["widget"]["optgroups"])
         secciones = []
         for titulo, filas in secciones_del_menu():
-            tabla = []
-            for nombre, modelo in filas:
-                celdas = []
-                for clave, verbo in ACCIONES.items():
-                    opcion = opciones.pop((modelo._meta.app_label, modelo._meta.model_name, clave), None)
-                    if opcion:
-                        opcion["etiqueta"] = f"{verbo} {nombre.lower()}"
-                    celdas.append(opcion)
-                if any(celdas):
-                    tabla.append({"nombre": nombre, "celdas": celdas})
+            tabla = [fila for fila in (fila_de_permisos(nombre, modelo, opciones) for nombre, modelo in filas) if fila]
             if tabla:
                 secciones.append({"titulo": titulo, "filas": tabla})
 

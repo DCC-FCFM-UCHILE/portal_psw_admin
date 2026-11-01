@@ -32,11 +32,14 @@ class ListadoParcial:
         media = super().media
         return forms.Media(js=[ruta for ruta in media._js if ruta not in SIN_USO], css=media._css)
 
+    def usa_guiones_de_django(self, request):
+        return IS_POPUP_VAR in request.GET or bool(self.list_editable)
+
     def changelist_view(self, request, extra_context=None):
         respuesta = super().changelist_view(request, extra_context)
         zona = zona_pedida(request)
         contexto = respuesta.context_data if isinstance(respuesta, TemplateResponse) else None
-        if contexto and "media" in contexto and not (IS_POPUP_VAR in request.GET or self.list_editable):
+        if contexto and "media" in contexto and not self.usa_guiones_de_django(request):
             media = contexto["media"]
             contexto["media"] = forms.Media(js=[ruta for ruta in media._js if not ruta.startswith("admin/js/")], css=media._css)
             contexto["sin_guiones_de_django"] = True

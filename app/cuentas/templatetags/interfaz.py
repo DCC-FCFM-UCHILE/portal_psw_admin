@@ -96,6 +96,31 @@ def sin_aplicacion(descripcion):
     return str(descripcion).split(" - ", 1)[-1]
 
 
+def listado_de(opciones):
+    listado = {"titulo": capfirst(opciones.verbose_name_plural), "enlace": ""}
+    try:
+        listado["enlace"] = reverse(f"admin:{opciones.app_label}_{opciones.model_name}_changelist")
+    except NoReverseMatch:
+        pass
+    return listado
+
+
+def confirma_borrado(context):
+    return (
+        "deleted_objects" in context
+        and context.get("object") is not None
+        and not context.get("protected")
+        and not context.get("perms_lacking")
+    )
+
+
+def titulo_de_ficha(context, titulo):
+    original = context.get("original")
+    if original is not None and not isinstance(original, str) and context.get("change"):
+        return str(original)
+    return titulo or str(original or "")
+
+
 @register.simple_tag(takes_context=True)
 def migas(context):
     if context.get("migas_vista"):
@@ -104,24 +129,12 @@ def migas(context):
     titulo = str(context.get("title") or "")
     if not opciones:
         return {"ruta": [], "titulo": titulo or "Inicio"}
-    listado = {"titulo": capfirst(opciones.verbose_name_plural), "enlace": ""}
-    try:
-        listado["enlace"] = reverse(f"admin:{opciones.app_label}_{opciones.model_name}_changelist")
-    except NoReverseMatch:
-        pass
+    listado = listado_de(opciones)
     if context.get("cl"):
         return {"ruta": [], "titulo": listado["titulo"]}
-    if (
-        "deleted_objects" in context
-        and context.get("object") is not None
-        and not context.get("protected")
-        and not context.get("perms_lacking")
-    ):
+    if confirma_borrado(context):
         return {"ruta": [listado], "titulo": f"Eliminar «{context['object']}»"}
-    original = context.get("original")
-    if original is not None and not isinstance(original, str) and context.get("change"):
-        return {"ruta": [listado], "titulo": str(original)}
-    return {"ruta": [listado], "titulo": titulo or str(original or "")}
+    return {"ruta": [listado], "titulo": titulo_de_ficha(context, titulo)}
 
 
 def version_de_siluetas():
