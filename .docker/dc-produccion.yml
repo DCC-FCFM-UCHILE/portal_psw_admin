@@ -15,7 +15,6 @@ services:
         volumes:
             - /home/instalar/static/portal-admin-psw/:/static/:rw
             - /home/instalar/media/portalpsw2/:/media/:rw
-            - /home/instalar/logs/portal-admin-psw:/logs:rw
             - /etc/timezone:/etc/timezone:ro
             - /etc/localtime:/etc/localtime:ro
         expose:
