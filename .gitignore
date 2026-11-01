@@ -24,6 +24,5 @@ db.sqlite3
 .env
 .docker/app/.env
 .env.test
-!.env.example
 
 .pytest_cache
