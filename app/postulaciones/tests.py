@@ -405,6 +405,10 @@ class FormulariosTests(BaseCompartida):
         self.assertContains(respuesta, '<button type="button" class="delete-template')
         self.assertContains(respuesta, "Quitar esta fila")
 
+    def test_agregar_un_integrante_es_un_boton(self):
+        respuesta = self.client.get(reverse("admin:applications_approvedproject_add"))
+        self.assertContains(respuesta, '<button type="button" class="add-row')
+
     def test_el_archivo_declara_sus_formatos(self):
         respuesta = self.client.get(reverse("admin:applications_application_add"))
         self.assertContains(respuesta, 'accept=".pdf"')

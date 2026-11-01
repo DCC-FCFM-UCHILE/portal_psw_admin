@@ -94,7 +94,7 @@ document.addEventListener("click", (evento) => {
         contarSeleccion();
         return;
     }
-    if (evento.target.closest("#changelist-form span.question a")) {
+    if (evento.target.closest("#changelist-form span.question button")) {
         evento.preventDefault();
         verSeleccion("todas");
         evento.target.closest("form")?.querySelector("[data-accion]")?.focus();

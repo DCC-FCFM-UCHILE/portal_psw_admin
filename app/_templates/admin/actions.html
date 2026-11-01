@@ -7,7 +7,7 @@
             {% if cl.result_count != cl.result_list|length and not cl.model_admin.list_disable_select_all %}
                 <span class="all hidden" role="status">{{ selection_note_all }}</span>
                 <span class="question hidden">
-                    <a href="#" class="barra-acciones-boton">{% blocktranslate with cl.result_count as total_count %}Select all {{ total_count }} {{ module_name }}{% endblocktranslate %}</a>
+                    <button type="button" class="barra-acciones-boton">{% blocktranslate with cl.result_count as total_count %}Select all {{ total_count }} {{ module_name }}{% endblocktranslate %}</button>
                 </span>
             {% endif %}
         {% endif %}
