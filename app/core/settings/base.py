@@ -168,7 +168,7 @@ NAVEGACION = [
     },
 ]
 
-GUIONES = ["tema", "menus", "seleccion", "formularios", "capas", "emergentes", "tablas", "listado", "buscador", "cajon"]
+GUIONES = ["tema", "menus", "seleccion", "formularios", "capas", "emergentes", "tablas", "listado", "buscador", "cajon", "sesion"]
 
 UNFOLD = {
     "SITE_TITLE": "Portal PSW · Administración",

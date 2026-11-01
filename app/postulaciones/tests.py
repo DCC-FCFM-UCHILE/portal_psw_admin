@@ -8,11 +8,12 @@ from django.contrib import admin
 from django.contrib.admin.models import ADDITION, LogEntry
 from django.contrib.auth.models import Group, Permission, User
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.sessions.models import Session
 from django.contrib.staticfiles import finders
 from django.core import mail
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase, override_settings
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.formats import date_format
@@ -1216,12 +1217,51 @@ class IngresoTests(TestCase):
     def test_la_sesion_dura_ocho_horas(self):
         User.objects.create_user("persona", password="clave-de-prueba", is_staff=True)
         respuesta = self.client.post(reverse("admin:login"), {"username": "persona", "password": "clave-de-prueba"})
-        self.assertEqual(respuesta.cookies["sessionid"]["max-age"], 8 * 60 * 60)
+        self.assertAlmostEqual(respuesta.cookies["sessionid"]["max-age"], 8 * 60 * 60, delta=1)
 
     def test_llegar_desde_otra_pagina_explica_que_hay_que_ingresar(self):
         respuesta = self.client.get(reverse("admin:applications_application_changelist"), follow=True)
         self.assertContains(respuesta, "Para ver esa página, primero ingresa con tu cuenta.")
         self.assertNotContains(self.client.get(reverse("admin:login")), "Para ver esa página")
+
+
+class SesionTests(BaseCompartida):
+    def guardada(self):
+        return Session.objects.get(session_key=self.client.session.session_key).expire_date
+
+    def test_la_pagina_lleva_el_vencimiento_guardado(self):
+        respuesta = self.client.get(reverse("admin:index"))
+        vence = int(re.search(r'id="sesion" hidden data-vence="(\d+)"', respuesta.content.decode())[1])
+        self.assertEqual(vence, int(self.guardada().timestamp() * 1000))
+        self.assertEqual(self.client.get(reverse("sesion")).json(), {"vence": vence})
+
+    def test_seguir_conectado_renueva_ocho_horas_desde_ahora(self):
+        Session.objects.filter(session_key=self.client.session.session_key).update(
+            expire_date=timezone.now() + datetime.timedelta(minutes=3)
+        )
+        respuesta = self.client.post(reverse("sesion"))
+        nuevo = respuesta.json()["vence"] / 1000
+        self.assertAlmostEqual(nuevo, (timezone.now() + datetime.timedelta(hours=8)).timestamp(), delta=5)
+        self.assertAlmostEqual(self.guardada().timestamp(), nuevo, delta=1)
+
+    def test_consultar_no_cambia_el_vencimiento(self):
+        antes = self.guardada()
+        self.client.get(reverse("sesion"))
+        self.assertEqual(self.guardada(), antes)
+
+    def test_sin_sesion_responde_401(self):
+        self.client.logout()
+        self.assertEqual(self.client.get(reverse("sesion")).status_code, 401)
+        self.assertEqual(self.client.post(reverse("sesion")).status_code, 401)
+
+    def test_renovar_pide_csrf(self):
+        cliente = Client(enforce_csrf_checks=True)
+        cliente.force_login(self.docente)
+        self.assertEqual(cliente.post(reverse("sesion")).status_code, 403)
+
+    def test_sin_sesion_la_pagina_no_lleva_vencimiento(self):
+        self.client.logout()
+        self.assertNotContains(self.client.get(reverse("admin:login")), 'id="sesion"')
 
 
 class InicioYMenuTests(BaseCompartida):

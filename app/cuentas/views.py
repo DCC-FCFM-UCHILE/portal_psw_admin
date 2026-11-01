@@ -1,8 +1,13 @@
 from django.contrib import admin, messages
 from django.contrib.auth import views
+from django.http import JsonResponse
 from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
+from django.views import View
+from django.views.decorators.cache import never_cache
 
 from cuentas.forms import NuevaClaveForm, RestablecerForm
+from cuentas.sesion import en_milisegundos, renovar
 
 
 class ConSitio:
@@ -35,3 +40,18 @@ class SalirView(views.LogoutView):
         respuesta = super().post(request, *args, **kwargs)
         messages.success(request, "Cerraste la sesión.")
         return respuesta
+
+
+@method_decorator(never_cache, name="dispatch")
+class SesionView(View):
+    def dispatch(self, request, *args, **kwargs):
+        if not (request.user.is_active and request.user.is_staff):
+            return JsonResponse({"vence": None}, status=401)
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request):
+        return JsonResponse({"vence": en_milisegundos(request.session)})
+
+    def post(self, request):
+        renovar(request.session)
+        return self.get(request)

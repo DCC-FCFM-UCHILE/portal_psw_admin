@@ -15,8 +15,15 @@ from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
 from unfold.templatetags.unfold_list import unfold_vertical_filters
 
+from cuentas.sesion import en_milisegundos
+
 register = template.Library()
 logger = logging.getLogger(__name__)
+
+
+@register.simple_tag(takes_context=True)
+def vence_sesion(context):
+    return en_milisegundos(context["request"].session)
 
 
 @register.filter
