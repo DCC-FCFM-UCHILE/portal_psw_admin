@@ -606,6 +606,10 @@ window.addEventListener("pageshow", (evento) => {
     }
 });
 
+document.addEventListener("formset:added", (evento) => {
+    evento.target.querySelector('input:not([type="hidden"]), select, textarea')?.focus();
+});
+
 document.addEventListener("formset:removed", (evento) => {
     document.getElementById(`${evento.detail.formsetName}-group`)?.querySelector(".add-row")?.focus();
 });
