@@ -103,6 +103,15 @@ input[type="checkbox"].appearance-none.rounded-full {
   }
 }
 
+.boton-quitar-fila .deshacer,
+.boton-quitar-fila:has(.delete:checked) .quitar {
+  display: none;
+}
+
+.boton-quitar-fila:has(.delete:checked) .deshacer {
+  display: inline-block;
+}
+
 #content textarea {
   max-inline-size: 42rem;
   min-block-size: calc(5lh + 1rem + 2px);

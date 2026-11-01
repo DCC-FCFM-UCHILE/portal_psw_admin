@@ -1,0 +1,10 @@
+{% if inline_admin_form.original or inline_admin_form.show_url %}
+    {% if inline_admin_form.needs_explicit_pk_field or inline_admin_form.fk_field %}
+        <tr hidden>
+            <td>
+                {% if inline_admin_form.needs_explicit_pk_field %}{{ inline_admin_form.pk_field.field }}{% endif %}
+                {% if inline_admin_form.fk_field %}{{ inline_admin_form.fk_field.field }}{% endif %}
+            </td>
+        </tr>
+    {% endif %}
+{% endif %}
