@@ -1049,3 +1049,19 @@ class BorradoDeCuentasTests(BaseCompartida):
         self.assertNotContains(respuesta, "user-permission")
         self.assertNotContains(respuesta, "user-group")
         self.assertNotContains(respuesta, "object (")
+
+
+class AvisoDeErroresTests(BaseCompartida):
+    def datos(self, **cambios):
+        return {"convenio": self.convocatoria.convenio.pk, "inicio": "15/03/2027", "cierre": "01/04/2027", "semestre": "FA", "anio": "2027", "_save": "1", **cambios}
+
+    def test_un_campo_con_error_se_anuncia_en_singular(self):
+        respuesta = self.client.post(reverse("admin:applications_announcement_add"), self.datos(anio="dos mil"))
+        self.assertContains(respuesta, "Corrige el error que se indica abajo.")
+        self.assertContains(respuesta, 'aria-invalid="true"')
+
+    def test_un_error_general_no_repite_el_aviso(self):
+        respuesta = self.client.post(reverse("admin:applications_announcement_add"), self.datos(cierre="01/03/2027"))
+        self.assertContains(respuesta, "La fecha de inicio debe ser menor a la final")
+        self.assertNotContains(respuesta, "que se indica")
+        self.assertNotContains(respuesta, "que se indican")
