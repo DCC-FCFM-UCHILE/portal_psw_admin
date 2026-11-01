@@ -247,4 +247,26 @@ window.addEventListener("load", () => {
 document.addEventListener("formset:removed", (evento) => {
     document.getElementById(`${evento.detail.formsetName}-group`)?.querySelector(".add-row")?.focus();
 });
+
+if (!CSS.supports("field-sizing", "content")) {
+    const ajustarAlto = (area) => {
+        const bordes = area.offsetHeight - area.clientHeight;
+        const marco = area.parentElement;
+        marco.style.minHeight = `${marco.offsetHeight}px`;
+        area.style.height = "0";
+        area.style.height = `${area.scrollHeight + bordes}px`;
+        marco.style.minHeight = "";
+    };
+    const ajustarTodas = () => document.querySelectorAll("#content textarea").forEach(ajustarAlto);
+    document.addEventListener("input", (evento) => {
+        if (evento.target.matches?.("#content textarea")) {
+            ajustarAlto(evento.target);
+        }
+    });
+    document.addEventListener("DOMContentLoaded", () => {
+        ajustarTodas();
+        document.fonts?.ready.then(ajustarTodas);
+    });
+    addEventListener("resize", () => requestAnimationFrame(ajustarTodas));
+}
 })();

@@ -103,6 +103,18 @@ input[type="checkbox"].appearance-none.rounded-full {
   }
 }
 
+#content textarea {
+  max-inline-size: 42rem;
+  min-block-size: calc(5lh + 1rem + 2px);
+  resize: vertical;
+}
+
+@supports (field-sizing: content) {
+  #content textarea {
+    field-sizing: content;
+  }
+}
+
 @media (width < 40rem) {
   :is(input:not([type="checkbox"], [type="radio"], [type="file"], [type="hidden"], [type="submit"], [type="button"], [type="reset"], [type="range"], [type="color"]), select) {
     font-size: var(--text-sm);
