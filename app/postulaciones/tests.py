@@ -16,6 +16,7 @@ from django.core import mail
 from django.core.exceptions import ValidationError
 from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.management import call_command
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
@@ -1871,3 +1872,52 @@ class CompresionTests(TestCase):
         for contenido in [b"\x89PNG\r\n\x1a\nno es una imagen", imagen("GIF")]:
             with self.subTest(contenido=contenido[:8]), self.assertRaises(ImagenInvalida):
                 comprimir(contenido)
+
+
+@override_settings(MEDIA_ROOT="/tmp/admin-pruebas-media-comando")
+class ComprimirLogosTests(BaseCompartida):
+    def setUp(self):
+        super().setUp()
+        self.grande = imagen("PNG", (2000, 1000))
+        nombre = default_storage.save("logo-grande.png", SimpleUploadedFile("logo-grande.png", self.grande))
+        self.unidad = self.postulacion.unidad
+        Unit.objects.filter(pk=self.unidad.pk).update(logo=nombre)
+        self.nombre = nombre
+
+    def tearDown(self):
+        default_storage.delete(self.nombre)
+        super().tearDown()
+
+    def correr(self, *argumentos):
+        salida = io.StringIO()
+        call_command("comprimir_logos", *argumentos, stdout=salida)
+        return salida.getvalue()
+
+    def leer(self):
+        with default_storage.open(self.nombre, "rb") as archivo:
+            return archivo.read()
+
+    def test_sin_aplicar_solo_informa(self):
+        salida = self.correr()
+        self.assertIn("sin --aplicar no se escribió nada", salida)
+        self.assertEqual(self.leer(), self.grande)
+
+    def test_una_segunda_pasada_no_vuelve_a_comprimir(self):
+        self.correr("--aplicar")
+        comprimido = self.leer()
+        self.assertIn("0 de", self.correr("--aplicar"))
+        self.assertEqual(self.leer(), comprimido)
+
+    def test_aplicar_reemplaza_el_archivo_con_el_mismo_nombre_y_formato(self):
+        self.correr("--aplicar")
+        self.assertEqual(medidas(self.leer())[:2], ("PNG", (640, 320)))
+        self.assertEqual(Unit.objects.get(pk=self.unidad.pk).logo.name, self.nombre)
+
+    def test_omite_svg_y_avisa_lo_que_falta_en_disco(self):
+        otra = Unit.objects.create(nombre="Otra", organizacion=self.unidad.organizacion)
+        Unit.objects.filter(pk=otra.pk).update(logo="viejo.svg")
+        tercera = Unit.objects.create(nombre="Tercera", organizacion=self.unidad.organizacion)
+        Unit.objects.filter(pk=tercera.pk).update(logo="no-esta.png")
+        salida = self.correr()
+        self.assertIn("se omite, no es PNG ni JPG: viejo.svg", salida)
+        self.assertIn("no está en disco: no-esta.png", salida)
