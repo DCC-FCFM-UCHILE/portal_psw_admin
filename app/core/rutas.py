@@ -3,6 +3,7 @@ import re
 from django.http import HttpResponsePermanentRedirect
 from django.urls import get_script_prefix, path, re_path
 from django.urls.resolvers import RoutePattern, URLResolver
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.generic import RedirectView
 
 MODELOS = {
@@ -107,7 +108,9 @@ def ruta_nueva(antigua):
 
 
 def redirigir_antigua(request, antigua, prefijo=""):
-    destino = get_script_prefix() + ruta_nueva(prefijo + antigua)
+    destino = get_script_prefix() + ruta_nueva(prefijo + antigua).lstrip("/\\")
+    if not url_has_allowed_host_and_scheme(destino, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
+        destino = get_script_prefix()
     if request.META.get("QUERY_STRING"):
         destino += "?" + request.META["QUERY_STRING"]
     return HttpResponsePermanentRedirect(destino)
