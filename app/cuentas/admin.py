@@ -9,9 +9,10 @@ from unfold.forms import AdminPasswordChangeForm, UserCreationForm
 
 from core.acciones import AccionesDeFila
 from core.listado import ListadoParcial
-from cuentas.forms import FichaUsuarioForm
+from cuentas.forms import FichaUsuarioForm, IngresoForm
 from cuentas.widgets import CasillasDeGrupos, MatrizPermisos
 
+admin.site.login_form = IngresoForm
 admin.site.unregister(User)
 admin.site.unregister(Group)
 

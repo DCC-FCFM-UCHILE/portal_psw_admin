@@ -589,6 +589,15 @@ msgstr ""
 "La extensión de archivo “%(extension)s” no está permitida. Las extensiones "
 "permitidas son: %(allowed_extensions)s."
 
+#, python-format
+msgid ""
+"Please enter the correct %(username)s and password for a staff account. Note "
+"that both fields may be case-sensitive."
+msgstr ""
+"No pudimos ingresar con ese %(username)s y esa contraseña. Revisa que estén "
+"bien escritos (se distinguen mayúsculas y minúsculas) y que la cuenta tenga "
+"acceso a la administración."
+
 msgid "Enter a valid value."
 msgstr "Escribe un valor válido."
 

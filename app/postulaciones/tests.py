@@ -821,3 +821,19 @@ class CuentaPropiaTests(BaseCompartida):
         otra = User.objects.create_user("otra", password="clave-de-prueba", is_staff=True)
         respuesta = self.client.get(reverse("admin:auth_user_change", args=[otra.pk]))
         self.assertNotContains(respuesta, "Tu propio acceso lo cambia otra persona")
+
+
+class IngresoTests(TestCase):
+    def test_un_ingreso_fallido_muestra_un_solo_aviso_asociado_a_los_campos(self):
+        User.objects.create_user("persona", password="clave-de-prueba", is_staff=True)
+        respuesta = self.client.post(reverse("admin:login"), {"username": "persona", "password": "otra"})
+        contenido = respuesta.content.decode()
+        self.assertEqual(contenido.count("errornote"), 1)
+        self.assertIn("No pudimos ingresar con ese nombre de usuario y esa contraseña.", contenido)
+        self.assertEqual(contenido.count('aria-describedby="error-ingreso"'), 2)
+        self.assertIn('id="error-ingreso"', contenido)
+
+    def test_llegar_desde_otra_pagina_explica_que_hay_que_ingresar(self):
+        respuesta = self.client.get(reverse("admin:applications_application_changelist"), follow=True)
+        self.assertContains(respuesta, "Para ver esa página, primero ingresa con tu cuenta.")
+        self.assertNotContains(self.client.get(reverse("admin:login")), "Para ver esa página")
