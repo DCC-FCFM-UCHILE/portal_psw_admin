@@ -1091,12 +1091,14 @@ const quitarCarga = () => {
     });
 };
 
-const listar = (url, alcance, fuente, empujar = true) => {
+const listar = (url, alcance, fuente, empujar = true, valores = null) => {
     const zona = zonaListado();
     const activo = document.activeElement;
     const panel = document.getElementById("changelist-filter");
     const pedido = {
         url,
+        respaldo: valores ? location.href : url,
+        metodo: valores ? "POST" : "GET",
         alcance,
         empujar,
         fuente,
@@ -1118,7 +1120,11 @@ const listar = (url, alcance, fuente, empujar = true) => {
             pedido.fuente = zona;
         }
         espera = setTimeout(() => enCurso === pedido && mostrarCarga(pedido), UMBRAL);
-        htmx.ajax("GET", url, { source: pedido.fuente, target: pedido.objetivo, swap: `innerHTML swap:${sinMovimiento.matches ? 0 : 140}ms` }).catch(() => {});
+        const opciones = { source: pedido.fuente, target: pedido.objetivo, swap: `innerHTML swap:${sinMovimiento.matches ? 0 : 140}ms` };
+        if (valores) {
+            opciones.values = valores;
+        }
+        htmx.ajax(pedido.metodo, url, opciones).catch(() => {});
     };
     if (alcance === "pagina") {
         traerALaVista(pedido.objetivo, true).then(emitir);
@@ -1167,6 +1173,23 @@ document.addEventListener(
     true,
 );
 
+document.addEventListener(
+    "submit",
+    (evento) => {
+        const formulario = evento.target;
+        const boton = evento.submitter;
+        if (evento.defaultPrevented || formulario.id !== "changelist-form" || !boton?.hasAttribute("data-en-listado") || !zonaListado() || !("htmx" in window)) {
+            return;
+        }
+        evento.preventDefault();
+        if (enCurso?.metodo === "POST") {
+            return;
+        }
+        listar(boton.formAction || location.href, "listado", formulario, false, boton.name ? { [boton.name]: boton.value } : {});
+    },
+    true,
+);
+
 window.addEventListener("popstate", (evento) => {
     if (evento.state?.listado && zonaListado()) {
         listar(location.href, "listado", zonaListado(), false);
@@ -1193,7 +1216,7 @@ document.addEventListener("htmx:beforeSwap", (evento) => {
         evento.detail.shouldSwap = false;
         enCurso = null;
         quitarCarga();
-        location.assign(evento.detail.isError ? pedido.url : final.href);
+        location.assign(evento.detail.isError ? pedido.respaldo : final.href);
         return;
     }
     pedido.final = final.href;
@@ -1221,7 +1244,7 @@ document.addEventListener("htmx:afterSwap", (evento) => {
 document.addEventListener("htmx:sendError", (evento) => {
     if (enCurso && evento.detail.xhr === enCurso.xhr) {
         quitarCarga();
-        location.assign(enCurso.url);
+        location.assign(enCurso.respaldo);
     }
 });
 
@@ -1242,6 +1265,11 @@ document.addEventListener("htmx:afterSettle", (evento) => {
 
     const activo = document.activeElement;
     const perdido = !activo || activo === document.body || !activo.isConnected;
+    if (pedido.metodo === "POST") {
+        enfocar(document.getElementById("avisos") || destinoDelFoco());
+        anunciarListado("");
+        return;
+    }
     if (pedido.alcance === "pagina") {
         enfocar(destinoDelFoco());
     } else if (perdido && pedido.focoId && document.getElementById(pedido.focoId)) {

@@ -1,0 +1,7 @@
+{% load unfold %}
+
+{% if messages %}
+    <div id="avisos" tabindex="-1" role="alert" class="{% if not cl.model_admin.list_fullwidth and is_fullwidth != "1" %}container{% endif %} mx-auto {% element_classes 'messages' %}">
+        {% include "unfold/helpers/messages.html" %}
+    </div>
+{% endif %}

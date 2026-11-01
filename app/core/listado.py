@@ -16,6 +16,8 @@ def zona_pedida(request):
 
 
 class ListadoParcial:
+    acciones_en_listado = ()
+
     @property
     def media(self):
         media = super().media

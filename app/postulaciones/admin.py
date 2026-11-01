@@ -96,6 +96,7 @@ class ApplicationAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, Format
     list_select_related = ["convocatoria", "postulante", "unidad__organizacion"]
     list_per_page = 10
     actions = ["aceptar", "rechazar"]
+    acciones_en_listado = ("aceptar", "rechazar")
     actions_row = ["editar_fila", "aceptar_fila", "rechazar_fila", "notificar", "contactar", "eliminar_fila"]
     actions_detail = ["notificar", "contactar"]
     list_before_template = "postulaciones/admin/filtros_estado.html"

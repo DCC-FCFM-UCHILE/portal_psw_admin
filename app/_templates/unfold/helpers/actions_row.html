@@ -26,7 +26,7 @@
                             <nav id="acciones-fila-{{ action_id }}" aria-label="Acciones de «{{ result.instance }}»" x-bind="menu" x-transition:enter="emergente-entra" x-transition:enter-start="emergente-fuera" x-transition:enter-end="" x-transition:leave="emergente-sale" x-transition:leave-start="" x-transition:leave-end="emergente-fuera" class="origin-top-right bg-white border border-base-200 flex flex-col py-1 rounded-default shadow-lg text-sm top-7 z-50 w-48 dark:bg-base-800 dark:border-base-700" x-cloak>
                                 {% for action in actions %}
                                     {% if action.display_in_dropdown and action.attrs.formmethod %}
-                                        <button type="submit" form="changelist-form" formaction="{% url action.raw_path instance_pk %}" formmethod="post" formnovalidate class="flex cursor-pointer items-center gap-2 mx-1 px-3 py-2 max-h-[30px] rounded-default text-left hover:bg-base-100 dark:hover:bg-base-700 dark:hover:text-base-200">
+                                        <button type="submit" form="changelist-form" formaction="{% url action.raw_path instance_pk %}" formmethod="post" formnovalidate data-en-listado class="flex cursor-pointer items-center gap-2 mx-1 px-3 py-2 max-h-[30px] rounded-default text-left hover:bg-base-100 dark:hover:bg-base-700 dark:hover:text-base-200">
                                             {% if action.icon %}
                                                 <span class="material-symbols-outlined" aria-hidden="true">{{ action.icon }}</span>
                                             {% endif %}

@@ -19,7 +19,7 @@
     <div class="barra-acciones-botones">
         {% for valor, nombre in action_form.fields.action.choices %}
             {% if valor and valor != "delete_selected" %}
-                <button type="submit" name="index" value="{{ action_index|default:0 }}" data-accion="{{ valor }}" class="barra-acciones-boton">{{ nombre }}</button>
+                <button type="submit" name="index" value="{{ action_index|default:0 }}" data-accion="{{ valor }}"{% if valor in cl.model_admin.acciones_en_listado %} data-en-listado{% endif %} class="barra-acciones-boton">{{ nombre }}</button>
             {% endif %}
         {% endfor %}
         {% for valor, nombre in action_form.fields.action.choices %}

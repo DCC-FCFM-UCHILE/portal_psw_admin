@@ -9,3 +9,5 @@
 {% if cl.has_filters and cl|unfold_vertical_filters %}
     <div id="contenido-filtros" hx-swap-oob="innerHTML">{% include "admin/listado/filtros.html" %}</div>
 {% endif %}
+
+<div id="zona-avisos" hx-swap-oob="innerHTML">{% include "admin/avisos.html" %}</div>

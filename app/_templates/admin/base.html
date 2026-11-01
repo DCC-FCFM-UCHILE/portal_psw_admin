@@ -35,11 +35,7 @@
 
             <main id="contenido" tabindex="-1" class="@container grow px-4 pb-8 sm:px-6">
                 {% block messages %}
-                    {% if messages %}
-                        <div id="avisos" tabindex="-1" role="alert" class="{% if not cl.model_admin.list_fullwidth and is_fullwidth != "1" %}container{% endif %} mx-auto {% element_classes 'messages' %}">
-                            {% include "unfold/helpers/messages.html" %}
-                        </div>
-                    {% endif %}
+                    <div id="zona-avisos">{% include "admin/avisos.html" %}</div>
                 {% endblock messages %}
 
                 <div id="content" class="{% if not cl.model_admin.list_fullwidth and is_fullwidth != "1" and not is_popup %}container{% endif %} mx-auto {% block coltype %}colM{% endblock %} {% element_classes 'content' %}">
