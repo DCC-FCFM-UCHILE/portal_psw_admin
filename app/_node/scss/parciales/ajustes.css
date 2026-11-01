@@ -105,12 +105,12 @@ input[type="checkbox"].appearance-none.rounded-full {
 
 @media (width < 40rem) {
   :is(input:not([type="checkbox"], [type="radio"], [type="file"], [type="hidden"], [type="submit"], [type="button"], [type="reset"], [type="range"], [type="color"]), select) {
-    font-size: 1rem;
-    line-height: 1.25rem;
+    font-size: var(--text-sm);
+    line-height: 1.25;
   }
 
   textarea {
-    font-size: 1rem;
+    font-size: var(--text-sm);
   }
 }
 
@@ -292,4 +292,8 @@ input[type="checkbox"].appearance-none.rounded-full {
     animation: none;
     width: 60%;
   }
+}
+
+trix-editor.prose-sm {
+  font-size: var(--text-sm);
 }

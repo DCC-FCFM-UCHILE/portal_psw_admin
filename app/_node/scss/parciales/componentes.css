@@ -59,10 +59,10 @@
     @apply w-full border-collapse text-sm;
   }
   .matriz-permisos-tabla caption {
-    @apply border-b border-base-200 bg-base-50 px-3 py-2 text-left text-[0.6875rem] font-bold uppercase tracking-widest text-gris-medio dark:border-oscuro-elevada dark:bg-oscuro-elevada dark:text-oscuro-suave;
+    @apply border-b border-base-200 bg-base-50 px-3 py-2 text-left text-xs font-bold uppercase tracking-widest text-gris-medio dark:border-oscuro-elevada dark:bg-oscuro-elevada dark:text-oscuro-suave;
   }
   .matriz-permisos-tabla thead :is(th, td) {
-    @apply border-b border-base-200 px-0.5 py-2 text-center text-[0.6875rem] font-semibold text-gris-medio sm:px-1 sm:text-xs dark:border-oscuro-elevada dark:text-oscuro-suave;
+    @apply border-b border-base-200 px-0.5 py-2 text-center text-xs font-semibold text-gris-medio sm:px-1 dark:border-oscuro-elevada dark:text-oscuro-suave;
   }
   .matriz-permisos-tabla :is(tbody th, thead td:first-child) {
     @apply sticky left-0 z-[1] w-full min-w-[7rem] bg-white dark:bg-oscuro-superficie;
@@ -71,7 +71,7 @@
     @apply border-t border-base-200 dark:border-oscuro-elevada;
   }
   .matriz-permisos-tabla tbody th {
-    @apply py-1 pl-2 pr-1 text-left text-[0.8125rem] font-medium text-gris-oscuro sm:px-3 sm:text-sm dark:text-oscuro-texto;
+    @apply py-1 pl-2 pr-1 text-left text-[0.9375rem] font-medium text-gris-oscuro sm:px-3 sm:text-sm dark:text-oscuro-texto;
   }
   .matriz-permisos-tabla tbody td,
   .matriz-permisos-tabla thead th {
@@ -115,7 +115,7 @@
       @apply min-h-14 flex-col gap-1;
     }
     .matriz-permisos-verbo {
-      @apply block text-[0.6875rem] text-gris-medio dark:text-oscuro-suave;
+      @apply block text-xs text-gris-medio dark:text-oscuro-suave;
     }
   }
   .matriz-permisos-nota,
@@ -147,7 +147,7 @@
     @apply inline-flex w-full cursor-pointer items-center justify-center gap-1 whitespace-nowrap rounded-default border border-transparent bg-red-600 px-3 py-2 font-medium text-white tabular-nums hover:bg-red-600/80 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-red-600 lg:w-auto;
   }
   .lateral-grupo {
-    @apply mx-3 mb-1 mt-5 flex items-center gap-2 px-3 text-[0.6875rem] font-bold uppercase tracking-widest text-[#B0B6BF];
+    @apply mx-3 mb-1 mt-5 flex items-center gap-2 px-3 text-xs font-bold uppercase tracking-widest text-[#B0B6BF];
   }
   .lateral-enlace {
     @apply flex min-h-10 items-center gap-3 rounded-md border-l-4 border-transparent px-3 py-2 text-sm text-gray-300 transition-[color,background-color] hover:bg-white/5 hover:text-white;
@@ -254,7 +254,7 @@
     @apply flex items-center justify-between gap-4 rounded-xl border border-base-200 bg-white px-5 py-4 shadow-xs transition-[border-color,transform] hover:-translate-y-px hover:border-rojo motion-reduce:hover:translate-y-0 dark:border-base-800 dark:bg-base-900;
   }
   .indicador-etiqueta {
-    @apply text-[0.6875rem] font-bold uppercase tracking-wider text-gris-medio dark:text-oscuro-suave;
+    @apply text-xs font-bold uppercase tracking-wider text-gris-medio dark:text-oscuro-suave;
   }
   .indicador-valor {
     @apply mt-1 text-2xl font-extrabold tabular-nums text-gris-oscuro dark:text-white;
