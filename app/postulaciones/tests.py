@@ -934,3 +934,11 @@ class AyudasTests(BaseCompartida):
         respuesta = self.client.get(reverse("admin:auth_user_change", args=[otra.pk]))
         self.assertContains(respuesta, 'aria-describedby="id_username_helptext"')
         self.assertContains(respuesta, 'id="id_username_helptext"')
+
+
+class CamposDeFechaTests(BaseCompartida):
+    def test_los_campos_de_fecha_y_hora_van_en_un_grupo_con_nombre(self):
+        otra = User.objects.create_user("otra", password="clave-de-prueba", is_staff=True)
+        respuesta = self.client.get(reverse("admin:auth_user_change", args=[otra.pk]))
+        self.assertContains(respuesta, 'id="id_date_joined_etiqueta"')
+        self.assertContains(respuesta, 'role="group" aria-labelledby="id_date_joined_etiqueta"')
