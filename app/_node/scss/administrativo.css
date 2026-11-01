@@ -492,6 +492,10 @@ html:has(#listado[aria-busy="true"]) :is(#pie-listado, #conteo-cabecera) {
   outline-color: var(--color-oscuro-acento);
 }
 
+.buscador-listado .boton-buscar:focus-visible {
+  outline-offset: -2px;
+}
+
 :is(.lateral, .barra-oscura) :where(a, button, summary, [tabindex]:not([tabindex="-1"])):focus-visible {
   outline-color: #fff;
 }
