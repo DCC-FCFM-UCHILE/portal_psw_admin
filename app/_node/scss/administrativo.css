@@ -233,6 +233,17 @@ html.cargando-vista:has([data-destino]) #ir-al-inicio[aria-current="page"]:not([
   }
 }
 
+@media (forced-colors: active) {
+  #ir-al-inicio:is([aria-current="page"], [data-destino]):not(:focus-visible) {
+    outline: 2px solid CanvasText;
+    outline-offset: -2px;
+  }
+
+  html.cargando-vista:has([data-destino]) #ir-al-inicio[aria-current="page"]:not([data-destino], :focus-visible) {
+    outline: none;
+  }
+}
+
 .silueta-vista.entrando {
   animation: var(--animate-entrada);
 }
