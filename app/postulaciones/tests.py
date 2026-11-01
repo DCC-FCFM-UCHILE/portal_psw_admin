@@ -221,6 +221,27 @@ class ProyectoSinPeriodoTests(BaseCompartida):
         self.assertEqual((proyecto.semestre, proyecto.anio, proyecto.tutor), (None, None, None))
 
 
+class DescripcionConSaltosTests(BaseCompartida):
+    def test_guardar_la_ficha_conserva_los_saltos(self):
+        descripcion = "Primera línea\nSegunda línea"
+        Application.objects.filter(pk=self.postulacion.pk).update(descripcion=descripcion)
+        url = reverse("admin:applications_application_change", args=[self.postulacion.pk])
+        ficha = self.client.get(url).content.decode()
+        self.assertRegex(ficha, r'<textarea name="descripcion"[^>]*>\s*Primera línea\nSegunda línea</textarea>')
+        datos = {
+            "postulante": self.postulacion.postulante_id,
+            "convocatoria": self.convocatoria.pk,
+            "unidad": self.postulacion.unidad_id,
+            "titulo": "Sistema de riego",
+            "descripcion": "x" * 189 + "\r\n" + "y" * 10,
+            "estado": "CR",
+            "_save": "",
+        }
+        self.assertEqual(self.client.post(url, datos).status_code, 302)
+        self.postulacion.refresh_from_db()
+        self.assertEqual(self.postulacion.descripcion, "x" * 189 + "\n" + "y" * 10)
+
+
 class ConvocatoriaTests(BaseCompartida):
     def test_rechaza_fechas_que_se_cruzan(self):
         otra = Announcement(

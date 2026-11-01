@@ -1,3 +1,4 @@
+from django import forms
 from django.core.validators import FileExtensionValidator
 from django.db import models
 
@@ -11,3 +12,9 @@ class FormatosDeArchivo:
             if extensiones:
                 campo.widget.attrs["accept"] = ",".join(extensiones)
         return campo
+
+
+class TextoConSaltos(forms.CharField):
+    def to_python(self, value):
+        texto = super().to_python(value)
+        return texto.replace("\r\n", "\n") if texto else texto

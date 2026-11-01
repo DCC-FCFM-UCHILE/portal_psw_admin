@@ -12,14 +12,14 @@ from unfold.admin import ModelAdmin
 from unfold.contrib.filters.admin import RelatedDropdownFilter
 from unfold.contrib.filters.forms import DropdownForm
 from unfold.decorators import action, display
-from unfold.widgets import UnfoldAdminSelectWidget
+from unfold.widgets import UnfoldAdminSelectWidget, UnfoldAdminTextareaWidget
 
 from core.acciones import AccionesDeFila
 from core.busqueda import BusquedaSinTildes
 from core.ficha import SinGuardarYAgregarOtro
 from core.listado import ListadoParcial, zona_pedida
 from postulaciones import historial
-from postulaciones.admin.comun import FormatosDeArchivo
+from postulaciones.admin.comun import FormatosDeArchivo, TextoConSaltos
 from postulaciones.models import Application
 from postulaciones.views import CorreoPostulanteView
 
@@ -71,6 +71,11 @@ class ApplicationAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, SinGua
     actions_detail = ["notificar", "contactar"]
     list_before_template = "postulaciones/admin/filtros_estado.html"
     change_form_before_template = "postulaciones/admin/resumen_postulacion.html"
+
+    def formfield_for_dbfield(self, db_field, request, **kwargs):
+        if db_field.name == "descripcion":
+            kwargs.update(form_class=TextoConSaltos, widget=UnfoldAdminTextareaWidget(attrs={"rows": 3}))
+        return super().formfield_for_dbfield(db_field, request, **kwargs)
 
     def changelist_view(self, request, extra_context=None):
         respuesta = super().changelist_view(request, extra_context)
