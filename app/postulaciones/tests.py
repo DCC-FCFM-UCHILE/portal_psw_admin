@@ -392,10 +392,12 @@ class RequisitosDeClaveTests(BaseCompartida):
                 self.assertIn("Al menos 8 caracteres.", contenido)
                 self.assertNotIn("La contraseña debe tener al menos", contenido)
                 self.assertIn("Los campos con * son obligatorios.", contenido)
+                self.assertIn('data-obligatorio="Este campo es obligatorio."', contenido)
         self.client.logout()
         contenido = self.client.get(self.enlace_de_recuperacion(self.otra)).content.decode()
         self.assertEqual(contenido.count("data-requisito="), 4)
         self.assertIn("Los campos con * son obligatorios.", contenido)
+        self.assertIn('data-obligatorio="Este campo es obligatorio."', contenido)
 
     def test_la_consulta_corre_los_validadores_de_django(self):
         url = reverse("admin:password_change")

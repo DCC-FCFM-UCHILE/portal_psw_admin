@@ -35,7 +35,8 @@ class ConRequisitos:
         self.mostrar_requisitos(requisitos())
 
     def mostrar_requisitos(self, lista):
-        ayuda = render_to_string("cuentas/requisitos.html", {"requisitos": lista, "no_cumple": NO_CUMPLE})
+        obligatorio = self.fields[self.clave_nueva].error_messages["required"]
+        ayuda = render_to_string("cuentas/requisitos.html", {"requisitos": lista, "no_cumple": NO_CUMPLE, "obligatorio": obligatorio})
         self.fields[self.clave_nueva].help_text = ayuda
         if self.clave_nueva in self._bound_fields_cache:
             self._bound_fields_cache[self.clave_nueva].help_text = ayuda

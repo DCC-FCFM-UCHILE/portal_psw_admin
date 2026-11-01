@@ -9,22 +9,38 @@ const alerta = document.createElement("p");
 alerta.className = "sr-only";
 alerta.setAttribute("role", "alert");
 
-const mostrarError = (campo, lista) => {
+const descripciones = (campo) => (campo.getAttribute("aria-describedby") || "").split(/\s+/).filter(Boolean);
+const textos = (error) => [...error.querySelectorAll("li")].map((li) => [...li.childNodes].filter((nodo) => nodo.nodeType === Node.TEXT_NODE).map((nodo) => nodo.textContent).join("").trim());
+
+const mostrarError = (campo, lista, texto) => {
     const id = `${campo.id}_error`;
-    if (!document.getElementById(id)) {
+    let error = document.getElementById(id);
+    if (!error) {
         const marco = document.createElement("div");
         marco.className = "mt-2 text-xs text-rojo dark:text-oscuro-acento";
-        marco.innerHTML = `<ul class="errorlist" id="${id}"><li><span class="material-symbols-outlined mr-1 select-none align-bottom text-[18px] leading-none" aria-hidden="true">warning</span></li></ul>`;
-        marco.querySelector("li").append(`${lista.dataset.error} `);
+        marco.innerHTML = `<ul class="errorlist" id="${id}"></ul>`;
         lista.closest('[id$="_helptext"]').before(marco);
-        const otras = (campo.getAttribute("aria-describedby") || "").split(/\s+/).filter(Boolean);
-        campo.setAttribute("aria-describedby", [id, ...otras].join(" "));
+        error = marco.firstElementChild;
     }
+    error.innerHTML = '<li><span class="material-symbols-outlined mr-1 select-none align-bottom text-[18px] leading-none" aria-hidden="true">warning</span></li>';
+    error.firstElementChild.append(`${texto} `);
+    campo.setAttribute("aria-describedby", [id, ...descripciones(campo).filter((otra) => otra !== id)].join(" "));
     campo.setAttribute("aria-invalid", "true");
     alerta.textContent = "";
     setTimeout(() => {
-        alerta.textContent = lista.dataset.error;
+        alerta.textContent = texto;
     }, 150);
+};
+
+const quitarError = (campo, lista) => {
+    const id = `${campo.id}_error`;
+    const error = document.getElementById(id);
+    if (!error || !textos(error).every((texto) => texto === lista.dataset.error || texto === lista.dataset.obligatorio)) {
+        return;
+    }
+    error.parentElement.remove();
+    campo.setAttribute("aria-describedby", descripciones(campo).filter((otra) => otra !== id).join(" "));
+    campo.removeAttribute("aria-invalid");
 };
 
 const preparar = (lista) => {
@@ -42,23 +58,29 @@ const preparar = (lista) => {
     let aprobado = false;
     let revisando = false;
 
-    const marcar = (resultado, { forzar = false } = {}) => {
+    const marcar = (resultado) => {
         let cumplidos = 0;
         requisitos.forEach((requisito) => {
             const valor = resultado?.[requisito.dataset.requisito];
-            const clase = valor === true ? "cumple" : valor === false || (resultado && forzar) ? "falla" : "";
+            const clase = valor === true ? "cumple" : valor === false ? "falla" : "";
             cumplidos += clase === "cumple";
             requisito.classList.toggle("cumple", clase === "cumple");
             requisito.classList.toggle("falla", clase === "falla");
             requisito.querySelector(".material-symbols-outlined").textContent = ICONOS[clase];
             requisito.querySelector(".estado").textContent = LECTURA[clase];
         });
-        const nuevo = !resultado || forzar ? "" : cumplidos === requisitos.length ? "La contraseña cumple todos los requisitos." : `Cumple ${cumplidos} de ${requisitos.length} requisitos.`;
-        if (nuevo && nuevo !== resumen && document.activeElement === campo) {
+        const todos = cumplidos === requisitos.length;
+        const nuevo = !resultado ? "" : todos ? "La contraseña cumple todos los requisitos." : `Cumple ${cumplidos} de ${requisitos.length} requisitos.`;
+        if (!nuevo) {
+            estado.textContent = "";
+        } else if (nuevo !== resumen && document.activeElement === campo) {
             estado.textContent = nuevo;
         }
         resumen = nuevo;
-        return cumplidos === requisitos.length;
+        if (resultado && todos) {
+            quitarError(campo, lista);
+        }
+        return todos;
     };
 
     const consultar = async () => {
@@ -90,6 +112,10 @@ const preparar = (lista) => {
             marcar(null);
             return;
         }
+        const error = document.getElementById(`${campo.id}_error`);
+        if (error && textos(error).includes(lista.dataset.obligatorio)) {
+            quitarError(campo, lista);
+        }
         reloj = setTimeout(async () => {
             const resultado = await consultar();
             if (resultado) {
@@ -109,17 +135,25 @@ const preparar = (lista) => {
         if (revisando) {
             return;
         }
-        revisando = true;
         clearTimeout(reloj);
+        if (!campo.value) {
+            pedido?.abort();
+            marcar(null);
+            mostrarError(campo, lista, lista.dataset.obligatorio);
+            campo.focus();
+            document.getElementById(`${campo.id}_error`)?.scrollIntoView({ block: "nearest" });
+            return;
+        }
+        revisando = true;
         const boton = evento.submitter;
         const resultado = await consultar();
         revisando = false;
-        if (!resultado || marcar(resultado, { forzar: !campo.value })) {
+        if (!resultado || marcar(resultado)) {
             aprobado = true;
             formulario.requestSubmit(boton?.form === formulario ? boton : null);
             return;
         }
-        mostrarError(campo, lista);
+        mostrarError(campo, lista, lista.dataset.error);
         campo.focus();
         document.getElementById(`${campo.id}_error`)?.scrollIntoView({ block: "nearest" });
     });

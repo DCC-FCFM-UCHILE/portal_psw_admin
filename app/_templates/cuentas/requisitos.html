@@ -1,5 +1,5 @@
 <p class="font-medium">Requisitos</p>
-<ul class="requisitos-clave" data-requisitos data-error="{{ no_cumple }}">
+<ul class="requisitos-clave" data-requisitos data-error="{{ no_cumple }}" data-obligatorio="{{ obligatorio }}">
     {% for requisito in requisitos %}
         <li data-requisito="{{ requisito.clave }}"{% if requisito.estado %} class="{{ requisito.estado }}"{% endif %}>
             <span class="material-symbols-outlined" aria-hidden="true">{% if requisito.estado == "cumple" %}check_circle{% elif requisito.estado == "falla" %}cancel{% else %}radio_button_unchecked{% endif %}</span>
