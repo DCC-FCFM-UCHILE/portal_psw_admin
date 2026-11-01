@@ -49,6 +49,16 @@ def describir_con(atributos, propia):
 
 
 @register.filter
+def grupos_visibles(navegacion):
+    grupos = []
+    for grupo in navegacion:
+        items = [item for item in grupo.get("items", []) if item.get("has_permission")]
+        if items:
+            grupos.append({**grupo, "items": items})
+    return grupos
+
+
+@register.filter
 def sin_aplicacion(descripcion):
     return str(descripcion).split(" - ", 1)[-1]
 

@@ -837,3 +837,31 @@ class IngresoTests(TestCase):
         respuesta = self.client.get(reverse("admin:applications_application_changelist"), follow=True)
         self.assertContains(respuesta, "Para ver esa página, primero ingresa con tu cuenta.")
         self.assertNotContains(self.client.get(reverse("admin:login")), "Para ver esa página")
+
+
+class InicioYMenuTests(BaseCompartida):
+    def test_el_menu_omite_los_grupos_sin_secciones_permitidas(self):
+        lector = User.objects.create_user("lector", password="clave-de-prueba", is_staff=True)
+        lector.user_permissions.add(Permission.objects.get(codename="view_application"))
+        self.client.force_login(lector)
+        respuesta = self.client.get(reverse("admin:index"))
+        self.assertContains(respuesta, 'class="lateral-grupo">Postulaciones</h2>')
+        self.assertNotContains(respuesta, 'class="lateral-grupo">Proyectos</h2>')
+
+    def test_un_personal_sin_permisos_ve_el_aviso(self):
+        sin_permisos = User.objects.create_user("sin-permisos", password="clave-de-prueba", is_staff=True)
+        self.client.force_login(sin_permisos)
+        respuesta = self.client.get(reverse("admin:index"))
+        self.assertContains(respuesta, "Tu cuenta todavía no tiene permisos en ninguna sección.")
+
+    def test_la_actividad_solo_muestra_lo_que_la_cuenta_puede_ver(self):
+        otra = User.objects.create_user("otra", password="clave-de-prueba")
+        LogEntry.objects.log_actions(user_id=self.docente.pk, queryset=[otra], action_flag=ADDITION)
+        LogEntry.objects.log_actions(user_id=self.docente.pk, queryset=[self.postulacion], action_flag=ADDITION)
+        lector = User.objects.create_user("lector", password="clave-de-prueba", is_staff=True)
+        lector.user_permissions.add(Permission.objects.get(codename="view_application"))
+        self.client.force_login(lector)
+        respuesta = self.client.get(reverse("admin:index"))
+        self.assertContains(respuesta, "Sistema de riego</a>")
+        self.assertNotContains(respuesta, reverse("admin:auth_user_change", args=[otra.pk]))
+        self.assertNotContains(respuesta, "Tu cuenta todavía no tiene permisos")

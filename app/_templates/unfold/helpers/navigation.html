@@ -15,7 +15,7 @@
     </div>
 
     <div id="nav-sidebar-apps" class="h-0 grow overflow-y-auto overflow-x-hidden px-3 pb-4 scrollbar-default-hover">
-        {% for grupo in sidebar_navigation %}
+        {% for grupo in sidebar_navigation|grupos_visibles %}
             {% if grupo.items %}
                 {% if grupo.title %}
                     <h2 id="grupo-menu-{{ forloop.counter }}" class="lateral-grupo">{{ grupo.title }}</h2>

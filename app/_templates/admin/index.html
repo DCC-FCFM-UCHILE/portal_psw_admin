@@ -26,6 +26,10 @@
         {% endif %}
     </div>
 
+    {% if sin_permisos %}
+        <p class="tarjeta mt-6 px-5 py-4 text-sm text-gris-oscuro dark:text-base-200">Tu cuenta todavía no tiene permisos en ninguna sección. Pídeselos a quien administra las cuentas.</p>
+    {% endif %}
+
     {% if tarjetas %}
         <h2 class="sr-only">Resumen</h2>
         <ul role="list" class="mt-6 grid grid-cols-[repeat(auto-fit,minmax(min(14rem,100%),1fr))] gap-4">

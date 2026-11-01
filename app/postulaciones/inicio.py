@@ -17,8 +17,16 @@ def sigue_existiendo(registro):
     return modelo is not None and modelo._default_manager.filter(pk=registro.object_id).exists()
 
 
-def actividad_reciente(cantidad=6):
-    registros = LogEntry.objects.select_related("user", "content_type").order_by("-action_time")[:cantidad]
+def puede_ver(usuario, registro):
+    tipo = registro.content_type
+    return tipo is not None and (
+        usuario.has_perm(f"{tipo.app_label}.view_{tipo.model}") or usuario.has_perm(f"{tipo.app_label}.change_{tipo.model}")
+    )
+
+
+def actividad_reciente(usuario, cantidad=6):
+    recientes = LogEntry.objects.select_related("user", "content_type").order_by("-action_time")[:200]
+    registros = [registro for registro in recientes if puede_ver(usuario, registro)][:cantidad]
     return [
         {
             "quien": registro.user.get_full_name() or registro.user.get_username(),
@@ -90,7 +98,8 @@ def indicadores(request, context):
             "convocatoria_abierta": abierta,
             "convocatoria": convocatoria,
             "tarjetas": tarjetas,
-            "actividad": actividad_reciente(),
+            "actividad": actividad_reciente(usuario),
+            "sin_permisos": not usuario.is_superuser and not usuario.get_all_permissions(),
             "accesos": accesos,
             "titulo_cabecera_secundario": True,
             "title": "Inicio",
