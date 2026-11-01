@@ -1,19 +1,24 @@
-{% load i18n admin_urls %}
+{% load admin_urls %}
 
 {% if cl %}
     {% url cl.opts|admin_urlname:"add" as add_url %}
-    {% blocktranslate with name=cl.opts.verbose_name asvar title %}Add {{ name }}{% endblocktranslate %}
 {% else %}
     {% url opts|admin_urlname:"add" as add_url %}
-    {% blocktranslate with name=opts.verbose_name asvar title %}Add {{ name }}{% endblocktranslate %}
 {% endif %}
 
 {% if add_url and not add %}
     {% if cl.model_admin.show_add_link or adminform.model_admin.show_add_link %}
-        <div class="flex flex-row items-center">
-            <a href="{% add_preserved_filters add_url is_popup to_field %}" class="addlink border border-primary-700 bg-primary-600 flex items-center h-[38px] justify-center -my-1 rounded-default w-[38px] hover:bg-primary-600/80 dark:border-primary-500" title="{{ title }}">
-                <span class="material-symbols-outlined text-white">add</span>
+        {% firstof cl.opts.verbose_name opts.verbose_name as nombre %}
+        {% if cl %}
+            <a href="{% add_preserved_filters add_url is_popup to_field %}" class="addlink boton-primario shrink-0 whitespace-nowrap max-md:size-10 max-md:px-0">
+                <span class="material-symbols-outlined md-18" aria-hidden="true">add</span>
+                <span class="max-md:sr-only">Agregar <span class="max-lg:sr-only">{{ nombre }}</span></span>
             </a>
-        </div>
+        {% else %}
+            <a href="{% add_preserved_filters add_url is_popup to_field %}" class="addlink boton-primario size-10 shrink-0 px-0" title="Agregar {{ nombre }}">
+                <span class="material-symbols-outlined md-18" aria-hidden="true">add</span>
+                <span class="sr-only">Agregar {{ nombre }}</span>
+            </a>
+        {% endif %}
     {% endif %}
 {% endif %}

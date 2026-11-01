@@ -72,6 +72,11 @@ class ListadoTests(BaseCompartida):
         self.assertNotContains(self.client.get(reverse("admin:search"), {"s": "administradora"}), "Administradora")
         self.assertEqual(self.client.get(lista).status_code, 200)
 
+    def test_el_listado_nombra_lo_que_agrega(self):
+        respuesta = self.client.get(reverse("admin:applications_organization_changelist"))
+        self.assertContains(respuesta, f'href="{reverse("admin:applications_organization_add")}"')
+        self.assertContains(respuesta, '>Agregar <span class="max-lg:sr-only">organización</span></span>')
+
     def test_la_alta_no_se_enlaza_a_si_misma(self):
         alta = reverse("admin:applications_organization_add")
         self.assertNotContains(self.client.get(alta), f'href="{alta}"')
