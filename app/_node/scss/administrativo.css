@@ -334,6 +334,96 @@ html:has(#listado[aria-busy="true"]) :is(#pie-listado, #conteo-cabecera) {
   }
 }
 
+#result_list {
+  --fondo-celda-fija: var(--color-white);
+  --borde-celda-fija: var(--color-base-200);
+  --sombra-celda-fija: rgb(0 0 0 / 0.18);
+
+  @variant dark {
+    --fondo-celda-fija: var(--color-base-900);
+    --borde-celda-fija: var(--color-base-700);
+    --sombra-celda-fija: rgb(0 0 0 / 0.6);
+  }
+}
+
+#result_list tbody.bg-base-50 {
+  --capa-alterna: var(--color-base-50);
+
+  @variant dark {
+    --capa-alterna: rgb(255 255 255 / 0.02);
+  }
+}
+
+#result_list .data-row:hover {
+  --capa-puntero: var(--color-base-100);
+
+  @variant dark {
+    --capa-puntero: color-mix(in oklab, var(--color-base-50) 4%, transparent);
+  }
+}
+
+#result_list tr.selected {
+  --capa-seleccion: color-mix(in oklab, var(--color-yellow-200) 10%, transparent);
+
+  @variant dark {
+    --capa-seleccion: color-mix(in oklab, var(--color-white) 3%, transparent);
+  }
+}
+
+#result_list :is(.action-checkbox, .action-checkbox-column) {
+  width: 2.25rem;
+  min-width: 2.25rem;
+}
+
+#result_list :is(.action-checkbox, .action-checkbox-column, .action-checkbox + th, .action-checkbox-column + th, .field-actions_holder, .columna-acciones),
+#result_list tr > th:first-child {
+  position: sticky;
+  z-index: 1;
+  background-color: var(--fondo-celda-fija);
+  background-image:
+    linear-gradient(var(--capa-seleccion, transparent), var(--capa-seleccion, transparent)),
+    linear-gradient(var(--capa-puntero, transparent), var(--capa-puntero, transparent)),
+    linear-gradient(var(--capa-alterna, transparent), var(--capa-alterna, transparent));
+}
+
+#result_list :is(.action-checkbox, .action-checkbox-column),
+#result_list tr > th:first-child {
+  left: 0;
+}
+
+#result_list :is(.action-checkbox + th, .action-checkbox-column + th) {
+  left: 2.25rem;
+}
+
+#result_list :is(.field-actions_holder, .columna-acciones) {
+  right: 0;
+}
+
+.hay-antes #result_list :is(.action-checkbox + th, .action-checkbox-column + th),
+.hay-antes #result_list tr > th:first-child:not(.action-checkbox-column) {
+  box-shadow: inset -1px 0 var(--borde-celda-fija), 6px 0 6px -6px var(--sombra-celda-fija);
+}
+
+.hay-despues #result_list :is(.field-actions_holder, .columna-acciones) {
+  box-shadow: inset 1px 0 var(--borde-celda-fija), -6px 0 6px -6px var(--sombra-celda-fija);
+}
+
+@media (width < 40rem) {
+  #result_list :is(.field-actions_holder, .columna-acciones) {
+    padding-inline: 0.25rem;
+  }
+
+  #result_list tbody tr > :is(.action-checkbox + th, th:first-child),
+  #result_list thead tr > :is(.action-checkbox-column + th, th:first-child):not(.sortable, .action-checkbox-column),
+  #result_list thead tr > :is(.action-checkbox-column + th, th:first-child) .encabezado-orden {
+    padding-left: 0.5rem;
+  }
+
+  #result_list tbody tr > :is(.action-checkbox + th, th:first-child) {
+    padding-right: 0.5rem;
+  }
+}
+
 .silueta-bloque {
   @apply bg-base-200 dark:bg-base-800;
 }

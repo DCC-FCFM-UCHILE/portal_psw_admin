@@ -42,5 +42,9 @@
                 </th>
             {% endif %}
         {% endfor %}
+
+        {% if actions_row %}
+            <th scope="col" class="columna-acciones w-px"><span class="sr-only">Acciones</span></th>
+        {% endif %}
     </tr>
 </thead>

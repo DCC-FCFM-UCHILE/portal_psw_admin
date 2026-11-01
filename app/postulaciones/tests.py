@@ -721,3 +721,9 @@ class MenusDeFilaTests(BaseCompartida):
         respuesta = self.client.get(reverse("admin:applications_application_changelist"))
         self.assertContains(respuesta, 'x-data="menuEmergente"')
         self.assertNotContains(respuesta, "x-anchor")
+
+
+class ColumnasFijasTests(BaseCompartida):
+    def test_la_columna_de_acciones_tiene_encabezado(self):
+        respuesta = self.client.get(reverse("admin:applications_application_changelist"))
+        self.assertContains(respuesta, '<th scope="col" class="columna-acciones w-px"><span class="sr-only">Acciones</span></th>')
