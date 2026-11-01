@@ -317,6 +317,33 @@ class ErroresDeContrasenaTests(BaseCompartida):
         )
 
 
+class ClaveObligatoriaTests(BaseCompartida):
+    def test_el_alta_marca_las_contrasenas_obligatorias(self):
+        contenido = self.client.get(reverse("admin:auth_user_add")).content.decode()
+        for nombre in ("password1", "password2"):
+            with self.subTest(campo=nombre):
+                self.assertIn("required", re.search(rf'<input[^>]*name="{nombre}"[^>]*>', contenido).group())
+                self.assertRegex(contenido, rf'for="id_{nombre}">[^<]*<span class="[^"]*">\*</span></label>')
+
+    def test_el_alta_sin_ingreso_con_contrasena_no_las_pide(self):
+        respuesta = self.client.post(reverse("admin:auth_user_add"), {"username": "sinclave", "usable_password": "false", "_save": "1"})
+        self.assertEqual(respuesta.status_code, 302)
+        self.assertFalse(User.objects.get(username="sinclave").has_usable_password())
+
+    def test_el_alta_con_las_contrasenas_vacias_las_pide(self):
+        respuesta = self.client.post(reverse("admin:auth_user_add"), {"username": "nueva", "usable_password": "true", "_save": "1"})
+        self.assertEqual(set(respuesta.context["adminform"].form.errors), {"password1", "password2"})
+
+    def test_la_contrasena_de_otra_cuenta_es_obligatoria(self):
+        otra = User.objects.create_user("otra", password="clave-de-prueba", is_staff=True)
+        url = reverse("admin:auth_user_password_change", args=[otra.pk])
+        contenido = self.client.get(url).content.decode()
+        self.assertIn("novalidate", re.search(r'<form[^>]*id="user_form"[^>]*>', contenido).group())
+        self.assertIn("required", re.search(r'<input[^>]*name="password1"[^>]*>', contenido).group())
+        self.assertNotIn('name="usable_password"', contenido)
+        self.assertEqual(set(self.client.post(url, {}).context["form"].errors), {"password1", "password2"})
+
+
 class ErrorJuntoAlCampoTests(BaseCompartida):
     def test_el_error_se_lee_y_se_ve_antes_que_la_ayuda(self):
         contenido = self.client.post(reverse("admin:applications_announcement_add"), {"_save": "1"}).content.decode()

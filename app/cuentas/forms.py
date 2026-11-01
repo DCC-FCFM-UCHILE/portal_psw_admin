@@ -36,11 +36,19 @@ class NuevaClaveForm(SinAutofocoConErrores, ErroresEnLaPrimeraClave, ConClasesDe
 
 
 class AltaUsuarioForm(SinAutofocoConErrores, ErroresEnLaPrimeraClave, UserCreationForm):
-    pass
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        sin_clave = self.is_bound and self.data.get("usable_password") == "false"
+        for nombre in ("password1", "password2"):
+            self.fields[nombre].required = not sin_clave
 
 
 class CambioClaveForm(SinAutofocoConErrores, ErroresEnLaPrimeraClave, AdminPasswordChangeForm):
-    pass
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields.pop("usable_password", None)
+        for nombre in ("password1", "password2"):
+            self.fields[nombre].required = True
 
 
 class CambioClavePropiaForm(SinAutofocoConErrores, ErroresEnLaPrimeraClave, AdminOwnPasswordChangeForm):

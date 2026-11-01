@@ -314,6 +314,29 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
+const alternarClaves = (formulario) => {
+    const opcion = formulario.querySelector('input[name="usable_password"]:checked');
+    if (!opcion) {
+        return;
+    }
+    const sinClave = opcion.value === "false";
+    const filas = [...formulario.querySelectorAll(".field-password1, .field-password2")].map((campo) => campo.closest(".form-row"));
+    filas.forEach((fila) => {
+        fila.hidden = sinClave;
+    });
+    opcion.closest(".form-row")?.classList.toggle("last", sinClave);
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll('input[name="usable_password"]').forEach((opcion) => opcion.form && alternarClaves(opcion.form));
+});
+
+document.addEventListener("change", (evento) => {
+    if (evento.target.name === "usable_password" && evento.target.form) {
+        alternarClaves(evento.target.form);
+    }
+});
+
 document.addEventListener("submit", (evento) => {
     evento.target.querySelectorAll?.(".campo-contrasena").forEach((marco) => {
         mostrarContrasena(marco.querySelector("input"), marco.querySelector("button"), false);
