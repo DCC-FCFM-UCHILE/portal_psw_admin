@@ -2,6 +2,7 @@ from django.contrib import admin, messages
 from django.contrib.admin.models import LogEntry
 from django.contrib.admin.utils import unquote
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.db.models import Count
@@ -273,6 +274,14 @@ class ApprovedProjectAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, Mo
         return obj.postulacion.postulante if obj.postulacion else "-"
 
 
+def logo_png_o_jpg(archivo):
+    extension = archivo.name.rsplit(".", 1)[-1].lower()
+    inicio = archivo.read(4)
+    archivo.seek(0)
+    if extension not in {"png", "jpg", "jpeg"} or not inicio.startswith((b"\x89PNG", b"\xff\xd8\xff")):
+        raise ValidationError("El logo tiene que ser una imagen PNG o JPG.")
+
+
 @admin.register(Candidate)
 class CandidateAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, ModelAdmin):
     list_display = ["nombre", "correo", "organizacion"]
@@ -298,6 +307,9 @@ class UnitAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, FormatosDeArc
     def get_form(self, request, obj=None, change=False, **kwargs):
         formulario = super().get_form(request, obj, change, **kwargs)
         formulario.base_fields["nombre"].required = True
+        logo = formulario.base_fields["logo"]
+        logo.validators.append(logo_png_o_jpg)
+        logo.widget.attrs["accept"] = ".png,.jpg,.jpeg"
         return formulario
 
 

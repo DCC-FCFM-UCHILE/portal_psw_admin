@@ -756,8 +756,8 @@ class ColumnasFijasTests(BaseCompartida):
 
 class TextosDeDjangoTests(BaseCompartida):
     def test_la_extension_no_permitida_se_escribe_con_tilde(self):
-        logo = SimpleUploadedFile("logo.txt", b"texto")
-        respuesta = self.client.post(reverse("admin:applications_unit_add"), {"nombre": "Unidad", "logo": logo, "_save": "1"})
+        perfil = SimpleUploadedFile("perfil.txt", b"texto")
+        respuesta = self.client.post(reverse("admin:applications_application_add"), {"archivo": perfil, "_save": "1"})
         self.assertContains(respuesta, "no está permitida")
 
     def test_los_errores_de_django_tutean(self):
@@ -785,6 +785,32 @@ class UnidadesTests(BaseCompartida):
         self.assertEqual(respuesta.status_code, 200)
         self.assertContains(respuesta, "Este campo es obligatorio.")
         self.assertEqual(Unit.objects.count(), antes)
+
+
+class LogoDeUnidadTests(BaseCompartida):
+    def agregar(self, nombre, contenido):
+        logo = SimpleUploadedFile(nombre, contenido)
+        return self.client.post(reverse("admin:applications_unit_add"), {"nombre": "Unidad nueva", "logo": logo, "_save": "1"})
+
+    def test_rechaza_svg(self):
+        respuesta = self.agregar("logo.svg", b'<svg xmlns="http://www.w3.org/2000/svg"></svg>')
+        self.assertContains(respuesta, "El logo tiene que ser una imagen PNG o JPG.")
+        self.assertFalse(Unit.objects.filter(nombre="Unidad nueva").exists())
+
+    def test_rechaza_svg_con_extension_png(self):
+        respuesta = self.agregar("logo.png", b'<svg xmlns="http://www.w3.org/2000/svg"></svg>')
+        self.assertContains(respuesta, "El logo tiene que ser una imagen PNG o JPG.")
+        self.assertFalse(Unit.objects.filter(nombre="Unidad nueva").exists())
+
+    def test_acepta_png_y_jpg(self):
+        for nombre, contenido in [("logo.png", b"\x89PNG\r\n\x1a\n"), ("logo.jpg", b"\xff\xd8\xff\xe0")]:
+            with self.subTest(nombre=nombre):
+                self.assertEqual(self.agregar(nombre, contenido).status_code, 302)
+                Unit.objects.filter(nombre="Unidad nueva").delete()
+
+    def test_el_campo_solo_ofrece_png_y_jpg(self):
+        respuesta = self.client.get(reverse("admin:applications_unit_add"))
+        self.assertContains(respuesta, 'accept=".png,.jpg,.jpeg"')
 
 
 class ArchivosTests(BaseCompartida):
