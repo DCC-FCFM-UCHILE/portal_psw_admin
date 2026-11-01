@@ -80,18 +80,94 @@ document.addEventListener("alpine:init", () => {
     };
 });
 
+const SEPARACION_MENU = 4;
+const MARGEN_MENU = 5;
+
 document.addEventListener("alpine:init", () => {
     Alpine.data("menuEmergente", () => ({
         abierto: false,
+        reubicar: null,
+
+        init() {
+            this.$watch("abierto", (abierto) => (abierto ? this.seguir() : this.soltar()));
+        },
+
+        destroy() {
+            this.soltar();
+        },
+
+        lista() {
+            return document.getElementById(this.$refs.disparador.getAttribute("aria-controls"));
+        },
 
         opciones() {
-            const menu = document.getElementById(this.$refs.disparador.getAttribute("aria-controls"));
+            const menu = this.lista();
             return menu ? [...menu.querySelectorAll("a[href], button")] : [];
+        },
+
+        ubicar() {
+            const menu = this.lista();
+            if (!menu || !this.$refs.disparador.isConnected) {
+                return;
+            }
+            const ancla = this.$refs.disparador.getBoundingClientRect();
+            Object.assign(menu.style, { maxHeight: "", overflowY: "" });
+            const ancho = menu.offsetWidth;
+            const alto = menu.offsetHeight;
+            const limite = window.visualViewport?.height ?? window.innerHeight;
+            const debajo = ancla.bottom + SEPARACION_MENU;
+            const encima = ancla.top - SEPARACION_MENU - alto;
+            const cabeDebajo = debajo + alto <= limite - MARGEN_MENU;
+            const subir = !cabeDebajo && encima >= MARGEN_MENU;
+            const ninguno = !cabeDebajo && !subir;
+            const izquierda = Math.max(MARGEN_MENU, Math.min(ancla.right - ancho, document.documentElement.clientWidth - ancho - MARGEN_MENU));
+            const arriba = ninguno ? Math.max(MARGEN_MENU, Math.min(debajo, limite - MARGEN_MENU - alto)) : subir ? encima : debajo;
+            Object.assign(menu.style, {
+                position: "fixed",
+                left: `${Math.round(izquierda)}px`,
+                top: `${Math.round(arriba)}px`,
+                transformOrigin: subir ? "bottom right" : "top right",
+                maxHeight: ninguno ? `${Math.floor(limite - 2 * MARGEN_MENU)}px` : "",
+                overflowY: ninguno ? "auto" : "",
+            });
+        },
+
+        seguir() {
+            this.soltar();
+            let pendiente = false;
+            this.reubicar = () => {
+                if (pendiente) {
+                    return;
+                }
+                pendiente = true;
+                requestAnimationFrame(() => {
+                    pendiente = false;
+                    this.ubicar();
+                });
+            };
+            document.addEventListener("scroll", this.reubicar, { capture: true, passive: true });
+            window.addEventListener("resize", this.reubicar);
+            window.visualViewport?.addEventListener("resize", this.reubicar);
+            this.$nextTick(() => this.ubicar());
+        },
+
+        soltar() {
+            if (!this.reubicar) {
+                return;
+            }
+            document.removeEventListener("scroll", this.reubicar, { capture: true });
+            window.removeEventListener("resize", this.reubicar);
+            window.visualViewport?.removeEventListener("resize", this.reubicar);
+            this.reubicar = null;
         },
 
         enfocar(indice) {
             const opciones = this.opciones();
-            opciones[(indice + opciones.length) % opciones.length]?.focus();
+            const opcion = opciones[(indice + opciones.length) % opciones.length];
+            opcion?.focus({ preventScroll: true });
+            if (this.lista()?.style.overflowY === "auto") {
+                opcion?.scrollIntoView({ block: "nearest", inline: "nearest" });
+            }
         },
 
         cerrar() {
@@ -106,7 +182,10 @@ document.addEventListener("alpine:init", () => {
             "@click"() {
                 this.abierto = !this.abierto;
                 if (this.abierto) {
-                    this.$nextTick(() => this.enfocar(0));
+                    this.$nextTick(() => {
+                        this.ubicar();
+                        this.enfocar(0);
+                    });
                 }
             },
             "@keydown.escape"() {

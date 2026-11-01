@@ -714,3 +714,10 @@ class ListadoParcialTests(BaseCompartida):
             for zona, plantilla in [("listado", "admin/listado_parcial.html"), ("resultados-listado", "admin/listado_resultados.html")]:
                 with self.subTest(url=url, zona=zona):
                     self.assertTemplateUsed(self.pedir(zona, url), plantilla)
+
+
+class MenusDeFilaTests(BaseCompartida):
+    def test_los_menus_no_quedan_atados_mientras_estan_cerrados(self):
+        respuesta = self.client.get(reverse("admin:applications_application_changelist"))
+        self.assertContains(respuesta, 'x-data="menuEmergente"')
+        self.assertNotContains(respuesta, "x-anchor")

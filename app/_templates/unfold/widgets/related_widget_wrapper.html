@@ -22,8 +22,7 @@
                                      aria-label="Acciones de {{ model }}"
                                      x-cloak
                                      x-transition:enter="emergente-entra" x-transition:enter-start="emergente-fuera" x-transition:enter-end="" x-transition:leave="emergente-sale" x-transition:leave-start="" x-transition:leave-end="emergente-fuera"
-                                     x-bind="menu"
-                                     x-anchor.bottom-end.offset.4="$refs.disparador">
+                                     x-bind="menu">
                                     {% if can_change_related %}
                                         <a class=" related-widget-wrapper-link change-related" id="change_id_{{ name }}" data-href-template="{{ change_related_template_url }}?{{ url_params }}" data-popup="yes" title="{% blocktranslate %}Change selected {{ model }}{% endblocktranslate %}">
                                             <span class="material-symbols-outlined -ml-1.5 text-icon">edit</span> <span class="grow truncate">{% blocktranslate %}Change selected {{ model }}{% endblocktranslate %}</span>
