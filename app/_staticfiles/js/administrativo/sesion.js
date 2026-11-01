@@ -45,6 +45,7 @@ const armar = () => {
     dialogo.innerHTML = `<form method="dialog" class="flex flex-col gap-3">
         <h2 id="dialogo-sesion-titulo" class="text-lg font-semibold"></h2>
         <p id="dialogo-sesion-texto" class="text-sm text-gris-medio dark:text-oscuro-suave"></p>
+        <p id="dialogo-sesion-aviso" role="alert" class="sr-only"></p>
         <div class="mt-3 flex flex-wrap justify-end gap-2"></div>
     </form>`;
     dialogo.addEventListener("close", () => {
@@ -66,17 +67,29 @@ const boton = (texto, clase, accion) => {
     return elemento;
 };
 
+const alertar = (texto) => {
+    const aviso = dialogo.querySelector("#dialogo-sesion-aviso");
+    aviso.textContent = "";
+    setTimeout(() => {
+        aviso.textContent = texto;
+    }, 150);
+};
+
 const mostrar = (titulo, texto, botones) => {
     if (!dialogo) {
         armar();
     }
+    const cambia = dialogo.open && dialogo.querySelector("h2").textContent !== titulo;
     dialogo.querySelector("h2").textContent = titulo;
-    dialogo.querySelector("p").textContent = texto;
+    dialogo.querySelector("#dialogo-sesion-texto").textContent = texto;
     dialogo.querySelector("div").replaceChildren(...botones);
     if (!dialogo.open) {
+        dialogo.querySelector("#dialogo-sesion-aviso").textContent = "";
         origen = document.activeElement;
         dialogo.showModal();
         administrativo.bloquearDesplazamiento();
+    } else if (cambia) {
+        alertar(`${titulo}. ${texto}`);
     }
     botones[0].focus();
 };
@@ -124,7 +137,9 @@ const seguir = async (evento) => {
         programar();
     } catch {
         elegido.disabled = false;
-        dialogo.querySelector("p").textContent = "No se pudo extender la sesión. Revisa la conexión y vuelve a intentarlo.";
+        const error = `No se pudo extender la sesión. Revisa la conexión y vuelve a intentarlo. La sesión termina a las ${hora(vence)}.`;
+        dialogo.querySelector("#dialogo-sesion-texto").textContent = error;
+        alertar(error);
         elegido.focus();
     }
 };
