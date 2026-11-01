@@ -76,6 +76,7 @@ DATABASES = {
         "PASSWORD": get_env_variable("DJANGO_DB_PASSWORD", ""),
         "HOST": get_env_variable("DJANGO_DB_HOST", ""),
         "PORT": get_env_variable("DJANGO_DB_PORT", ""),
+        "TEST": {"NAME": "test_portal_psw_admin"},
     }
 }
 
