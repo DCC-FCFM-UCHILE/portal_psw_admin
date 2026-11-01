@@ -919,3 +919,10 @@ class EmergentesAccesiblesTests(BaseCompartida):
     def test_la_capa_de_las_emergentes_es_un_dialogo(self):
         respuesta = self.client.get(reverse("admin:applications_unit_add"))
         self.assertContains(respuesta, '<div id="capa-emergente" role="dialog" aria-modal="true"')
+
+
+class BuscadorTests(BaseCompartida):
+    def test_el_buscador_es_un_combobox_con_lista(self):
+        respuesta = self.client.get(reverse("admin:index"))
+        self.assertContains(respuesta, 'role="combobox"')
+        self.assertContains(respuesta, "aria-activedescendant")

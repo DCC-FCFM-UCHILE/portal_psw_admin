@@ -3,7 +3,7 @@
 {% if request.user.is_staff %}
     <div class="flex flex-col fixed inset-0 p-4 lg:p-32 z-[1000]" x-data="searchCommand()" x-show="openCommandResults" x-transition:enter="capa-entra" x-transition:enter-start="capa-fuera" x-transition:enter-end="" x-transition:leave="capa-sale" x-transition:leave-start="" x-transition:leave-end="capa-fuera" x-cloak x-on:opencommand.window="handleOpen()" x-on:keydown.window="handleShortcut($event)" x-trap.noautofocus.noreturn="openCommandResults" x-init="let origen = null; $watch('openCommandResults', (abierto) => { if (abierto) { origen = document.activeElement; if (esCajon && sidebarOpen === true) { sidebarOpen = false; origen = document.getElementById('alternar-menu'); } return; } $nextTick(() => ((origen && origen !== document.body && origen.checkVisibility?.()) ? origen : document.getElementById('abrir-busqueda'))?.focus({ preventScroll: true })); })" role="dialog" aria-modal="true" aria-label="Buscar">
         <div class="bg-base-50 dark:bg-base-800 flex flex-col max-w-3xl min-h-0 mx-auto overflow-hidden rounded-default shadow-lg w-full" x-on:click.outside="handleOutsideClick()">
-            <div class="flex flex-row items-center px-4 w-full">
+            <div class="flex flex-row items-center px-4 w-full rounded-default focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-rojo dark:focus-within:outline-white">
                 <span id="command-submit" class="group flex items-center" aria-hidden="true">
                     <span class="block material-symbols-outlined text-xl text-base-400 dark:text-base-500 group-[.htmx-request]:hidden">
                         search
@@ -19,6 +19,11 @@
                     type="search"
                     placeholder="{% trans "Type to search" %}"
                     aria-label="Buscar postulaciones, organizaciones, postulantes y más"
+                    role="combobox"
+                    aria-autocomplete="list"
+                    x-bind:aria-expanded="(totalItems > 0 && hasResponse).toString()"
+                    x-bind:aria-controls="totalItems > 0 && hasResponse ? 'command-results-list' : null"
+                    x-bind:aria-activedescendant="totalItems > 0 && hasResponse && currentIndex > 0 ? 'resultado-busqueda-' + currentIndex : null"
                     class="[&::-webkit-search-cancel-button]:hidden font-medium grow min-w-0 px-2 py-4 placeholder-text-subtle text-important focus:outline-hidden"
                     name="s"
                     id="search-input-command"
@@ -27,15 +32,15 @@
                     x-on:keydown.escape.prevent="handleClear()"
                     x-on:keydown.arrow-down.prevent="nextItem()"
                     x-on:keydown.arrow-up.prevent="prevItem()"
-                    x-on:keydown.meta.enter.prevent="selectItem({% if command_show_history %}true{% else %}false{% endif %}, true)"
-                    x-on:keydown.ctrl.enter.prevent="selectItem({% if command_show_history %}true{% else %}false{% endif %}, true)"
+                    x-on:keydown.meta.enter.prevent="currentIndex > 0 && selectItem({% if command_show_history %}true{% else %}false{% endif %}, true)"
+                    x-on:keydown.ctrl.enter.prevent="currentIndex > 0 && selectItem({% if command_show_history %}true{% else %}false{% endif %}, true)"
                     x-on:keydown.meta.k.prevent="handleOpen()"
                     x-on:keydown.ctrl.k.prevent="handleOpen()"
-                    x-on:keydown.enter.prevent="if (!$event.metaKey && !$event.ctrlKey) selectItem({% if command_show_history %}true{% else %}false{% endif %}, false)"
+                    x-on:keydown.enter.prevent="if (!$event.metaKey && !$event.ctrlKey && currentIndex > 0) selectItem({% if command_show_history %}true{% else %}false{% endif %}, false)"
                     hx-get="{% url "admin:search" %}"
                     hx-trigger="keyup changed delay:500ms"
                     hx-select="#command-results-list"
-                    hx-select-oob="#command-results-note"
+                    hx-select-oob="#command-results-note:innerHTML"
                     hx-target="#command-results">
 
                 <button type="button" class="flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-md text-icon-action" x-on:click="handleClear()" aria-label="Cerrar la búsqueda">
@@ -44,7 +49,7 @@
             </div>
 
             <div class="bg-white border border-b-0 border-base-200 flex flex-col grow -mx-px min-h-0 rounded-default dark:border-base-700 dark:bg-white/[.04]">
-                <div class="grow h-full overflow-y-auto scrollbar-default" x-on:htmx:after-swap="handleContentLoaded($event)">
+                <div class="grow h-full overflow-y-auto scrollbar-default" x-on:htmx:after-swap="handleContentLoaded($event); if (hasResponse && totalItems > 0 && currentIndex === 0) currentIndex = 1">
                     <div id="command-results"></div>
 
                     {% if command_show_history %}
