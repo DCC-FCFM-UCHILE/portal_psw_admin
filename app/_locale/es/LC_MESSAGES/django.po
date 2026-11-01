@@ -194,10 +194,10 @@ msgid "You don’t have permission to view or edit anything."
 msgstr "Tu cuenta no tiene permisos para ver ni editar nada."
 
 msgid "After you've created a user, you’ll be able to edit more user options."
-msgstr "Después de crear el usuario podrás editar el resto de sus datos."
+msgstr "Después de crear el usuario podrás editar el resto de sus datos. Los campos con * son obligatorios."
 
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
-msgstr "Escribe una contraseña nueva para <strong>%(username)s</strong>."
+msgstr "Escribe una contraseña nueva para <strong>%(username)s</strong>. Los campos con * son obligatorios."
 
 msgid "Change password"
 msgstr "Cambiar la contraseña"
@@ -281,7 +281,7 @@ msgid "Your password was changed."
 msgstr "Tu contraseña se cambió."
 
 msgid "Please enter your old password, for security’s sake, and then enter your new password twice so we can verify you typed it in correctly."
-msgstr "Por seguridad, escribe tu contraseña actual y después la nueva dos veces, para confirmar que quedó bien escrita."
+msgstr "Por seguridad, escribe tu contraseña actual y después la nueva dos veces, para confirmar que quedó bien escrita. Los campos con * son obligatorios."
 
 msgid "No data"
 msgstr "Sin datos"
