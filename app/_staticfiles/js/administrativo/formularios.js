@@ -269,4 +269,53 @@ if (!CSS.supports("field-sizing", "content")) {
     });
     addEventListener("resize", () => requestAnimationFrame(ajustarTodas));
 }
+
+const estadoContrasena = document.createElement("p");
+estadoContrasena.className = "sr-only";
+estadoContrasena.setAttribute("aria-live", "polite");
+
+const nombreDelCampo = (campo) => {
+    const texto = campo.labels?.[0]?.textContent.replace("*", "").trim() || "contraseña";
+    return texto.charAt(0).toLowerCase() + texto.slice(1);
+};
+
+const mostrarContrasena = (campo, boton, visible) => {
+    campo.type = visible ? "text" : "password";
+    boton.querySelector(".material-symbols-outlined").textContent = visible ? "visibility_off" : "visibility";
+    boton.querySelector(".texto").textContent = visible ? "Ocultar" : "Mostrar";
+    boton.setAttribute("aria-label", `${visible ? "Ocultar" : "Mostrar"} ${nombreDelCampo(campo)}`);
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+    const campos = document.querySelectorAll('input[type="password"]');
+    if (!campos.length) {
+        return;
+    }
+    document.body.append(estadoContrasena);
+    campos.forEach((campo) => {
+        campo.spellcheck = false;
+        campo.setAttribute("autocapitalize", "none");
+        const marco = document.createElement("div");
+        marco.className = "campo-contrasena";
+        const boton = document.createElement("button");
+        boton.type = "button";
+        boton.className = "boton-campo";
+        boton.setAttribute("aria-controls", campo.id);
+        boton.innerHTML = '<span class="material-symbols-outlined md-18" aria-hidden="true">visibility</span><span class="texto"></span>';
+        campo.replaceWith(marco);
+        marco.append(campo, boton);
+        mostrarContrasena(campo, boton, false);
+        boton.addEventListener("click", () => {
+            const visible = campo.type === "password";
+            mostrarContrasena(campo, boton, visible);
+            estadoContrasena.textContent = visible ? "Contraseña visible" : "Contraseña oculta";
+        });
+    });
+});
+
+document.addEventListener("submit", (evento) => {
+    evento.target.querySelectorAll?.(".campo-contrasena").forEach((marco) => {
+        mostrarContrasena(marco.querySelector("input"), marco.querySelector("button"), false);
+    });
+}, true);
 })();

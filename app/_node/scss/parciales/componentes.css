@@ -18,6 +18,15 @@
   .dark tr.form-row:has(.delete:checked) td.field-tabular:first-of-type .flex-col::after {
     color: var(--color-oscuro-acento);
   }
+  .campo-contrasena {
+    @apply flex w-full max-w-2xl items-stretch gap-2;
+  }
+  .campo-contrasena > input {
+    @apply min-w-0 flex-1;
+  }
+  .campo-contrasena > .boton-campo {
+    @apply h-auto min-h-[38px];
+  }
   .lateral {
     @apply bg-gris-oscuro text-gray-300 dark:bg-oscuro-cabecera;
   }
