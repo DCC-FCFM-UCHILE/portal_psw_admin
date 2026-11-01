@@ -1,11 +1,10 @@
-from django.conf import settings
-from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, re_path
 from django.utils import timezone
 from django.views.decorators.cache import cache_control
 from django.views.decorators.http import last_modified
 
+from core.archivos import entregar
 from core.rutas import redirigir_antigua, traducir
 from cuentas import views
 from interfaz.views import SiluetasView
@@ -26,10 +25,8 @@ urlpatterns = [
     path("cambiar-contrasena/", admin.site.admin_view(views.CambiarClaveView.as_view())),
     path("sesion/", views.SesionView.as_view(), name="sesion"),
     path("jsi18n/", admin.site.admin_view(catalogo, cacheable=True)),
+    path("archivos/<path:nombre>", admin.site.admin_view(entregar), name="archivo"),
 ]
-
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 urlpatterns += [
     path("", (traducir(admin.site.get_urls()), "admin", admin.site.name)),

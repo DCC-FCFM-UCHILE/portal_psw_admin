@@ -13,6 +13,7 @@ from django.contrib.sessions.models import Session
 from django.contrib.staticfiles import finders
 from django.core import mail
 from django.core.exceptions import ValidationError
+from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
@@ -1734,3 +1735,68 @@ class TituloDeBorradoTests(BaseCompartida):
         otra = User.objects.create_user("otra", password="clave-de-prueba", is_staff=True)
         respuesta = self.client.get(reverse("admin:auth_user_delete", args=[otra.pk]))
         self.assertContains(respuesta, "Eliminar «otra»</h1>")
+
+
+class EntregaDeArchivosTests(BaseCompartida):
+    def contenido(self, respuesta):
+        return b"".join(respuesta.streaming_content)
+
+    def test_el_enlace_del_perfil_pasa_por_el_administrativo(self):
+        self.assertTrue(self.postulacion.archivo.url.startswith("/archivos/"))
+
+    def test_entrega_el_perfil_con_sesion(self):
+        respuesta = self.client.get(self.postulacion.archivo.url)
+        self.assertEqual(respuesta.status_code, 200)
+        self.assertEqual(self.contenido(respuesta), b"%PDF-1.4")
+        self.assertEqual(respuesta["Content-Type"], "application/pdf")
+        self.assertTrue(respuesta["Content-Disposition"].startswith("inline"))
+        self.assertIn("no-store", respuesta["Cache-Control"])
+
+    def test_sin_sesion_manda_al_ingreso(self):
+        self.client.logout()
+        respuesta = self.client.get(self.postulacion.archivo.url)
+        self.assertEqual(respuesta.status_code, 302)
+        self.assertIn(reverse("admin:login"), respuesta["Location"])
+
+    def test_sin_permiso_de_ver_la_postulacion_no_lo_entrega(self):
+        User.objects.create_user("sin-permisos", password="clave-de-prueba", is_staff=True)
+        self.client.login(username="sin-permisos", password="clave-de-prueba")
+        self.assertEqual(self.client.get(self.postulacion.archivo.url).status_code, 404)
+
+    def test_con_permiso_de_ver_lo_entrega(self):
+        usuario = User.objects.create_user("lectora", password="clave-de-prueba", is_staff=True)
+        usuario.user_permissions.add(Permission.objects.get(codename="view_application"))
+        self.client.login(username="lectora", password="clave-de-prueba")
+        self.assertEqual(self.client.get(self.postulacion.archivo.url).status_code, 200)
+
+    def test_un_archivo_que_no_es_de_ningun_registro_no_se_entrega(self):
+        nombre = default_storage.save("suelto.pdf", SimpleUploadedFile("suelto.pdf", b"%PDF-1.4"))
+        self.assertEqual(self.client.get(f"/archivos/{nombre}").status_code, 404)
+
+    def test_una_ruta_fuera_de_media_no_se_entrega(self):
+        Application.objects.filter(pk=self.postulacion.pk).update(archivo="../../etc/passwd")
+        self.assertEqual(self.client.get("/archivos/../../etc/passwd").status_code, 404)
+
+    def test_un_registro_sin_su_archivo_en_disco_da_404(self):
+        Application.objects.filter(pk=self.postulacion.pk).update(archivo="no-esta.pdf")
+        self.assertEqual(self.client.get("/archivos/no-esta.pdf").status_code, 404)
+
+    def test_el_logo_png_se_muestra_y_el_svg_se_descarga(self):
+        unidad = self.postulacion.unidad
+        unidad.logo = SimpleUploadedFile("logo.png", b"\x89PNG\r\n\x1a\n")
+        unidad.save()
+        respuesta = self.client.get(unidad.logo.url)
+        self.assertEqual(respuesta["Content-Type"], "image/png")
+        self.assertTrue(respuesta["Content-Disposition"].startswith("inline"))
+        unidad.logo = SimpleUploadedFile("logo.svg", b"<svg xmlns='http://www.w3.org/2000/svg'/>")
+        unidad.save()
+        respuesta = self.client.get(unidad.logo.url)
+        self.assertTrue(respuesta["Content-Disposition"].startswith("attachment"))
+
+    def test_entrega_los_documentos_del_convenio(self):
+        convenio = self.convocatoria.convenio
+        convenio.perfil_de_proyecto = SimpleUploadedFile("perfil.docx", b"PK")
+        convenio.save()
+        respuesta = self.client.get(convenio.perfil_de_proyecto.url)
+        self.assertEqual(respuesta.status_code, 200)
+        self.assertTrue(respuesta["Content-Disposition"].startswith("attachment"))

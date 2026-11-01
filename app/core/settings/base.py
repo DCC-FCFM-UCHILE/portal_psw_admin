@@ -106,7 +106,7 @@ STATIC_URL = "static/"
 STATIC_ROOT = get_env_variable("DJANGO_STATIC_ROOT", "/static")
 STATICFILES_DIRS = [BASE_DIR / "_staticfiles"]
 
-MEDIA_URL = "media/"
+MEDIA_URL = "archivos/"
 MEDIA_ROOT = get_env_variable("DJANGO_MEDIA_ROOT", "/media")
 
 
