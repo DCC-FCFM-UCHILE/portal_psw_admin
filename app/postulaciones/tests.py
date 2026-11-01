@@ -1,7 +1,9 @@
 import datetime
 from unittest import mock
 
+from django.contrib.admin.models import ADDITION, LogEntry
 from django.contrib.auth.models import Group, Permission, User
+from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -93,6 +95,23 @@ class ListadoTests(BaseCompartida):
     def test_el_buscador_del_listado_ocupa_el_ancho_disponible(self):
         respuesta = self.client.get(reverse("admin:applications_organization_changelist"))
         self.assertContains(respuesta, '<div id="toolbar" class="sm:grow lg:grow-0">')
+
+    def test_la_actividad_no_enlaza_registros_borrados(self):
+        borrada = Organization.objects.create(rut="1-9", nombre="Organización borrada")
+        for objeto in [borrada, self.postulacion]:
+            LogEntry.objects.create(
+                user=self.docente,
+                content_type=ContentType.objects.get_for_model(objeto),
+                object_id=str(objeto.pk),
+                object_repr=str(objeto),
+                action_flag=ADDITION,
+            )
+        enlace_borrada = reverse("admin:applications_organization_change", args=[borrada.pk])
+        borrada.delete()
+        respuesta = self.client.get(reverse("admin:index"))
+        self.assertContains(respuesta, "Organización borrada")
+        self.assertNotContains(respuesta, f'href="{enlace_borrada}"')
+        self.assertContains(respuesta, f'href="{reverse("admin:applications_application_change", args=[self.postulacion.pk])}"')
 
 
 class AccionesTests(BaseCompartida):

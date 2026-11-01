@@ -14,6 +14,11 @@ def convocatoria_actual():
     return abierta, abierta or Announcement.objects.first()
 
 
+def sigue_existiendo(registro):
+    modelo = registro.content_type.model_class() if registro.content_type else None
+    return modelo is not None and modelo._default_manager.filter(pk=registro.object_id).exists()
+
+
 def actividad_reciente(cantidad=6):
     registros = LogEntry.objects.select_related("user", "content_type").order_by("-action_time")[:cantidad]
     return [
@@ -22,7 +27,7 @@ def actividad_reciente(cantidad=6):
             "accion": ACCIONES.get(registro.action_flag, "modificó"),
             "tipo": registro.content_type.name if registro.content_type else "",
             "objeto": registro.object_repr,
-            "enlace": registro.get_admin_url() if registro.action_flag != DELETION else "",
+            "enlace": registro.get_admin_url() if registro.action_flag != DELETION and sigue_existiendo(registro) else "",
             "cuando": registro.action_time,
         }
         for registro in registros
