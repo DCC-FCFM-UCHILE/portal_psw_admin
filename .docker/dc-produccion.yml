@@ -14,7 +14,7 @@ services:
         command: [ "sh", "-c", "python manage.py collectstatic --noinput && gunicorn --workers=2 --threads=4 --worker-class=gthread --worker-tmp-dir /dev/shm --env SCRIPT_NAME=/portal-admin --bind :8000 core.wsgi" ]
         volumes:
             - /home/instalar/static/portal-admin-psw/:/static/:rw
-            - /home/instalar/media/portal-admin-psw/:/media/:rw
+            - /home/instalar/media/portalpsw2/:/media/:rw
             - /home/instalar/logs/portal-admin-psw:/logs:rw
             - /etc/timezone:/etc/timezone:ro
             - /etc/localtime:/etc/localtime:ro
