@@ -1,6 +1,0 @@
-[flake8]
-max-line-length = 140
-exclude = 
-    __pycache__,
-    core/settings/*,
-ignore = E501,W503

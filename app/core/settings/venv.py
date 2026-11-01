@@ -1,4 +1,4 @@
-from core.settings.base import *  # noqa: F401,F403
+from core.settings.base import *  # noqa: F403
 
 DEBUG = True
 

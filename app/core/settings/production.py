@@ -1,5 +1,5 @@
 from core.functions import get_env_variable
-from core.settings.base import *  # noqa: F401,F403
+from core.settings.base import *  # noqa: F403
 
 DEBUG = False
 

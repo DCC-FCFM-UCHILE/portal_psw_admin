@@ -3,9 +3,7 @@
 django-debug-toolbar    
 django-extensions     
 
-black
-isort
-flake8
+ruff
 bandit
 
 pytest

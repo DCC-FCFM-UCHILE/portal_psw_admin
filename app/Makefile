@@ -8,11 +8,12 @@ migrar:
 	python manage.py migrate
 
 formato:
-	black .
-	isort .
+	ruff check --select I --fix .
+	ruff format .
 
 revisar:
-	flake8 .
+	ruff check .
+	ruff format --check .
 
 seguridad:
 	bandit -r core cuentas convenios postulaciones -x postulaciones/tests.py
