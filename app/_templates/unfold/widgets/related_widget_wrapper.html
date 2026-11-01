@@ -17,35 +17,39 @@
                             </button>
 
                             <template x-teleport="body">
-                                <nav class="origin-top-right bg-white border border-base-200 flex flex-col py-1 rounded-default shadow-lg top-7 z-50 w-56 dark:bg-base-800 dark:border-base-700 *:opacity-50 *:[&[href]]:opacity-100 *:flex *:items-center *:gap-2 *:mx-1 *:px-3 *:py-2 *:max-h-[30px] *:truncate *:rounded-default *:hover:bg-base-100 *:dark:hover:bg-base-700 *:dark:hover:text-base-200"
+                                <nav class="origin-top-right bg-white border border-base-200 flex flex-col py-1 rounded-default shadow-lg top-7 z-50 w-56 dark:bg-base-800 dark:border-base-700"
                                      id="related-widget-wrapper-{{ name }}"
                                      aria-label="Acciones de {{ model }}"
                                      x-cloak
                                      x-transition:enter="emergente-entra" x-transition:enter-start="emergente-fuera" x-transition:enter-end="" x-transition:leave="emergente-sale" x-transition:leave-start="" x-transition:leave-end="emergente-fuera"
                                      x-bind="menu">
-                                    {% if can_change_related %}
-                                        <a class=" related-widget-wrapper-link change-related" id="change_id_{{ name }}" data-href-template="{{ change_related_template_url }}?{{ url_params }}" data-popup="yes" title="{% blocktranslate %}Change selected {{ model }}{% endblocktranslate %}">
-                                            <span class="material-symbols-outlined -ml-1.5 text-icon">edit</span> <span class="grow truncate">{% blocktranslate %}Change selected {{ model }}{% endblocktranslate %}</span>
-                                        </a>
-                                    {% endif %}
+                                    {% with opcion="flex items-center gap-2 mx-1 px-3 py-2 max-h-[30px] truncate rounded-default opacity-50 [&[href]]:opacity-100 hover:bg-base-100 dark:hover:bg-base-700 dark:hover:text-base-200" %}
+                                        {% if can_view_related %}
+                                            <a role="link" class="{{ opcion }} related-widget-wrapper-link view-related" id="view_id_{{ name }}" data-href-template="{{ change_related_template_url }}?{{ view_related_url_params }}">
+                                                <span class="material-symbols-outlined -ml-1.5 text-icon">visibility</span> <span class="grow truncate">{% blocktranslate %}View selected {{ model }}{% endblocktranslate %}</span>
+                                            </a>
+                                        {% endif %}
 
-                                    {% if can_add_related %}
-                                        <a class="related-widget-wrapper-link add-related" data-popup="yes" id="add_id_{{ name }}" href="{{ add_related_url }}?{{ url_params }}" title="{% blocktranslate %}Add another {{ model }}{% endblocktranslate %}">
-                                            <span class="material-symbols-outlined -ml-1.5 text-icon">add</span> <span class="grow truncate">{% blocktranslate %}Add another {{ model }}{% endblocktranslate %}</span>
-                                        </a>
-                                    {% endif %}
+                                        {% if can_change_related %}
+                                            <a role="link" class="{{ opcion }} related-widget-wrapper-link change-related" id="change_id_{{ name }}" data-href-template="{{ change_related_template_url }}?{{ url_params }}" data-popup="yes">
+                                                <span class="material-symbols-outlined -ml-1.5 text-icon">edit</span> <span class="grow truncate">{% blocktranslate %}Change selected {{ model }}{% endblocktranslate %}</span>
+                                            </a>
+                                        {% endif %}
 
-                                    {% if can_view_related %}
-                                        <a class="related-widget-wrapper-link view-related" id="view_id_{{ name }}" data-href-template="{{ change_related_template_url }}?{{ view_related_url_params }}" title="{% blocktranslate %}View selected {{ model }}{% endblocktranslate %}">
-                                            <span class="material-symbols-outlined -ml-1.5 text-icon">visibility</span> <span class="grow truncate">{% blocktranslate %}View selected {{ model }}{% endblocktranslate %}</span>
-                                        </a>
-                                    {% endif %}
+                                        {% if can_add_related %}
+                                            <a class="{{ opcion }} related-widget-wrapper-link add-related" data-popup="yes" id="add_id_{{ name }}" href="{{ add_related_url }}?{{ url_params }}">
+                                                <span class="material-symbols-outlined -ml-1.5 text-icon">add</span> <span class="grow truncate">{% blocktranslate %}Add another {{ model }}{% endblocktranslate %}</span>
+                                            </a>
+                                        {% endif %}
 
-                                    {% if can_delete_related %}
-                                        <a class="related-widget-wrapper-link delete-related text-rojo hover:text-rojo dark:!text-red-300 dark:hover:!text-red-300" id="delete_id_{{ name }}" data-href-template="{{ delete_related_template_url }}?{{ url_params }}" data-popup="yes" title="{% blocktranslate %}Delete selected {{ model }}{% endblocktranslate %}">
-                                            <span class="material-symbols-outlined -ml-1.5 text-icon text-rojo dark:text-red-300">delete</span> <span class="grow truncate">{% blocktranslate %}Delete selected {{ model }}{% endblocktranslate %}</span>
-                                        </a>
-                                    {% endif %}
+                                        {% if can_delete_related %}
+                                            <div class="order-last{% if can_view_related or can_change_related or can_add_related %} mt-1 border-t border-base-200 pt-1 dark:border-base-700{% endif %}">
+                                                <a role="link" class="{{ opcion }} related-widget-wrapper-link delete-related text-rojo hover:text-rojo dark:!text-red-300 dark:hover:!text-red-300" id="delete_id_{{ name }}" data-href-template="{{ delete_related_template_url }}?{{ url_params }}" data-popup="yes">
+                                                    <span class="material-symbols-outlined -ml-1.5 text-icon text-rojo dark:text-red-300">delete</span> <span class="grow truncate">{% blocktranslate %}Delete selected {{ model }}{% endblocktranslate %}</span>
+                                                </a>
+                                            </div>
+                                        {% endif %}
+                                    {% endwith %}
                                 </nav>
                             </template>
                         </div>

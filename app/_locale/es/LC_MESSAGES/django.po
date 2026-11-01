@@ -470,16 +470,16 @@ msgid "Toggle password visibility"
 msgstr "Mostrar u ocultar la contraseña"
 
 msgid "Change selected %(model)s"
-msgstr "Editar la selección (%(model)s)"
+msgstr "Editar %(model)s"
 
 msgid "Add another %(model)s"
 msgstr "Agregar %(model)s"
 
 msgid "View selected %(model)s"
-msgstr "Ver la selección (%(model)s)"
+msgstr "Ver %(model)s"
 
 msgid "Delete selected %(model)s"
-msgstr "Eliminar la selección (%(model)s)"
+msgstr "Eliminar %(model)s"
 
 msgid "Add row"
 msgstr "Agregar una fila"

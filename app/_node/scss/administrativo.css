@@ -981,7 +981,7 @@ input[type="checkbox"].appearance-none.rounded-full {
     @apply bg-transparent hover:bg-white/20;
   }
   [data-peligro] {
-    @apply text-rojo dark:text-red-400;
+    @apply text-rojo! dark:text-red-300!;
   }
   .boton-borrado-definitivo {
     @apply inline-flex w-full cursor-pointer items-center justify-center gap-1 whitespace-nowrap rounded-default border border-transparent bg-red-600 px-3 py-2 font-medium text-white tabular-nums hover:bg-red-600/80 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-red-600 lg:w-auto;

@@ -34,6 +34,9 @@
                                             <span class="grow truncate">{{ action.title }}</span>
                                         </button>
                                     {% elif action.display_in_dropdown and not propia or action.display_in_dropdown and action.raw_path != "admin:auth_user_eliminar_fila" %}
+                                        {% if "eliminar_fila" in action.raw_path and not forloop.first %}
+                                            <div class="my-1 border-t border-base-200 dark:border-base-700" aria-hidden="true"></div>
+                                        {% endif %}
                                         <a href="{% url action.raw_path instance_pk %}"
                                            {% if action.dialog %}
                                                hx-get="{% url action.raw_path instance_pk %}"
