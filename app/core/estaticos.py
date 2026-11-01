@@ -8,6 +8,6 @@ class ConVersion(StaticFilesStorage):
     def url(self, name):
         url = super().url(name)
         ruta = finders.find(name)
-        if ruta:
+        if ruta and not name.endswith(".woff2"):
             url += f"?v={int(os.path.getmtime(ruta))}"
         return url

@@ -4,6 +4,7 @@ from unittest import mock
 from django.core.exceptions import ImproperlyConfigured
 from django.test import SimpleTestCase, TestCase
 
+from core.estaticos import ConVersion
 from core.functions import get_env_variable
 
 
@@ -33,3 +34,11 @@ class VariablesDeEntornoTests(SimpleTestCase):
     def test_opcional_vacia_toma_el_valor_por_omision(self):
         with mock.patch.dict(os.environ, {"PRUEBA_OPCIONAL": ""}):
             self.assertEqual(get_env_variable("PRUEBA_OPCIONAL", "por omisión"), "por omisión")
+
+
+class VersionDeEstaticosTests(SimpleTestCase):
+    def test_las_fuentes_van_sin_version_para_calzar_con_la_precarga(self):
+        estaticos = ConVersion()
+        self.assertEqual(estaticos.url("fuentes/iconos.woff2"), "/static/fuentes/iconos.woff2")
+        self.assertEqual(estaticos.url("vendor/inter/inter-latin-wght-normal.woff2"), "/static/vendor/inter/inter-latin-wght-normal.woff2")
+        self.assertIn("?v=", estaticos.url("js/administrativo/tema.js"))
