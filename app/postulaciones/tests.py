@@ -987,6 +987,21 @@ class TextosDeDjangoTests(BaseCompartida):
         self.assertContains(respuesta, "Escribe un correo válido")
         self.assertNotContains(respuesta, "Introduzca")
 
+    def test_los_errores_de_contrasena_tutean(self):
+        respuesta = self.client.post(
+            reverse("admin:auth_user_password_change", args=[self.docente.pk]),
+            {"password1": "docente", "password2": "docente", "usable_password": "true"},
+        )
+        self.assertContains(respuesta, "La contraseña se parece demasiado a un dato de la cuenta (nombre de usuario).")
+        self.assertContains(respuesta, "La contraseña es muy corta: debe tener al menos 8 caracteres.")
+        respuesta = self.client.post(
+            reverse("admin:auth_user_password_change", args=[self.docente.pk]),
+            {"password1": "12345678", "password2": "12345678", "usable_password": "true"},
+        )
+        self.assertContains(respuesta, "Es una contraseña de uso común. Elige otra.")
+        self.assertContains(respuesta, "La contraseña no puede tener solo números.")
+        self.assertNotContains(respuesta, "Esta contraseña")
+
     def test_las_fechas_de_convocatoria_indican_el_formato(self):
         respuesta = self.client.get(reverse("admin:applications_announcement_add"))
         self.assertContains(respuesta, "Día/mes/año, por ejemplo 15/03/2027.", count=2)

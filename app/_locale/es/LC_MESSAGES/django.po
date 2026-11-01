@@ -520,6 +520,22 @@ msgid_plural "Your password must contain at least %(min_length)d characters."
 msgstr[0] "La contraseña debe tener al menos %(min_length)d carácter."
 msgstr[1] "La contraseña debe tener al menos %(min_length)d caracteres."
 
+#, python-format
+msgid "This password is too short. It must contain at least %d character."
+msgid_plural "This password is too short. It must contain at least %d characters."
+msgstr[0] "La contraseña es muy corta: debe tener al menos %d carácter."
+msgstr[1] "La contraseña es muy corta: debe tener al menos %d caracteres."
+
+#, python-format
+msgid "The password is too similar to the %(verbose_name)s."
+msgstr "La contraseña se parece demasiado a un dato de la cuenta (%(verbose_name)s)."
+
+msgid "This password is too common."
+msgstr "Es una contraseña de uso común. Elige otra."
+
+msgid "This password is entirely numeric."
+msgstr "La contraseña no puede tener solo números."
+
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "La contraseña actual no es correcta. Escríbela de nuevo."
 
