@@ -276,7 +276,7 @@ const anotarParaDeshacer = (formulario, boton) => {
     porDeshacer = { objetivo: accion === "aceptar" ? "AC" : "RE", filas, seleccion };
 };
 
-const devolver = async (fila) => {
+const devolver = async (fila, objetivo) => {
     const pagina = await fetch(fila.url, { credentials: "same-origin" });
     if (!pagina.ok) {
         throw new Error(pagina.status);
@@ -285,6 +285,9 @@ const devolver = async (fila) => {
     const ficha = documento.querySelector('form[id$="_form"][method="post"]');
     if (!ficha) {
         throw new Error("sin formulario");
+    }
+    if (ficha.querySelector('[name="estado"]')?.value !== objetivo || ficha.querySelector('[name="fue_notificada"]')?.checked) {
+        throw new Error("cambió");
     }
     const datos = new FormData(ficha);
     datos.set("estado", fila.estado);
@@ -302,12 +305,17 @@ const devolver = async (fila) => {
 const deshacer = async (datos, cambiadas, boton) => {
     boton.disabled = true;
     boton.textContent = "Deshaciendo…";
-    const resultados = await Promise.allSettled(cambiadas.map(devolver));
-    const fallidas = resultados.filter((resultado) => resultado.status === "rejected").length;
-    const devueltas = cambiadas.length - fallidas;
+    const resultados = await Promise.allSettled(cambiadas.map((fila) => devolver(fila, datos.objetivo)));
+    const rechazos = resultados.filter((resultado) => resultado.status === "rejected");
+    const otras = rechazos.filter((resultado) => resultado.reason?.message === "cambió").length;
+    const fallidas = rechazos.length - otras;
+    const devueltas = cambiadas.length - rechazos.length;
     const partes = [];
     if (devueltas) {
         partes.push(devueltas === 1 ? "Se deshizo: 1 postulación volvió a su estado anterior." : `Se deshizo: ${devueltas} postulaciones volvieron a su estado anterior.`);
+    }
+    if (otras) {
+        partes.push(otras === 1 ? "1 había cambiado desde entonces y no se tocó; revísala en su ficha." : `${otras} habían cambiado desde entonces y no se tocaron; revísalas en su ficha.`);
     }
     if (fallidas) {
         partes.push(fallidas === 1 ? "1 no se pudo devolver; revísala en su ficha." : `${fallidas} no se pudieron devolver; revísalas en su ficha.`);
