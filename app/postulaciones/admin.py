@@ -8,7 +8,9 @@ from django.utils.html import format_html
 from django.utils.text import capfirst
 from unfold.admin import ModelAdmin, TabularInline
 from unfold.contrib.filters.admin import RelatedDropdownFilter
+from unfold.contrib.filters.forms import DropdownForm
 from unfold.decorators import action, display
+from unfold.widgets import UnfoldAdminSelectWidget
 
 from postulaciones.models import Announcement, Application, ApprovedProject, Candidate, Member, Organization, Unit
 from postulaciones.views import CorreoPostulanteView
@@ -18,6 +20,17 @@ ESTADOS = {
     Application.Estado.ACEPTADA: "success",
     Application.Estado.RECHAZADA: "danger",
 }
+
+
+class FormularioDesplegable(DropdownForm):
+    widget = UnfoldAdminSelectWidget()
+
+    class Media:
+        extend = False
+
+
+class ConvocatoriaFilter(RelatedDropdownFilter):
+    form_class = FormularioDesplegable
 
 
 class NotificacionFilter(admin.SimpleListFilter):
@@ -51,7 +64,7 @@ class AnnouncementAdmin(ModelAdmin):
 class ApplicationAdmin(ModelAdmin):
     list_display = ["titulo", "convocatoria", "organizacion", "unidad", "postulante", "mostrar_estado", "fue_notificada", "perfil"]
     list_display_links = ["titulo"]
-    list_filter = ["estado", NotificacionFilter, ("convocatoria", RelatedDropdownFilter)]
+    list_filter = ["estado", NotificacionFilter, ("convocatoria", ConvocatoriaFilter)]
     list_filter_submit = True
     search_fields = ["titulo", "unidad__nombre", "unidad__organizacion__nombre"]
     list_select_related = ["convocatoria", "postulante", "unidad__organizacion"]
