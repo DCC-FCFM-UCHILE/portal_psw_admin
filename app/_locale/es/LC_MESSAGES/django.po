@@ -221,13 +221,13 @@ msgid "Objects"
 msgstr "Registros"
 
 msgid "Deleting the selected %(objects_name)s would result in deleting related objects, but your account doesn't have permission to delete the following types of objects:"
-msgstr "Eliminar los %(objects_name)s seleccionados eliminaría registros relacionados, pero tu cuenta no tiene permiso para eliminar estos tipos de registro:"
+msgstr "Eliminar la selección eliminaría registros relacionados, pero tu cuenta no tiene permiso para eliminar estos tipos de registro:"
 
 msgid "Deleting the selected %(objects_name)s would require deleting the following protected related objects:"
-msgstr "Para eliminar los %(objects_name)s seleccionados habría que eliminar antes estos registros relacionados protegidos:"
+msgstr "Para eliminar la selección habría que eliminar antes estos registros relacionados protegidos:"
 
 msgid "Are you sure you want to delete the selected %(objects_name)s? All of the following objects and their related items will be deleted:"
-msgstr "¿Seguro que quieres eliminar los %(objects_name)s seleccionados? Se eliminarán estos registros y todo lo relacionado con ellos:"
+msgstr "¿Seguro que quieres eliminar la selección? Se eliminarán estos registros y todo lo relacionado con ellos:"
 
 msgid "Summary"
 msgstr "Resumen"
@@ -552,7 +552,7 @@ msgstr "Se eliminó “%(obj)s” (%(name)s)."
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
-msgstr "Eliminación lista: %(count)d %(items)s."
+msgstr "Se eliminó la selección: %(count)d %(items)s."
 
 #, python-format
 msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
@@ -565,3 +565,15 @@ msgstr "Elegir %s para editar"
 #, python-format
 msgid "Select %s to view"
 msgstr "Elegir %s para ver"
+
+msgid "Add %s"
+msgstr "Agregar %s"
+
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Eliminar %(verbose_name_plural)s"
+
+msgid "Change %s"
+msgstr "Editar %s"
+
+msgid "View %s"
+msgstr "Ver %s"

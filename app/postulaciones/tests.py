@@ -394,3 +394,30 @@ class RestablecerTests(TestCase):
             for campo in formulario:
                 with self.subTest(campo=campo.name):
                     self.assertIn("border-base-200", campo.field.widget.attrs["class"])
+
+
+class TextosTests(BaseCompartida):
+    def test_las_altas_dicen_agregar(self):
+        respuesta = self.client.get(reverse("admin:applications_unit_add"))
+        self.assertContains(respuesta, "Agregar unidad")
+        self.assertNotContains(respuesta, "Añadir")
+
+    def test_las_fichas_dicen_editar(self):
+        respuesta = self.client.get(reverse("admin:applications_application_change", args=[self.postulacion.pk]))
+        self.assertContains(respuesta, "Editar postulación")
+        self.assertNotContains(respuesta, "Modificar")
+
+    def test_la_fila_en_linea_dice_que_agrega(self):
+        proyecto = ApprovedProject.objects.create(titulo="Riego", semestre="SP", anio=2026, tutor="Tutor")
+        respuesta = self.client.get(reverse("admin:applications_approvedproject_change", args=[proyecto.pk]))
+        self.assertContains(respuesta, "<span>Agregar integrante</span>", html=True)
+        self.assertNotContains(respuesta, "Integrante adicional.</span>")
+
+    def test_borrar_en_bloque_no_concuerda_genero_ni_numero(self):
+        borrable = Organization.objects.create(rut="1-9", nombre="Borrable")
+        lista = reverse("admin:applications_organization_changelist")
+        datos = {"action": "delete_selected", "index": "0", "_selected_action": [borrable.pk]}
+        self.assertContains(self.client.post(lista, datos), "¿Seguro que quieres eliminar la selección?")
+        respuesta = self.client.post(lista, {**datos, "post": "yes"}, follow=True)
+        self.assertContains(respuesta, "Se eliminó la selección: 1 organización.")
+        self.assertNotContains(respuesta, "seleccionado/s")
