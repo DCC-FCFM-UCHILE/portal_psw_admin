@@ -7,12 +7,13 @@ from unfold.decorators import display
 
 from core.acciones import AccionesDeFila
 from core.busqueda import BusquedaSinTildes
+from core.ficha import SinGuardarYAgregarOtro
 from core.listado import ListadoParcial
 from postulaciones.models import Announcement
 
 
 @admin.register(Announcement)
-class AnnouncementAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, ModelAdmin):
+class AnnouncementAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, SinGuardarYAgregarOtro, ModelAdmin):
     list_display = ["__str__", "inicio", "cierre", "convenio", "ver_postulaciones"]
     search_fields = ["anio"]
     list_per_page = 10

@@ -5,6 +5,7 @@ from unfold.decorators import display
 
 from core.acciones import AccionesDeFila
 from core.busqueda import BusquedaSinTildes
+from core.ficha import SinGuardarYAgregarOtro
 from core.listado import ListadoParcial
 from postulaciones.models import ApprovedProject, Member
 
@@ -22,7 +23,7 @@ class MemberInline(TabularInline):
 
 
 @admin.register(ApprovedProject)
-class ApprovedProjectAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, ModelAdmin):
+class ApprovedProjectAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, SinGuardarYAgregarOtro, ModelAdmin):
     list_display = ["titulo", "convocatoria", "organizacion", "unidad", "postulante", "semestre", "anio", "tutor", "es_visible"]
     list_filter = ["es_visible"]
     search_fields = ["titulo", "postulacion__titulo"]

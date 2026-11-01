@@ -10,6 +10,7 @@ from unfold.forms import AdminPasswordChangeForm, UserCreationForm
 
 from core.acciones import AccionesDeFila
 from core.busqueda import BusquedaSinTildes
+from core.ficha import SinGuardarYAgregarOtro
 from core.listado import ListadoParcial
 from cuentas.forms import FichaUsuarioForm, IngresoForm
 from cuentas.widgets import CasillasDeGrupos, MatrizPermisos
@@ -103,7 +104,7 @@ def sin_relaciones_internas(modelo, borrados, cantidades):
 
 
 @admin.register(User)
-class UserAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, PermisosEnTabla, BaseUserAdmin, ModelAdmin):
+class UserAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, SinGuardarYAgregarOtro, PermisosEnTabla, BaseUserAdmin, ModelAdmin):
     form = FichaUsuarioForm
     add_form = UserCreationForm
     change_password_form = AdminPasswordChangeForm
@@ -187,6 +188,6 @@ class UserAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, PermisosEnTab
 
 
 @admin.register(Group)
-class GroupAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, PermisosEnTabla, BaseGroupAdmin, ModelAdmin):
+class GroupAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, SinGuardarYAgregarOtro, PermisosEnTabla, BaseGroupAdmin, ModelAdmin):
     def has_module_permission(self, request):
         return False

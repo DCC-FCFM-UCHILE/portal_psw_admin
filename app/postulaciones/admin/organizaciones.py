@@ -4,6 +4,7 @@ from unfold.admin import ModelAdmin
 
 from core.acciones import AccionesDeFila
 from core.busqueda import BusquedaSinTildes
+from core.ficha import SinGuardarYAgregarOtro
 from core.listado import ListadoParcial
 from postulaciones.admin.comun import FormatosDeArchivo
 from postulaciones.models import Candidate, Organization, Unit
@@ -18,7 +19,7 @@ def logo_png_o_jpg(archivo):
 
 
 @admin.register(Candidate)
-class CandidateAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, ModelAdmin):
+class CandidateAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, SinGuardarYAgregarOtro, ModelAdmin):
     list_display = ["nombre", "correo", "organizacion"]
     search_fields = ["organizacion__nombre", "nombre", "correo"]
     list_select_related = ["organizacion"]
@@ -26,14 +27,14 @@ class CandidateAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, ModelAdm
 
 
 @admin.register(Organization)
-class OrganizationAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, ModelAdmin):
+class OrganizationAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, SinGuardarYAgregarOtro, ModelAdmin):
     list_display = ["rut", "nombre", "rubro"]
     search_fields = ["rut", "nombre", "rubro"]
     list_per_page = 10
 
 
 @admin.register(Unit)
-class UnitAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, FormatosDeArchivo, ModelAdmin):
+class UnitAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, SinGuardarYAgregarOtro, FormatosDeArchivo, ModelAdmin):
     list_display = ["id", "nombre", "organizacion", "esta_vetada"]
     search_fields = ["nombre", "organizacion__nombre", "organizacion__rut"]
     list_select_related = ["organizacion"]

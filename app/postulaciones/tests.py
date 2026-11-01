@@ -878,6 +878,20 @@ class IconosTests(BaseCompartida):
         self.assertEqual((declarados & ligaduras(TTFont(FUENTE)).keys()) - iconos_recortados(), set())
 
 
+class BarraDeGuardadoTests(BaseCompartida):
+    def test_ninguna_ficha_ofrece_guardar_y_agregar_otro(self):
+        unidad = self.postulacion.unidad
+        objetos = [self.postulacion, self.convocatoria, self.convocatoria.convenio, unidad, unidad.organizacion]
+        objetos += [self.postulacion.postulante, self.docente]
+        urls = [reverse(f"admin:{modelo._meta.app_label}_{modelo._meta.model_name}_add") for modelo in admin.site._registry]
+        urls += [reverse(f"admin:{objeto._meta.app_label}_{objeto._meta.model_name}_change", args=[objeto.pk]) for objeto in objetos]
+        for url in urls:
+            with self.subTest(url=url):
+                respuesta = self.client.get(url)
+                self.assertContains(respuesta, 'name="_continue"')
+                self.assertNotContains(respuesta, 'name="_addanother"')
+
+
 class CatalogoDeTraduccionesTests(BaseCompartida):
     def test_el_catalogo_queda_en_cache_del_navegador(self):
         respuesta = self.client.get(reverse("admin:jsi18n"))

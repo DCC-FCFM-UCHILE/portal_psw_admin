@@ -16,6 +16,7 @@ from unfold.widgets import UnfoldAdminSelectWidget
 
 from core.acciones import AccionesDeFila
 from core.busqueda import BusquedaSinTildes
+from core.ficha import SinGuardarYAgregarOtro
 from core.listado import ListadoParcial, zona_pedida
 from postulaciones import historial
 from postulaciones.admin.comun import FormatosDeArchivo
@@ -56,7 +57,7 @@ class NotificacionFilter(admin.SimpleListFilter):
 
 
 @admin.register(Application)
-class ApplicationAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, FormatosDeArchivo, ModelAdmin):
+class ApplicationAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, SinGuardarYAgregarOtro, FormatosDeArchivo, ModelAdmin):
     list_display = ["titulo", "convocatoria", "organizacion", "unidad", "postulante", "mostrar_estado", "fue_notificada", "perfil"]
     list_display_links = ["titulo"]
     list_filter = ["estado", NotificacionFilter, ("convocatoria", ConvocatoriaFilter)]

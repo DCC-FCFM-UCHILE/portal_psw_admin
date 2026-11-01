@@ -4,11 +4,12 @@ from unfold.admin import ModelAdmin
 from convenios.models import RulesApplications
 from core.acciones import AccionesDeFila
 from core.busqueda import BusquedaSinTildes
+from core.ficha import SinGuardarYAgregarOtro
 from core.listado import ListadoParcial
 
 
 @admin.register(RulesApplications)
-class RulesApplicationsAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, ModelAdmin):
+class RulesApplicationsAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, SinGuardarYAgregarOtro, ModelAdmin):
     list_display = ["descripcion"]
     search_fields = ["descripcion"]
     list_per_page = 10
