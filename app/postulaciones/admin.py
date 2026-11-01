@@ -286,6 +286,11 @@ class UnitAdmin(ListadoParcial, AccionesDeFila, FormatosDeArchivo, ModelAdmin):
     list_select_related = ["organizacion"]
     list_per_page = 10
 
+    def get_form(self, request, obj=None, change=False, **kwargs):
+        formulario = super().get_form(request, obj, change, **kwargs)
+        formulario.base_fields["nombre"].required = True
+        return formulario
+
 
 @admin.register(Member)
 class MemberAdmin(ListadoParcial, AccionesDeFila, ModelAdmin):

@@ -751,3 +751,12 @@ class TextosDeDjangoTests(BaseCompartida):
         respuesta = self.client.get(reverse("admin:auth_user_add"))
         self.assertContains(respuesta, "Hasta 150 caracteres")
         self.assertNotContains(respuesta, "carácteres")
+
+
+class UnidadesTests(BaseCompartida):
+    def test_la_unidad_necesita_nombre(self):
+        antes = Unit.objects.count()
+        respuesta = self.client.post(reverse("admin:applications_unit_add"), {"nombre": "", "_save": "1"})
+        self.assertEqual(respuesta.status_code, 200)
+        self.assertContains(respuesta, "Este campo es obligatorio.")
+        self.assertEqual(Unit.objects.count(), antes)
