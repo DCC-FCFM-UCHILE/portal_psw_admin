@@ -60,7 +60,7 @@
                             <div class="min-w-0 text-sm">
                                 <p class="break-words text-gris-oscuro dark:text-base-200">
                                     <span class="font-semibold">{{ registro.quien }}</span> {{ registro.accion }} {{ registro.tipo }}
-                                    {% if registro.enlace %}<a href="{{ registro.enlace }}" class="enlace">{{ registro.objeto }}</a>{% else %}<span class="font-semibold">{{ registro.objeto }}</span>{% endif %}
+                                    {% if registro.enlace %}<a href="{{ registro.enlace }}" class="enlace">{{ registro.objeto|default:"(sin nombre)" }}</a>{% else %}<span class="font-semibold">{{ registro.objeto|default:"(sin nombre)" }}</span>{% endif %}
                                 </p>
                                 <p class="mt-0.5 text-xs text-gris-medio dark:text-base-400"><time datetime="{{ registro.cuando|date:'c' }}">{{ registro.cuando|date:"j \d\e F, H:i" }}</time></p>
                             </div>

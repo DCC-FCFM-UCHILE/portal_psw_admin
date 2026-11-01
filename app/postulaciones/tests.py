@@ -865,3 +865,11 @@ class InicioYMenuTests(BaseCompartida):
         self.assertContains(respuesta, "Sistema de riego</a>")
         self.assertNotContains(respuesta, reverse("admin:auth_user_change", args=[otra.pk]))
         self.assertNotContains(respuesta, "Tu cuenta todavía no tiene permisos")
+
+
+class ActividadSinNombreTests(BaseCompartida):
+    def test_la_actividad_nombra_los_registros_sin_nombre(self):
+        unidad = Unit.objects.create(nombre="")
+        LogEntry.objects.log_actions(user_id=self.docente.pk, queryset=[unidad], action_flag=ADDITION)
+        respuesta = self.client.get(reverse("admin:index"))
+        self.assertContains(respuesta, "(sin nombre)</a>")
