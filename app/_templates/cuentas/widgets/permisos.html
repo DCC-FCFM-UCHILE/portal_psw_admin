@@ -1,0 +1,64 @@
+<div class="matriz-permisos" x-data="matrizPermisos" x-on:change="cambio($event)">
+    {% for seccion in widget.secciones %}
+        <div class="matriz-permisos-marco">
+            <table class="matriz-permisos-tabla">
+                <caption>{{ seccion.titulo }}</caption>
+                <thead>
+                    <tr>
+                        <td></td>
+                        {% for verbo in widget.acciones %}
+                            <th scope="col">{{ verbo }}</th>
+                        {% endfor %}
+                        <th scope="col" x-cloak>Todos</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fila in seccion.filas %}
+                        <tr data-fila>
+                            <th scope="row">{{ fila.nombre }}</th>
+                            {% for opcion in fila.celdas %}
+                                <td>
+                                    {% if opcion %}
+                                        <label class="matriz-permisos-celda">
+                                            <input type="checkbox" name="{{ opcion.name }}" value="{{ opcion.value }}" id="{{ opcion.attrs.id }}" class="{{ widget.attrs.class }}"{% if opcion.selected %} checked{% endif %}>
+                                            <span class="sr-only">{{ opcion.etiqueta }}</span>
+                                        </label>
+                                    {% else %}
+                                        <span aria-hidden="true" class="text-gris-medio dark:text-oscuro-suave">·</span>
+                                        <span class="sr-only">No aplica</span>
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
+                            <td x-cloak>
+                                <label class="matriz-permisos-celda">
+                                    <input type="checkbox" data-todas class="{{ widget.attrs.class }}">
+                                    <span class="sr-only">Todos los permisos de {{ fila.nombre|lower }}</span>
+                                </label>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endfor %}
+
+    {% if widget.otros %}
+        <details class="matriz-permisos-otros" data-otros{% if widget.otros_elegidos %} open{% endif %}>
+            <summary>
+                <span>Otros permisos</span>
+                <span class="matriz-permisos-cuenta">{{ widget.otros|length }} · <span x-text="otrosElegidos">{{ widget.otros_elegidos }}</span> elegidos</span>
+            </summary>
+            <p class="matriz-permisos-nota">No los usa este portal. Se conservan porque las cuentas se comparten con otros sistemas.</p>
+            <ul role="list">
+                {% for opcion in widget.otros %}
+                    <li>
+                        <label for="{{ opcion.attrs.id }}">
+                            <input type="checkbox" name="{{ opcion.name }}" value="{{ opcion.value }}" id="{{ opcion.attrs.id }}" class="{{ widget.attrs.class }}"{% if opcion.selected %} checked{% endif %}>
+                            <span>{{ opcion.etiqueta }}</span>
+                        </label>
+                    </li>
+                {% endfor %}
+            </ul>
+        </details>
+    {% endif %}
+</div>

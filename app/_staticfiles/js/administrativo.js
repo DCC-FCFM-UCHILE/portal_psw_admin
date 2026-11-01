@@ -170,6 +170,39 @@ document.addEventListener("alpine:init", () => {
         },
     }));
 
+    Alpine.data("matrizPermisos", () => ({
+        otrosElegidos: 0,
+
+        init() {
+            this.$el.querySelectorAll("tr[data-fila]").forEach((fila) => this.sincronizar(fila));
+            this.contarOtros();
+        },
+
+        sincronizar(fila) {
+            const casillas = [...fila.querySelectorAll("input[name]")];
+            const todas = fila.querySelector("input[data-todas]");
+            const marcadas = casillas.filter((casilla) => casilla.checked).length;
+            todas.checked = casillas.length > 0 && marcadas === casillas.length;
+            todas.indeterminate = marcadas > 0 && marcadas < casillas.length;
+        },
+
+        contarOtros() {
+            this.otrosElegidos = this.$el.querySelectorAll("[data-otros] input:checked").length;
+        },
+
+        cambio(evento) {
+            const fila = evento.target.closest("tr[data-fila]");
+            if (evento.target.hasAttribute("data-todas")) {
+                fila.querySelectorAll("input[name]").forEach((casilla) => {
+                    casilla.checked = evento.target.checked;
+                });
+            }
+            if (fila) {
+                this.sincronizar(fila);
+            }
+            this.contarOtros();
+        },
+    }));
 });
 
 document.addEventListener("trix-before-initialize", () => {

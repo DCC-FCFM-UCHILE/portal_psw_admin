@@ -522,6 +522,10 @@ input[type="checkbox"].appearance-none.rounded-full {
   }
 }
 
+.matriz-permisos-otros[open] > summary {
+  margin-bottom: 0;
+}
+
 .zona-archivo-destino:has(> input:focus-visible) {
   outline: 2px solid var(--color-rojo);
   outline-offset: 2px;
@@ -625,6 +629,65 @@ input[type="checkbox"].appearance-none.rounded-full {
   }
   .zona-archivo-formatos {
     @apply text-xs;
+  }
+  .matriz-permisos {
+    @apply flex min-w-0 max-w-2xl grow flex-col gap-4;
+  }
+  .matriz-permisos-marco {
+    @apply overflow-x-auto rounded-default border border-base-200 bg-white dark:border-oscuro-elevada dark:bg-oscuro-superficie;
+  }
+  .matriz-permisos-tabla {
+    @apply w-full border-collapse text-sm;
+  }
+  .matriz-permisos-tabla caption {
+    @apply border-b border-base-200 bg-base-50 px-3 py-2 text-left text-[0.6875rem] font-bold uppercase tracking-widest text-gris-medio dark:border-oscuro-elevada dark:bg-oscuro-elevada dark:text-oscuro-suave;
+  }
+  .matriz-permisos-tabla thead :is(th, td) {
+    @apply border-b border-base-200 px-0.5 py-2 text-center text-[0.6875rem] font-semibold text-gris-medio sm:px-1 sm:text-xs dark:border-oscuro-elevada dark:text-oscuro-suave;
+  }
+  .matriz-permisos-tabla :is(tbody th, thead td:first-child) {
+    @apply sticky left-0 z-[1] w-full min-w-[7rem] bg-white dark:bg-oscuro-superficie;
+  }
+  .matriz-permisos-tabla tbody tr + tr {
+    @apply border-t border-base-200 dark:border-oscuro-elevada;
+  }
+  .matriz-permisos-tabla tbody th {
+    @apply py-1 pl-2 pr-1 text-left text-[0.8125rem] font-medium text-gris-oscuro sm:px-3 sm:text-sm dark:text-oscuro-texto;
+  }
+  .matriz-permisos-tabla tbody td,
+  .matriz-permisos-tabla thead th {
+    @apply w-10 min-w-10 sm:w-14 sm:min-w-14;
+  }
+  .matriz-permisos-tabla tbody td {
+    @apply p-0 text-center;
+  }
+  .matriz-permisos-tabla tbody td:last-child,
+  .matriz-permisos-tabla thead th:last-child {
+    @apply border-l border-base-200 dark:border-oscuro-elevada;
+  }
+  .matriz-permisos-celda {
+    @apply flex min-h-11 cursor-pointer items-center justify-center hover:bg-base-50 dark:hover:bg-oscuro-elevada;
+  }
+  .matriz-permisos-otros {
+    @apply rounded-default border border-base-200 text-sm dark:border-oscuro-elevada;
+  }
+  .matriz-permisos-otros summary {
+    @apply relative flex min-h-11 cursor-pointer list-none items-center gap-2 pl-3 pr-10 font-medium text-gris-oscuro hover:bg-base-50 dark:text-oscuro-texto dark:hover:bg-oscuro-elevada;
+  }
+  .matriz-permisos-otros summary::-webkit-details-marker {
+    display: none;
+  }
+  .matriz-permisos-cuenta {
+    @apply ml-auto text-xs font-normal text-gris-medio dark:text-oscuro-suave;
+  }
+  .matriz-permisos-nota {
+    @apply border-t border-base-200 px-3 py-2 text-xs text-gris-medio dark:border-oscuro-elevada dark:text-oscuro-suave;
+  }
+  .matriz-permisos-otros ul {
+    @apply grid gap-x-4 border-t border-base-200 px-3 py-2 sm:grid-cols-2 dark:border-oscuro-elevada;
+  }
+  .matriz-permisos-otros label {
+    @apply flex min-h-9 cursor-pointer items-center gap-2 text-gris-oscuro dark:text-oscuro-texto;
   }
   .lateral-grupo {
     @apply mx-3 mb-1 mt-5 flex items-center gap-2 px-3 text-[0.6875rem] font-bold uppercase tracking-widest text-[#B0B6BF];
