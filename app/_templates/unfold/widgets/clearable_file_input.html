@@ -25,12 +25,12 @@
 
     <div class="zona-archivo-destino" x-bind:class="{ 'encima': encima, 'elegido': nombre }">
         {% with zona=widget.attrs.id|add:"_zona" %}
-            <input type="{{ widget.type }}" name="{{ widget.name }}" x-ref="entrada" x-bind="entrada"{% for nombre, valor in widget.attrs|describir_con:zona %}{% if valor is not False %} {{ nombre }}{% if valor is not True %}="{{ valor|stringformat:'s' }}"{% endif %}{% endif %}{% endfor %}>
+            <input type="{{ widget.type }}" name="{{ widget.name }}" x-ref="entrada" x-bind="entrada"{% for nombre, valor in widget.attrs|describir_con:zona %}{% if valor is not False %} {{ nombre }}{% if valor is not True %}="{{ valor|stringformat:'s' }}"{% endif %}{% endif %}{% endfor %} aria-labelledby="{{ widget.attrs.id }}_etiqueta {{ widget.attrs.id }}_boton">
         {% endwith %}
 
         <span class="material-symbols-outlined zona-archivo-icono" aria-hidden="true" x-text="nombre ? 'task' : 'upload_file'">upload_file</span>
 
-        <span class="zona-archivo-boton" aria-hidden="true" x-text="nombre ? 'Cambiar el archivo' : $el.dataset.texto" data-texto="{% if widget.is_initial %}Reemplazar el archivo{% else %}Elegir un archivo{% endif %}">{% if widget.is_initial %}Reemplazar el archivo{% else %}Elegir un archivo{% endif %}</span>
+        <span id="{{ widget.attrs.id }}_boton" class="zona-archivo-boton" aria-hidden="true" x-text="nombre ? 'Cambiar el archivo' : $el.dataset.texto" data-texto="{% if widget.is_initial %}Reemplazar el archivo{% else %}Elegir un archivo{% endif %}">{% if widget.is_initial %}Reemplazar el archivo{% else %}Elegir un archivo{% endif %}</span>
 
         <span id="{{ widget.attrs.id }}_zona" class="zona-archivo-texto">
             <span x-show="!nombre">o arrástralo aquí</span>
