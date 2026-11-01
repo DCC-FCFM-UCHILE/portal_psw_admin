@@ -2,6 +2,7 @@ import datetime
 from types import SimpleNamespace
 from unittest import mock
 
+from django.contrib import admin
 from django.contrib.admin.models import ADDITION, LogEntry
 from django.contrib.auth.models import Group, Permission, User
 from django.contrib.contenttypes.models import ContentType
@@ -645,11 +646,71 @@ class OrdenTests(BaseCompartida):
     def test_cada_encabezado_ordena_por_una_sola_columna(self):
         respuesta = self.client.get(reverse("admin:applications_organization_changelist"), {"o": "2"})
         self.assertContains(respuesta, 'aria-sort="ascending"', count=1)
-        self.assertContains(respuesta, '<a href="?o=-2" class="encabezado-orden" data-orden="ascendente" aria-describedby="orden-descendente">')
-        self.assertContains(respuesta, '<a href="?o=1" class="encabezado-orden" aria-describedby="orden-ascendente">')
+        self.assertContains(respuesta, '<a href="?o=-2" id="orden-3" class="encabezado-orden" data-orden="ascendente" aria-describedby="orden-descendente">')
+        self.assertContains(respuesta, '<a href="?o=1" id="orden-2" class="encabezado-orden" aria-describedby="orden-ascendente">')
         self.assertContains(respuesta, '<span id="orden-descendente" hidden>Ordenar de forma descendente</span>')
 
     def test_las_columnas_calculadas_no_se_ofrecen_para_ordenar(self):
         respuesta = self.client.get(reverse("admin:applications_application_changelist"))
         self.assertContains(respuesta, "<span>Título</span>")
         self.assertNotContains(respuesta, "<span>Organización</span>")
+
+
+class ListadoParcialTests(BaseCompartida):
+    def pedir(self, zona, url=None, **parametros):
+        return self.client.get(url or reverse("admin:applications_application_changelist"), parametros, HTTP_HX_REQUEST="true", HTTP_HX_TARGET=zona)
+
+    def test_htmx_recibe_solo_la_zona_del_listado(self):
+        respuesta = self.pedir("listado")
+        self.assertTemplateUsed(respuesta, "admin/listado_parcial.html")
+        self.assertNotContains(respuesta, "<html")
+        self.assertContains(respuesta, 'aria-label="Filtrar por estado"')
+        self.assertContains(respuesta, '<div id="pie-listado" hx-swap-oob="innerHTML">')
+        self.assertContains(respuesta, '<span id="conteo-cabecera" hx-swap-oob="innerHTML">')
+        self.assertContains(respuesta, '<div id="contenido-filtros" hx-swap-oob="innerHTML">')
+
+    def test_al_paginar_recibe_solo_la_tabla_y_el_pie(self):
+        with mock.patch.object(admin.site._registry[Application].__class__, "filtros_estado") as filtros:
+            respuesta = self.pedir("resultados-listado")
+        filtros.assert_not_called()
+        self.assertTemplateUsed(respuesta, "admin/listado_resultados.html")
+        self.assertContains(respuesta, "Sistema de riego")
+        self.assertContains(respuesta, '<div id="pie-listado" hx-swap-oob="innerHTML">')
+        self.assertNotContains(respuesta, 'aria-label="Filtrar por estado"')
+        self.assertNotContains(respuesta, 'id="contenido-filtros"')
+
+    def test_sin_htmx_responde_la_pagina_completa(self):
+        respuesta = self.client.get(reverse("admin:applications_application_changelist"))
+        self.assertContains(respuesta, "<html")
+        self.assertIn("HX-Request", respuesta["Vary"])
+        self.assertIn("HX-Target", respuesta["Vary"])
+
+    def test_otra_zona_de_htmx_recibe_la_pagina_completa(self):
+        self.assertContains(self.pedir("modal-content"), "<html")
+
+    def test_la_confirmacion_de_borrado_no_se_vuelve_fragmento(self):
+        respuesta = self.client.post(
+            reverse("admin:applications_application_changelist"),
+            {"action": "delete_selected", "_selected_action": [self.postulacion.pk], "index": 0},
+            HTTP_HX_REQUEST="true",
+            HTTP_HX_TARGET="listado",
+        )
+        self.assertTemplateNotUsed(respuesta, "admin/listado_parcial.html")
+        self.assertContains(respuesta, "<html")
+
+    def test_el_listado_no_carga_actions_js(self):
+        respuesta = self.client.get(reverse("admin:applications_application_changelist"))
+        self.assertNotContains(respuesta, "admin/js/actions.js")
+        self.assertContains(respuesta, "admin/js/core.js")
+
+    def test_los_filtros_conservan_la_busqueda_pero_no_la_pagina(self):
+        respuesta = self.client.get(reverse("admin:applications_application_changelist"), {"q": "riego", "p": "1"})
+        self.assertContains(respuesta, '<input type="hidden" name="q" value="riego">')
+        self.assertNotContains(respuesta, '<input type="hidden" name="p"')
+
+    def test_todos_los_listados_responden_fragmentos(self):
+        for modelo in admin.site._registry:
+            url = reverse(f"admin:{modelo._meta.app_label}_{modelo._meta.model_name}_changelist")
+            for zona, plantilla in [("listado", "admin/listado_parcial.html"), ("resultados-listado", "admin/listado_resultados.html")]:
+                with self.subTest(url=url, zona=zona):
+                    self.assertTemplateUsed(self.pedir(zona, url), plantilla)

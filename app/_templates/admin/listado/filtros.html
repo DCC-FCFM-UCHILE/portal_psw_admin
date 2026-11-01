@@ -1,0 +1,18 @@
+{% load admin_list interfaz unfold unfold_list %}
+
+{% if cl.model_admin.list_filter_submit %}
+    {% parametros_sin_filtro cl as conservados %}
+    {% for nombre, valor in conservados %}
+        <input type="hidden" name="{{ nombre }}" value="{{ valor }}">
+    {% endfor %}
+{% endif %}
+
+<div class="flex flex-col grow gap-4 overflow-auto scrollbar-default *:mb-0">
+    <div class="flex flex-col gap-4 px-3 py-2.5 {% if not cl.model_admin.list_filter_sheet %}2xl:pb-1 2xl:px-0 2xl:py-0{% endif %} *:mb-0">
+        {% for spec in cl|unfold_vertical_filters %}
+            {% unfold_admin_list_filter cl spec %}
+        {% endfor %}
+    </div>
+</div>
+
+{% include "unfold/helpers/change_list_filter_actions.html" %}

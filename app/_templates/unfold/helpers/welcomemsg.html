@@ -41,10 +41,8 @@
         {% else %}
             <h1 class="min-w-0 line-clamp-3 font-semibold leading-tight wrap-anywhere hyphens-auto sm:line-clamp-2 sm:wrap-normal text-gris-oscuro dark:text-white">{{ migas.titulo }}</h1>
         {% endif %}
-        {% if cl and cl.full_result_count != cl.result_count and cl.paginator|class_name != "InfinitePaginator" %}
-            <span class="hidden shrink-0 text-xs font-medium text-gris-medio sm:inline dark:text-base-400">
-                {{ cl.result_count }} de {{ cl.full_result_count }} (<a href="?{% if cl.is_popup %}_popup=1{% endif %}" class="enlace">ver todo</a>)
-            </span>
+        {% if cl %}
+            <span id="conteo-cabecera" class="contents">{% include "admin/listado/conteo.html" %}</span>
         {% endif %}
     </div>
 </div>

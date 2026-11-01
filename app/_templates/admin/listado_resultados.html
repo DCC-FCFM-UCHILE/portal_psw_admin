@@ -1,0 +1,5 @@
+{% load admin_list %}
+
+{% include "admin/listado/resultados.html" %}
+
+<div id="pie-listado" hx-swap-oob="innerHTML">{% pagination cl %}</div>

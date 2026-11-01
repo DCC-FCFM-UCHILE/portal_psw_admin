@@ -13,7 +13,7 @@
         {% for header in result_headers %}
             {% if header.sortable %}
                 <th class="align-middle font-semibold p-0 text-left text-important whitespace-nowrap {{ header.class_attrib }}" scope="col"{% if header.sort_priority == 1 %} aria-sort="{% if header.ascending %}ascending{% else %}descending{% endif %}"{% endif %}>
-                    <a href="{% url_orden cl header %}" class="encabezado-orden{% if header.formatting == "price" %} justify-end{% endif %}"{% if header.sort_priority == 1 %} data-orden="{% if header.ascending %}ascendente{% else %}descendente{% endif %}"{% endif %} aria-describedby="{% if header.sort_priority == 1 and header.ascending %}orden-descendente{% else %}orden-ascendente{% endif %}">
+                    <a href="{% url_orden cl header %}" id="orden-{{ forloop.counter }}" class="encabezado-orden{% if header.formatting == "price" %} justify-end{% endif %}"{% if header.sort_priority == 1 %} data-orden="{% if header.ascending %}ascendente{% else %}descendente{% endif %}"{% endif %} aria-describedby="{% if header.sort_priority == 1 and header.ascending %}orden-descendente{% else %}orden-ascendente{% endif %}">
                         <span>{{ header.text|capfirst }}</span>
                         {% if header.sort_priority != 1 %}
                             {% include "components/iconos/orden.html" %}

@@ -1,8 +1,34 @@
 {% extends "admin/change_list.html" %}
-{% load unfold_list %}
 
-{% block result_list %}
-    {% unfold_result_list cl %}
+{% block content %}
+    <div id="content-main">
+        {% if cl.formset and cl.formset.errors %}
+            {% include "unfold/helpers/messages/errornote.html" with errors=cl.formset.errors %}
 
-    {% include "unfold/helpers/change_list_actions.html" %}
+            {{ cl.formset.non_form_errors }}
+        {% endif %}
+
+        <div class="flex -mx-4 module{% if cl.has_filters %} filtered{% endif %}" id="changelist" x-data="{ changeListWidth: 0 }">
+            <div class="result-list-wrapper changelist-form-container flex flex-row grow gap-4 min-w-0 px-4">
+                <div id="listado" class="grow min-w-0" x-resize="changeListWidth = $width"{% if not is_popup %} data-nombre="{{ cl.opts.verbose_name_plural }}"{% endif %}>
+                    {% include "admin/listado/zona.html" %}
+                </div>
+
+                {% include "unfold/helpers/change_list_filter_vertical.html" %}
+            </div>
+        </div>
+
+        {% if not is_popup %}
+            <p id="estado-listado" role="status" class="sr-only"></p>
+
+            <template id="silueta-tabla">
+                <div class="silueta-tabla {% if cl.search_fields or cl.has_filters %}rounded-default lg:rounded-t-none lg:rounded-b-default{% else %}lg:rounded-default{% endif %} overflow-hidden border border-base-200 bg-white shadow-xs dark:border-base-800 dark:bg-base-900" aria-hidden="true">
+                    <div class="px-3 py-3">
+                        <div class="silueta-bloque h-4 w-2/3 rounded"></div>
+                    </div>
+                    {% include "components/siluetas/filas.html" %}
+                </div>
+            </template>
+        {% endif %}
+    </div>
 {% endblock %}

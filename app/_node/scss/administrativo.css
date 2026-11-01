@@ -283,6 +283,57 @@ html.cargando-vista:has([data-destino]) #ir-al-inicio[aria-current="page"]:not([
   animation: var(--animate-entrada);
 }
 
+#listado {
+  overflow-anchor: none;
+}
+
+#listado .zona-tabla {
+  transition: opacity 220ms var(--ease-out), translate 220ms var(--ease-out);
+}
+
+:is(#listado, #resultados-listado).htmx-swapping .zona-tabla {
+  opacity: 0;
+  translate: 0 -6px;
+  transition-duration: 140ms;
+  transition-timing-function: var(--ease-in);
+}
+
+#listado :is(.htmx-added .zona-tabla, .zona-tabla.htmx-added) {
+  opacity: 0;
+  translate: 0 8px;
+}
+
+.silueta-tabla {
+  display: none;
+}
+
+.zona-tabla.cargando > .silueta-tabla {
+  display: block;
+  animation: var(--animate-entrada);
+}
+
+.zona-tabla.cargando > :not(.silueta-tabla) {
+  display: none;
+}
+
+html:has(#listado[aria-busy="true"]) :is(#pie-listado, #conteo-cabecera) {
+  visibility: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #listado .zona-tabla,
+  :is(#listado, #resultados-listado).htmx-swapping .zona-tabla,
+  #listado :is(.htmx-added .zona-tabla, .zona-tabla.htmx-added) {
+    opacity: 1;
+    translate: none;
+    transition: none;
+  }
+
+  .zona-tabla.cargando > .silueta-tabla {
+    animation: none;
+  }
+}
+
 .silueta-bloque {
   @apply bg-base-200 dark:bg-base-800;
 }

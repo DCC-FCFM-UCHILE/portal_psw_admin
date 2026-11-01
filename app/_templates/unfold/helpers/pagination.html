@@ -2,7 +2,7 @@
 
 {% if cl %}
     <div class="pie-paginacion px-4 lg:bg-white lg:dark:bg-base-900 lg:left-0 lg:right-0 lg:bottom-0 lg:sticky relative z-40 lg:border-t lg:border-base-200 lg:relative lg:scrollable-top lg:dark:border-base-800 {% element_classes 'pagination' %}">
-        <div class="{% if not cl.model_admin.list_fullwidth and not is_popup %}container mx-auto{% endif %}">
+        <div id="pie-listado" class="{% if not cl.model_admin.list_fullwidth and not is_popup %}container mx-auto{% endif %}">
             {% pagination cl %}
         </div>
     </div>

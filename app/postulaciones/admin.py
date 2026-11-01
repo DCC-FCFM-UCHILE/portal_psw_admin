@@ -18,6 +18,7 @@ from unfold.decorators import action, display
 from unfold.widgets import UnfoldAdminSelectWidget
 
 from core.acciones import AccionesDeFila
+from core.listado import ListadoParcial, zona_pedida
 from postulaciones import historial
 from postulaciones.models import Announcement, Application, ApprovedProject, Candidate, Member, Organization, Unit
 from postulaciones.views import CorreoPostulanteView
@@ -67,7 +68,7 @@ class NotificacionFilter(admin.SimpleListFilter):
 
 
 @admin.register(Announcement)
-class AnnouncementAdmin(AccionesDeFila, ModelAdmin):
+class AnnouncementAdmin(ListadoParcial, AccionesDeFila, ModelAdmin):
     list_display = ["__str__", "inicio", "cierre", "convenio", "ver_postulaciones"]
     search_fields = ["anio"]
     list_per_page = 10
@@ -79,7 +80,7 @@ class AnnouncementAdmin(AccionesDeFila, ModelAdmin):
 
 
 @admin.register(Application)
-class ApplicationAdmin(AccionesDeFila, FormatosDeArchivo, ModelAdmin):
+class ApplicationAdmin(ListadoParcial, AccionesDeFila, FormatosDeArchivo, ModelAdmin):
     list_display = ["titulo", "convocatoria", "organizacion", "unidad", "postulante", "mostrar_estado", "fue_notificada", "perfil"]
     list_display_links = ["titulo"]
     list_filter = ["estado", NotificacionFilter, ("convocatoria", ConvocatoriaFilter)]
@@ -95,7 +96,7 @@ class ApplicationAdmin(AccionesDeFila, FormatosDeArchivo, ModelAdmin):
 
     def changelist_view(self, request, extra_context=None):
         respuesta = super().changelist_view(request, extra_context)
-        if hasattr(respuesta, "context_data") and "cl" in respuesta.context_data:
+        if hasattr(respuesta, "context_data") and "cl" in respuesta.context_data and zona_pedida(request) != "resultados-listado":
             respuesta.context_data["filtros_estado"] = self.filtros_estado(request)
         return respuesta
 
@@ -232,7 +233,7 @@ class MemberInline(TabularInline):
 
 
 @admin.register(ApprovedProject)
-class ApprovedProjectAdmin(AccionesDeFila, ModelAdmin):
+class ApprovedProjectAdmin(ListadoParcial, AccionesDeFila, ModelAdmin):
     list_display = ["titulo", "convocatoria", "organizacion", "unidad", "postulante", "semestre", "anio", "tutor", "es_visible"]
     list_filter = ["es_visible"]
     search_fields = ["titulo", "postulacion__titulo"]
@@ -258,7 +259,7 @@ class ApprovedProjectAdmin(AccionesDeFila, ModelAdmin):
 
 
 @admin.register(Candidate)
-class CandidateAdmin(AccionesDeFila, ModelAdmin):
+class CandidateAdmin(ListadoParcial, AccionesDeFila, ModelAdmin):
     list_display = ["nombre", "correo", "organizacion"]
     search_fields = ["organizacion__nombre", "nombre", "correo"]
     list_select_related = ["organizacion"]
@@ -266,14 +267,14 @@ class CandidateAdmin(AccionesDeFila, ModelAdmin):
 
 
 @admin.register(Organization)
-class OrganizationAdmin(AccionesDeFila, ModelAdmin):
+class OrganizationAdmin(ListadoParcial, AccionesDeFila, ModelAdmin):
     list_display = ["rut", "nombre", "rubro"]
     search_fields = ["rut", "nombre", "rubro"]
     list_per_page = 10
 
 
 @admin.register(Unit)
-class UnitAdmin(AccionesDeFila, FormatosDeArchivo, ModelAdmin):
+class UnitAdmin(ListadoParcial, AccionesDeFila, FormatosDeArchivo, ModelAdmin):
     list_display = ["id", "nombre", "organizacion", "esta_vetada"]
     search_fields = ["nombre", "organizacion__nombre", "organizacion__rut"]
     list_select_related = ["organizacion"]
@@ -281,7 +282,7 @@ class UnitAdmin(AccionesDeFila, FormatosDeArchivo, ModelAdmin):
 
 
 @admin.register(Member)
-class MemberAdmin(AccionesDeFila, ModelAdmin):
+class MemberAdmin(ListadoParcial, AccionesDeFila, ModelAdmin):
     list_display = ["nombre", "proyecto", "es_visible"]
     search_fields = ["proyecto__titulo", "nombre"]
     list_select_related = ["proyecto"]

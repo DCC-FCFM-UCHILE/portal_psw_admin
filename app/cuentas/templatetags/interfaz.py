@@ -12,6 +12,7 @@ from django.template.loader import render_to_string
 from django.urls import NoReverseMatch, reverse
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
+from unfold.templatetags.unfold_list import unfold_vertical_filters
 
 register = template.Library()
 logger = logging.getLogger(__name__)
@@ -117,3 +118,9 @@ def paginas_cercanas(cl, vecinas=1, extremos=1):
 def url_orden(cl, encabezado):
     orden = parse_qs(urlsplit(encabezado["url_primary"]).query).get(ORDER_VAR, [""])[0]
     return cl.get_query_string({ORDER_VAR: orden.split(".")[0]})
+
+
+@register.simple_tag
+def parametros_sin_filtro(cl):
+    usados = {parametro for spec in unfold_vertical_filters(cl) for parametro in spec.used_parameters}
+    return [(nombre, valor) for nombre, valores in cl.filter_params.items() if nombre not in usados for valor in valores]

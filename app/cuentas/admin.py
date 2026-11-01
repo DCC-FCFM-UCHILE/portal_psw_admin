@@ -6,6 +6,7 @@ from unfold.admin import ModelAdmin
 from unfold.forms import AdminPasswordChangeForm, UserCreationForm
 
 from core.acciones import AccionesDeFila
+from core.listado import ListadoParcial
 from cuentas.forms import FichaUsuarioForm
 from cuentas.widgets import CasillasDeGrupos, MatrizPermisos
 
@@ -26,7 +27,7 @@ class PermisosEnTabla:
 
 
 @admin.register(User)
-class UserAdmin(AccionesDeFila, PermisosEnTabla, BaseUserAdmin, ModelAdmin):
+class UserAdmin(ListadoParcial, AccionesDeFila, PermisosEnTabla, BaseUserAdmin, ModelAdmin):
     form = FichaUsuarioForm
     add_form = UserCreationForm
     change_password_form = AdminPasswordChangeForm
@@ -40,6 +41,6 @@ class UserAdmin(AccionesDeFila, PermisosEnTabla, BaseUserAdmin, ModelAdmin):
 
 
 @admin.register(Group)
-class GroupAdmin(AccionesDeFila, PermisosEnTabla, BaseGroupAdmin, ModelAdmin):
+class GroupAdmin(ListadoParcial, AccionesDeFila, PermisosEnTabla, BaseGroupAdmin, ModelAdmin):
     def has_module_permission(self, request):
         return False

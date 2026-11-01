@@ -1,0 +1,7 @@
+{% load unfold %}
+
+{% if cl.full_result_count != cl.result_count and cl.paginator|class_name != "InfinitePaginator" %}
+    <span class="hidden shrink-0 text-xs font-medium text-gris-medio sm:inline dark:text-base-400">
+        {{ cl.result_count }} de {{ cl.full_result_count }} (<a href="?{% if cl.is_popup %}_popup=1{% endif %}" class="enlace">ver todo</a>)
+    </span>
+{% endif %}
