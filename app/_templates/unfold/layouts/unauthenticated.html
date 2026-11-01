@@ -12,14 +12,7 @@
 
 {% block extrahead %}
     {{ block.super }}
-    <style>
-        @view-transition { navigation: auto; }
-        @media (prefers-reduced-motion: reduce) {
-            @view-transition { navigation: none; }
-        }
-    </style>
-    <script>{% en_linea "components/layout/arranque.js" %}</script>
-    <script>{% en_linea "components/layout/navegacion.js" %}</script>
+    {% include "components/layout/cabeza.html" %}
 {% endblock %}
 
 {% block base %}
