@@ -869,6 +869,20 @@ class IconosTests(BaseCompartida):
         self.assertEqual((declarados & ligaduras(TTFont(FUENTE)).keys()) - iconos_recortados(), set())
 
 
+class CatalogoDeTraduccionesTests(BaseCompartida):
+    def test_el_catalogo_queda_en_cache_del_navegador(self):
+        respuesta = self.client.get(reverse("admin:jsi18n"))
+        self.assertEqual(respuesta.status_code, 200)
+        self.assertIn("private", respuesta["Cache-Control"])
+        self.assertIn("max-age=3600", respuesta["Cache-Control"])
+        otra = self.client.get(reverse("admin:jsi18n"), headers={"If-Modified-Since": respuesta["Last-Modified"]})
+        self.assertEqual(otra.status_code, 304)
+
+    def test_el_catalogo_sigue_pidiendo_sesion(self):
+        self.client.logout()
+        self.assertEqual(self.client.get(reverse("admin:jsi18n")).status_code, 302)
+
+
 class MenusDeFilaTests(BaseCompartida):
     def test_los_menus_no_quedan_atados_mientras_estan_cerrados(self):
         respuesta = self.client.get(reverse("admin:applications_application_changelist"))

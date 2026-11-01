@@ -2,9 +2,16 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, re_path
+from django.utils import timezone
+from django.views.decorators.cache import cache_control
+from django.views.decorators.http import last_modified
 
 from core.rutas import redirigir_antigua, traducir
 from cuentas import views
+
+ARRANQUE = timezone.now()
+
+catalogo = cache_control(private=True, max_age=3600)(last_modified(lambda request, **kwargs: ARRANQUE)(admin.site.i18n_javascript))
 
 urlpatterns = [
     re_path(r"^admin/(?P<antigua>.*)$", redirigir_antigua),
@@ -15,6 +22,7 @@ urlpatterns = [
     path("recuperar-contrasena/<uidb64>/<token>/", views.RestablecerConfirmarView.as_view(), name="password_reset_confirm"),
     path("siluetas/", views.SiluetasView.as_view(), name="siluetas"),
     path("salir/", views.SalirView.as_view()),
+    path("jsi18n/", admin.site.admin_view(catalogo, cacheable=True)),
 ]
 
 if settings.DEBUG:
