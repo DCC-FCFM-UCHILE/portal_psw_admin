@@ -20,13 +20,12 @@ const verSeleccion = (estado) => {
 const contarSeleccion = () => {
     const contador = document.querySelector("#changelist-form span.action-counter");
     const todas = document.getElementById("action-toggle");
-    if (!contador || !todas || typeof ngettext !== "function") {
+    if (!contador || !todas) {
         return;
     }
     const casillas = casillasDeFila();
     const marcadas = casillas.filter((casilla) => casilla.checked).length;
-    const texto = ngettext("%(sel)s of %(cnt)s selected", "%(sel)s of %(cnt)s selected", marcadas);
-    contador.textContent = interpolate(texto, { sel: marcadas, cnt: Number(contador.dataset.actionsIcnt) }, true);
+    contador.textContent = contador.dataset.plantilla.replace("%(sel)s", marcadas).replace("%(cnt)s", contador.dataset.actionsIcnt);
     todas.checked = casillas.length > 0 && marcadas === casillas.length;
     verSeleccion(todas.checked ? "pagina" : "ninguna");
 };

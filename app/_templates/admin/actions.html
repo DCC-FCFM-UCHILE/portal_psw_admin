@@ -3,7 +3,7 @@
 <div id="changelist-actions" class="actions barra-acciones-caja {% if not cl.model_admin.list_fullwidth %}mx-auto{% endif %}" x-bind:style="'max-width: ' + changeListWidth + 'px'" role="group" aria-label="Acciones sobre la selección">
     <div class="barra-acciones-seleccion">
         {% if actions_selection_counter %}
-            <span class="action-counter" role="status" data-actions-icnt="{{ cl.result_list|length }}">{{ selection_note }}</span>
+            <span class="action-counter" role="status" data-actions-icnt="{{ cl.result_list|length }}" data-plantilla="Selección: %(sel)s de %(cnt)s">{{ selection_note }}</span>
             {% if cl.result_count != cl.result_list|length and not cl.model_admin.list_disable_select_all %}
                 <span class="all hidden" role="status">{{ selection_note_all }}</span>
                 <span class="question hidden">

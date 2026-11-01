@@ -42,6 +42,11 @@ def diferir(html):
     return GUION.sub(poner, str(html))
 
 
+@register.filter(is_safe=True)
+def sin_guion(html, ruta):
+    return re.sub(rf'<script src="{re.escape(ruta)}"></script>', "", str(html))
+
+
 def compactar(codigo):
     return "\n".join(linea.strip() for linea in str(codigo).splitlines() if linea.strip())
 

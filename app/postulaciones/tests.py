@@ -750,10 +750,16 @@ class ListadoParcialTests(BaseCompartida):
         self.assertTemplateNotUsed(respuesta, "admin/listado_parcial.html")
         self.assertContains(respuesta, "<html")
 
-    def test_el_listado_no_carga_actions_js(self):
+    def test_el_listado_no_carga_los_guiones_de_django(self):
         respuesta = self.client.get(reverse("admin:applications_application_changelist"))
-        self.assertNotContains(respuesta, "admin/js/actions.js")
-        self.assertContains(respuesta, "admin/js/core.js")
+        self.assertNotContains(respuesta, "admin/js/")
+        self.assertNotContains(respuesta, reverse("admin:jsi18n"))
+        self.assertContains(respuesta, 'data-plantilla="Selección: %(sel)s de %(cnt)s"')
+
+    def test_la_ventana_emergente_conserva_los_guiones_de_django(self):
+        respuesta = self.client.get(reverse("admin:applications_application_changelist"), {"_popup": "1"})
+        self.assertContains(respuesta, "admin/js/admin/RelatedObjectLookups.js")
+        self.assertContains(respuesta, reverse("admin:jsi18n"))
 
     def test_los_filtros_conservan_la_busqueda_pero_no_la_pagina(self):
         respuesta = self.client.get(reverse("admin:applications_application_changelist"), {"q": "riego", "p": "1"})
