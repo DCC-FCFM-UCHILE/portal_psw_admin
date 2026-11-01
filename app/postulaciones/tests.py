@@ -727,3 +727,27 @@ class ColumnasFijasTests(BaseCompartida):
     def test_la_columna_de_acciones_tiene_encabezado(self):
         respuesta = self.client.get(reverse("admin:applications_application_changelist"))
         self.assertContains(respuesta, '<th scope="col" class="columna-acciones w-px"><span class="sr-only">Acciones</span></th>')
+
+
+class TextosDeDjangoTests(BaseCompartida):
+    def test_la_extension_no_permitida_se_escribe_con_tilde(self):
+        logo = SimpleUploadedFile("logo.txt", b"texto")
+        respuesta = self.client.post(reverse("admin:applications_unit_add"), {"nombre": "Unidad", "logo": logo, "_save": "1"})
+        self.assertContains(respuesta, "no está permitida")
+
+    def test_los_errores_de_django_tutean(self):
+        organizacion = Organization.objects.first()
+        respuesta = self.client.post(
+            reverse("admin:applications_candidate_add"), {"organizacion": organizacion.pk, "correo": "no-es-correo", "_save": "1"}
+        )
+        self.assertContains(respuesta, "Escribe un correo válido")
+        self.assertNotContains(respuesta, "Introduzca")
+
+    def test_las_fechas_de_convocatoria_indican_el_formato(self):
+        respuesta = self.client.get(reverse("admin:applications_announcement_add"))
+        self.assertContains(respuesta, "Día/mes/año, por ejemplo 15/03/2027.", count=2)
+
+    def test_la_ayuda_del_nombre_de_usuario_esta_bien_escrita(self):
+        respuesta = self.client.get(reverse("admin:auth_user_add"))
+        self.assertContains(respuesta, "Hasta 150 caracteres")
+        self.assertNotContains(respuesta, "carácteres")

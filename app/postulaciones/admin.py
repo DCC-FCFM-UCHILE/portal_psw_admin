@@ -73,6 +73,12 @@ class AnnouncementAdmin(ListadoParcial, AccionesDeFila, ModelAdmin):
     search_fields = ["anio"]
     list_per_page = 10
 
+    def formfield_for_dbfield(self, db_field, request, **kwargs):
+        campo = super().formfield_for_dbfield(db_field, request, **kwargs)
+        if isinstance(db_field, models.DateField) and campo is not None and not campo.help_text:
+            campo.help_text = "Día/mes/año, por ejemplo 15/03/2027."
+        return campo
+
     @display(description="Postulaciones")
     def ver_postulaciones(self, obj):
         url = reverse("admin:applications_application_changelist")

@@ -580,3 +580,118 @@ msgstr "Ver %s"
 
 msgid "Delete multiple objects"
 msgstr "Eliminar la selección"
+
+#, python-format
+msgid ""
+"File extension “%(extension)s” is not allowed. Allowed extensions are: "
+"%(allowed_extensions)s."
+msgstr ""
+"La extensión de archivo “%(extension)s” no está permitida. Las extensiones "
+"permitidas son: %(allowed_extensions)s."
+
+msgid "Enter a valid value."
+msgstr "Escribe un valor válido."
+
+msgid "Enter a valid integer."
+msgstr "Escribe un número entero."
+
+msgid "Enter a valid email address."
+msgstr "Escribe un correo válido, por ejemplo nombre@dominio.cl."
+
+#, python-format
+msgid "Ensure this value is less than or equal to %(limit_value)s."
+msgstr "Debe ser menor o igual que %(limit_value)s."
+
+#, python-format
+msgid "Ensure this value is greater than or equal to %(limit_value)s."
+msgstr "Debe ser mayor o igual que %(limit_value)s."
+
+msgid "Enter a number."
+msgstr "Escribe un número."
+
+msgid "Enter a whole number."
+msgstr "Escribe un número entero."
+
+msgid "Enter a valid date."
+msgstr "Escribe una fecha válida, como 15/03/2027 (día/mes/año)."
+
+msgid "No file was submitted. Check the encoding type on the form."
+msgstr "No llegó ningún archivo. Vuelve a elegirlo."
+
+msgid "No file was submitted."
+msgstr "No llegó ningún archivo."
+
+msgid "The submitted file is empty."
+msgstr "El archivo está vacío."
+
+#, python-format
+msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
+msgid_plural ""
+"Ensure this filename has at most %(max)d characters (it has %(length)d)."
+msgstr[0] "El nombre del archivo puede tener como máximo %(max)d carácter (tiene %(length)d)."
+msgstr[1] "El nombre del archivo puede tener como máximo %(max)d caracteres (tiene %(length)d)."
+
+msgid "Please either submit a file or check the clear checkbox, not both."
+msgstr "Elige un archivo nuevo o marca «Quitar», pero no las dos cosas."
+
+#, python-format
+msgid "Select a valid choice. %(value)s is not one of the available choices."
+msgstr "Elige una opción de la lista; %(value)s no está entre ellas."
+
+#, python-format
+msgid "Please correct the duplicate data for %(field)s."
+msgstr "Hay datos repetidos en %(field)s; corrígelos."
+
+#, python-format
+msgid "Please correct the duplicate data for %(field)s, which must be unique."
+msgstr "%(field)s no se puede repetir; corrige los datos repetidos."
+
+msgid "Please correct the duplicate values below."
+msgstr "Hay valores repetidos; corrígelos abajo."
+
+msgid "Select a valid choice. That choice is not one of the available choices."
+msgstr "Elige una opción de la lista."
+
+msgid "Conflicting form data submitted. Please try again."
+msgstr "Los datos del formulario no calzan. Inténtalo de nuevo."
+
+msgid "Password changed successfully."
+msgstr "Se cambió la contraseña."
+
+msgid "Enter the same password as before, for verification."
+msgstr "Escribe otra vez la contraseña nueva, para confirmarla."
+
+msgid "Old password"
+msgstr "Contraseña actual"
+
+#, python-format
+msgid ""
+"Ensure this value has at least %(limit_value)d character (it has "
+"%(show_value)d)."
+msgid_plural ""
+"Ensure this value has at least %(limit_value)d characters (it has "
+"%(show_value)d)."
+msgstr[0] "Debe tener al menos %(limit_value)d carácter (tiene %(show_value)d)."
+msgstr[1] "Debe tener al menos %(limit_value)d caracteres (tiene %(show_value)d)."
+
+#, python-format
+msgid ""
+"Ensure this value has at most %(limit_value)d character (it has "
+"%(show_value)d)."
+msgid_plural ""
+"Ensure this value has at most %(limit_value)d characters (it has "
+"%(show_value)d)."
+msgstr[0] "Puede tener como máximo %(limit_value)d carácter (tiene %(show_value)d)."
+msgstr[1] "Puede tener como máximo %(limit_value)d caracteres (tiene %(show_value)d)."
+
+msgid ""
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
+msgstr ""
+"Escribe un nombre de usuario válido: solo letras sin tilde, números y los "
+"signos @ . + - _."
+
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr ""
+"Obligatorio. Hasta 150 caracteres: letras sin tilde, números y los signos @ . "
+"+ - _."
