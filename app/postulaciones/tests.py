@@ -1001,3 +1001,23 @@ class TraduccionesDeDjangoTests(BaseCompartida):
         self.assertContains(respuesta, "Acceso a la administración")
         self.assertNotContains(respuesta, "Es staff")
         self.assertNotContains(respuesta, "estado de superusuario")
+
+
+class BusquedaSinTildesTests(BaseCompartida):
+    def test_encuentra_sin_tildes_en_los_listados(self):
+        respuesta = self.client.get(reverse("admin:applications_organization_changelist"), {"q": "fundacion"})
+        self.assertContains(respuesta, "Fundación Ejemplo")
+        respuesta = self.client.get(reverse("admin:applications_application_changelist"), {"q": "RIEGO fundacion"})
+        self.assertContains(respuesta, "Sistema de riego")
+
+    def test_cada_palabra_tiene_que_aparecer(self):
+        respuesta = self.client.get(reverse("admin:applications_application_changelist"), {"q": "riego inexistente"})
+        self.assertNotContains(respuesta, "Sistema de riego")
+
+    def test_los_campos_que_no_son_texto_se_buscan_como_antes(self):
+        respuesta = self.client.get(reverse("admin:applications_announcement_changelist"), {"q": "2026"})
+        self.assertContains(respuesta, f'{reverse("admin:applications_announcement_change", args=[self.convocatoria.pk])}?_changelist_filters=q%3D2026')
+
+    def test_el_buscador_de_la_cabecera_tampoco_distingue_tildes(self):
+        respuesta = self.client.get(reverse("admin:search"), {"s": "fundacion"})
+        self.assertContains(respuesta, "Fundación Ejemplo")
