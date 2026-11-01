@@ -165,7 +165,6 @@ NAVEGACION = [
             entrada("Convenios", "description", "commons.rulesapplications"),
             entrada("Convocatorias", "event", "applications.announcement"),
             entrada("Usuarios", "person", "auth.user"),
-            entrada("Grupos", "groups", "auth.group"),
         ],
     },
 ]

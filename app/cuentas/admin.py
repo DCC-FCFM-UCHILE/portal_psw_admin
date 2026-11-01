@@ -32,4 +32,5 @@ class UserAdmin(PermisosEnTabla, BaseUserAdmin, ModelAdmin):
 
 @admin.register(Group)
 class GroupAdmin(PermisosEnTabla, BaseGroupAdmin, ModelAdmin):
-    pass
+    def has_module_permission(self, request):
+        return False

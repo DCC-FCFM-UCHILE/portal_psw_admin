@@ -64,6 +64,14 @@ class ListadoTests(BaseCompartida):
         self.assertEqual(self.client.get(reverse("admin:commons_rulesapplications_changelist")).status_code, 200)
         self.assertEqual(self.client.get(reverse("admin:applications_application_change", args=[self.postulacion.pk])).status_code, 200)
 
+    def test_grupos_no_esta_en_la_navegacion(self):
+        lista = reverse("admin:auth_group_changelist")
+        self.assertNotContains(self.client.get(reverse("admin:index")), f'href="{lista}"')
+        self.assertNotContains(self.client.get(reverse("admin:search"), {"s": "grup"}), f'href="{lista}"')
+        Group.objects.create(name="Administradora")
+        self.assertNotContains(self.client.get(reverse("admin:search"), {"s": "administradora"}), "Administradora")
+        self.assertEqual(self.client.get(lista).status_code, 200)
+
     def test_no_ofrece_borrar_en_bloque(self):
         respuesta = self.client.get(reverse("admin:applications_application_changelist"))
         self.assertNotContains(respuesta, 'value="delete_selected"')
