@@ -969,3 +969,35 @@ class BuscadorComoEnlaceTests(BaseCompartida):
         respuesta = self.client.get(reverse("admin:search"), {"s": "Fundación"})
         self.assertContains(respuesta, 'id="resultado-busqueda-1"')
         self.assertNotContains(respuesta, "selectItem")
+
+
+class TraduccionesDeDjangoTests(BaseCompartida):
+    def test_los_selectores_de_fecha_y_la_ayuda_de_activa_estan_traducidos(self):
+        respuesta = self.client.get(reverse("admin:jsi18n"))
+        self.assertContains(respuesta, "Elegir la fecha")
+        self.assertContains(respuesta, "Elegir la hora")
+        otra = User.objects.create_user("otra", password="clave-de-prueba", is_staff=True)
+        respuesta = self.client.get(reverse("admin:auth_user_change", args=[otra.pk]))
+        self.assertContains(respuesta, "Indica si la cuenta puede ingresar.")
+
+    def test_el_alta_de_cuenta_explica_el_ingreso_sin_contrasena(self):
+        respuesta = self.client.get(reverse("admin:auth_user_add"))
+        self.assertContains(respuesta, "Ingreso con contraseña")
+        self.assertContains(respuesta, "no puede ingresar ni recuperar la contraseña")
+        self.assertNotContains(respuesta, "Single Sign-On")
+        self.assertContains(respuesta, "La contraseña no puede tener solo números.")
+        self.assertNotContains(respuesta, "Tu contraseña")
+
+    def test_el_historial_dice_que_cambio(self):
+        otra = User.objects.create_user("otra", password="clave-de-prueba", is_staff=True)
+        url = reverse("admin:auth_user_password_change", args=[otra.pk])
+        self.client.post(url, {"password1": "otra-clave-larga-2026", "password2": "otra-clave-larga-2026", "usable_password": "true"})
+        respuesta = self.client.get(reverse("admin:auth_user_history", args=[otra.pk]))
+        self.assertContains(respuesta, "Cambios en contraseña.")
+        self.assertNotContains(respuesta, "Modificado")
+
+    def test_los_campos_de_acceso_tienen_nombres_claros(self):
+        respuesta = self.client.get(reverse("admin:auth_user_changelist"))
+        self.assertContains(respuesta, "Acceso a la administración")
+        self.assertNotContains(respuesta, "Es staff")
+        self.assertNotContains(respuesta, "estado de superusuario")

@@ -506,19 +506,19 @@ msgstr[0] "\n            <span class=\"font-medium text-important\">%(counter)s<
 msgstr[1] "\n            <span class=\"font-medium text-important\">%(counter)s</span> resultados\n        "
 
 msgid "Your password can’t be too similar to your other personal information."
-msgstr "Tu contraseña no puede parecerse demasiado a tus otros datos personales."
+msgstr "La contraseña no puede parecerse demasiado a los datos de la cuenta."
 
 msgid "Your password can’t be a commonly used password."
-msgstr "Tu contraseña no puede ser una de uso común."
+msgstr "La contraseña no puede ser una de uso común."
 
 msgid "Your password can’t be entirely numeric."
-msgstr "Tu contraseña no puede tener solo números."
+msgstr "La contraseña no puede tener solo números."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
-msgstr[0] "Tu contraseña debe tener al menos %(min_length)d carácter."
-msgstr[1] "Tu contraseña debe tener al menos %(min_length)d caracteres."
+msgstr[0] "La contraseña debe tener al menos %(min_length)d carácter."
+msgstr[1] "La contraseña debe tener al menos %(min_length)d caracteres."
 
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "La contraseña actual no es correcta. Escríbela de nuevo."
@@ -704,3 +704,59 @@ msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
 "Obligatorio. Hasta 150 caracteres: letras sin tilde, números y los signos @ . "
 "+ - _."
+
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"Indica si la cuenta puede ingresar. Desmárcala en vez de borrar la cuenta."
+
+msgid ""
+"Whether the user will be able to authenticate using a password or not. If "
+"disabled, they may still be able to authenticate using other backends, such "
+"as Single Sign-On or LDAP."
+msgstr ""
+"Sin contraseña, la cuenta queda creada pero no puede ingresar ni recuperar "
+"la contraseña hasta que alguien le asigne una desde su ficha."
+
+msgid "Password-based authentication"
+msgstr "Ingreso con contraseña"
+
+msgid "Password-based authentication was disabled."
+msgstr "La cuenta quedó sin contraseña: no podrá ingresar hasta que se le asigne una."
+
+msgid ""
+"Enable password-based authentication for this user by setting a password."
+msgstr "Para que la cuenta pueda ingresar, asígnale una contraseña."
+
+msgid "Changed {fields}."
+msgstr "Cambios en {fields}."
+
+msgid "Added."
+msgstr "Agregado."
+
+msgid "Added {name} “{object}”."
+msgstr "Se agregó {name} “{object}”."
+
+msgid "Changed {fields} for {name} “{object}”."
+msgstr "Cambios en {fields} de {name} “{object}”."
+
+msgid "Deleted {name} “{object}”."
+msgstr "Se eliminó {name} “{object}”."
+
+msgid "staff status"
+msgstr "acceso a la administración"
+
+msgid "Designates whether the user can log into this admin site."
+msgstr "Indica si la cuenta puede entrar a este sitio de administración."
+
+msgid "superuser status"
+msgstr "superusuario"
+
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr "Tiene todos los permisos, sin asignárselos uno por uno."
+
+msgid "active"
+msgstr "activa"

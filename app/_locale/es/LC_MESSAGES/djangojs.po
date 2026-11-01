@@ -9,3 +9,12 @@ msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] "Selección: %(sel)s de %(cnt)s"
 msgstr[1] "Selección: %(sel)s de %(cnt)s"
+
+msgid "Choose a Time"
+msgstr "Elegir la hora"
+
+msgid "Choose a time"
+msgstr "Elegir la hora"
+
+msgid "Choose a Date"
+msgstr "Elegir la fecha"
