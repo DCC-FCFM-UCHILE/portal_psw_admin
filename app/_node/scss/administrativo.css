@@ -565,6 +565,35 @@ html {
   }
 }
 
+@media (max-height: 30rem) {
+  #cabecera,
+  .pie-paginacion {
+    position: relative;
+  }
+
+  html,
+  html:is(:has(#changelist), :has([name="_save"]), :has(input.action-select:checked)) {
+    scroll-padding-block: 1rem;
+  }
+
+  body:has(input.action-select:checked) {
+    padding-bottom: 0;
+  }
+
+  .barra-acciones {
+    display: none;
+  }
+
+  #changelist-form:has(input.action-select:checked) .barra-acciones {
+    display: block;
+    position: static;
+  }
+
+  body:has(#changelist-form input.action-select:checked) .pie-paginacion {
+    visibility: visible;
+  }
+}
+
 fieldset {
   min-inline-size: 0;
 }
