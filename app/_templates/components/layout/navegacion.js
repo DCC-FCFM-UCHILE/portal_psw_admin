@@ -100,6 +100,56 @@ const anunciar = (texto) => {
     }
 };
 
+const cajonAbierto = () => {
+    try {
+        const estado = window.Alpine && Alpine.$data(raiz);
+        return estado && estado.esCajon && estado.sidebarOpen ? estado : null;
+    } catch {
+        return null;
+    }
+};
+
+const despedirCajon = () => {
+    const estado = cajonAbierto();
+    const envoltura = document.querySelector(".envoltura-lateral");
+    if (!estado || !envoltura) {
+        return;
+    }
+    let listo = false;
+    const cerrar = () => {
+        if (listo) {
+            return;
+        }
+        listo = true;
+        estado.sidebarOpen = false;
+        const llevarFoco = () => {
+            const activo = document.activeElement;
+            if (!activo || activo === document.body || envoltura.contains(activo)) {
+                document.getElementById("contenido")?.focus({ preventScroll: true });
+            }
+        };
+        Alpine.nextTick(llevarFoco);
+        let cuadros = 0;
+        const esperar = () => {
+            llevarFoco();
+            if (envoltura.checkVisibility() && cuadros++ < 30) {
+                requestAnimationFrame(esperar);
+            } else {
+                raiz.classList.remove("cajon-saliente");
+            }
+        };
+        requestAnimationFrame(esperar);
+    };
+    const yaFundido = raiz.classList.contains("vista-saliente") || matchMedia("(prefers-reduced-motion: reduce)").matches;
+    raiz.classList.add("cajon-saliente");
+    if (yaFundido) {
+        cerrar();
+    } else {
+        envoltura.addEventListener("animationend", (evento) => evento.target === envoltura && cerrar());
+        setTimeout(cerrar, 400);
+    }
+};
+
 const mostrarSilueta = (destino) => {
     const contenido = document.getElementById("content");
     const forma = formaDe(destino);
@@ -112,6 +162,7 @@ const mostrarSilueta = (destino) => {
         focoAnterior = document.activeElement;
         document.getElementById("contenido").focus({ preventScroll: true });
     }
+    despedirCajon();
     raiz.classList.remove("vista-saliente");
     raiz.classList.add("cargando-vista");
     if (performance.now() - ultimoCuadro < 100) {
@@ -205,6 +256,13 @@ window.addEventListener("pageshow", (evento) => {
     raiz.classList.remove("en-transicion");
     if (evento.persisted) {
         sesion((almacen) => almacen.removeItem("transicion-vistas"));
+        raiz.classList.remove("cajon-saliente");
+        const estado = cajonAbierto();
+        if (estado) {
+            raiz.classList.add("restaurada");
+            estado.sidebarOpen = false;
+            requestAnimationFrame(() => requestAnimationFrame(() => raiz.classList.remove("restaurada")));
+        }
     }
 });
 

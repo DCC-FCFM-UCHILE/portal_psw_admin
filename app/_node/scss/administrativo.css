@@ -166,6 +166,24 @@ html.vista-saliente #contenido {
   animation: var(--animate-salida);
 }
 
+@media (max-width: 1280px) {
+  html.vista-saliente .envoltura-lateral,
+  html.cajon-saliente .envoltura-lateral {
+    animation: var(--animate-salida);
+  }
+}
+
+html.cajon-saliente .envoltura-lateral,
+html.cajon-saliente .envoltura-lateral * {
+  transition: none !important;
+}
+
+html.restaurada .envoltura-lateral,
+html.restaurada .envoltura-lateral * {
+  transition: none !important;
+  animation: none !important;
+}
+
 html.vista-entrante #contenido {
   animation: var(--animate-entrada);
 }
@@ -377,6 +395,8 @@ input[type="checkbox"].appearance-none.rounded-full {
   #avisos,
   .silueta-vista.entrando,
   html.vista-saliente #contenido,
+  html.vista-saliente .envoltura-lateral,
+  html.cajon-saliente .envoltura-lateral,
   html.vista-entrante #contenido {
     animation: none;
   }
