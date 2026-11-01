@@ -90,6 +90,10 @@ class ListadoTests(BaseCompartida):
             with self.subTest(url=url):
                 self.assertNotContains(self.client.get(url), "<kbd")
 
+    def test_el_buscador_del_listado_ocupa_el_ancho_disponible(self):
+        respuesta = self.client.get(reverse("admin:applications_organization_changelist"))
+        self.assertContains(respuesta, '<div id="toolbar" class="sm:grow lg:grow-0">')
+
 
 class AccionesTests(BaseCompartida):
     def aplicar(self, accion):
