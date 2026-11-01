@@ -1185,6 +1185,11 @@ document.addEventListener(
         if (enCurso?.metodo === "POST") {
             return;
         }
+        const menu = boton.closest("nav[id]");
+        const disparador = menu && document.querySelector(`[aria-controls="${menu.id}"]`);
+        if (disparador) {
+            Alpine.$data(disparador).cerrar();
+        }
         listar(boton.formAction || location.href, "listado", formulario, false, boton.name ? { [boton.name]: boton.value } : {});
     },
     true,
