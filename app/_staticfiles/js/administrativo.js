@@ -716,9 +716,14 @@ const medirAlto = (elemento, variable) => {
     if (!elemento || !("ResizeObserver" in window)) {
         return;
     }
-    const observador = new ResizeObserver(() => {
-        document.documentElement.style.setProperty(variable, `${Math.ceil(elemento.getBoundingClientRect().height)}px`);
-    });
+    const observador = new ResizeObserver(() =>
+        requestAnimationFrame(() => {
+            const alto = `${Math.ceil(elemento.getBoundingClientRect().height)}px`;
+            if (document.documentElement.style.getPropertyValue(variable) !== alto) {
+                document.documentElement.style.setProperty(variable, alto);
+            }
+        }),
+    );
     observador.observe(elemento);
     alturas.set(variable, observador);
 };
