@@ -926,3 +926,11 @@ class BuscadorTests(BaseCompartida):
         respuesta = self.client.get(reverse("admin:index"))
         self.assertContains(respuesta, 'role="combobox"')
         self.assertContains(respuesta, "aria-activedescendant")
+
+
+class AyudasTests(BaseCompartida):
+    def test_cada_ayuda_tiene_el_id_que_la_describe(self):
+        otra = User.objects.create_user("otra", password="clave-de-prueba", is_staff=True)
+        respuesta = self.client.get(reverse("admin:auth_user_change", args=[otra.pk]))
+        self.assertContains(respuesta, 'aria-describedby="id_username_helptext"')
+        self.assertContains(respuesta, 'id="id_username_helptext"')
