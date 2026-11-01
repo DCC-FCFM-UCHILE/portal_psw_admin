@@ -4,12 +4,14 @@
 
 {% block extrahead %}
     {{ block.super }}
-    <style>
-        @view-transition { navigation: auto; }
-        @media (prefers-reduced-motion: reduce) {
-            @view-transition { navigation: none; }
-        }
-    </style>
+    {% if not is_popup %}
+        <style>
+            @view-transition { navigation: auto; }
+            @media (prefers-reduced-motion: reduce) {
+                @view-transition { navigation: none; }
+            }
+        </style>
+    {% endif %}
     <script>{% filter compactar %}{% include "components/layout/arranque.js" %}{% endfilter %}</script>
     <script>{% filter compactar %}{% include "components/layout/navegacion.js" %}{% endfilter %}</script>
 {% endblock %}

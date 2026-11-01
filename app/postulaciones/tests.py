@@ -491,3 +491,10 @@ class PermisosAjenosTests(BaseCompartida):
         }
         self.assertEqual(self.client.post(reverse("admin:auth_user_change", args=[externo.pk]), datos).status_code, 302)
         self.assertEqual(set(externo.user_permissions.all()), {ajeno, propio})
+
+
+class EmergentesTests(BaseCompartida):
+    def test_las_emergentes_no_se_inscriben_en_la_transicion_entre_vistas(self):
+        alta = reverse("admin:applications_organization_add")
+        self.assertContains(self.client.get(alta), "@view-transition")
+        self.assertNotContains(self.client.get(alta, {"_popup": "1", "_to_field": "id"}), "@view-transition")
