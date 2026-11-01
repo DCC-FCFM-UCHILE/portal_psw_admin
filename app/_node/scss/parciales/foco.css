@@ -1,0 +1,101 @@
+@layer base {
+  :where(input:not([type="hidden"]), select, textarea, trix-editor, .buscador-listado) {
+    outline: 0 solid transparent;
+    outline-offset: -2px;
+    transition-property: outline-color, outline-width;
+    transition-duration: 150ms;
+    transition-timing-function: var(--ease-out);
+
+    @media (prefers-reduced-motion: reduce) {
+      transition-property: outline-color;
+    }
+  }
+
+  :where(input[type="checkbox"], input[type="radio"]) {
+    outline-offset: 2px;
+  }
+}
+
+:where(a, button, summary, [tabindex]:not([tabindex="-1"]), input[type="checkbox"], input[type="radio"]):focus-visible {
+  outline: 2px solid var(--color-rojo);
+  outline-offset: 2px;
+}
+
+.dark :where(a, button, summary, [tabindex]:not([tabindex="-1"]), input[type="checkbox"], input[type="radio"]):focus-visible {
+  outline-color: var(--color-oscuro-acento);
+}
+
+.buscador-listado .boton-buscar:focus-visible {
+  outline-offset: -2px;
+}
+
+.salto-sobre-oscuro:focus-visible {
+  outline-color: #fff;
+}
+
+:is(.lateral, .barra-oscura) :where(a, button, summary, [tabindex]:not([tabindex="-1"])):focus-visible {
+  outline-color: #fff;
+}
+
+:where(input:not([type="checkbox"], [type="radio"], [type="hidden"]), select, textarea).border-base-200:not([aria-invalid="true"]),
+:where(input[type="checkbox"], input[type="radio"]).border-base-300 {
+  border-color: var(--color-borde);
+}
+
+.dark :where(input:not([type="checkbox"], [type="radio"], [type="hidden"]), select, textarea, input[type="checkbox"], input[type="radio"]):not([aria-invalid="true"]) {
+  border-color: var(--color-oscuro-borde);
+}
+
+.dark :is(input, select, textarea, [contenteditable="true"]):is(:focus, :focus-visible) {
+  outline-color: var(--color-oscuro-acento);
+}
+
+@layer base {
+  trix-editor:not(:focus) {
+    outline: 0 solid transparent !important;
+  }
+
+  trix-editor {
+    border-color: var(--color-borde) !important;
+
+    @variant dark {
+      border-color: var(--color-oscuro-borde) !important;
+    }
+  }
+
+  .errors trix-editor {
+    border-color: var(--color-rojo) !important;
+
+    @variant dark {
+      border-color: var(--color-red-400) !important;
+    }
+  }
+
+  .dark trix-editor:focus {
+    outline-color: var(--color-oscuro-acento) !important;
+  }
+
+  .hoja-correo > trix-editor {
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
+  }
+}
+
+.hoja-correo > trix-toolbar {
+  order: -1;
+}
+
+#menu-cuenta :where(a, button, input):focus-visible,
+.panel-tema :where(a, button, input):focus-visible {
+  outline-color: var(--color-rojo);
+
+  @variant dark {
+    outline-color: var(--color-oscuro-acento);
+  }
+}
+
+@layer utilities {
+  .changelist-actions :is(select, button, a):focus-visible {
+    outline-color: var(--color-white) !important;
+  }
+}

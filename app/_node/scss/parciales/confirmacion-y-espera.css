@@ -1,0 +1,46 @@
+.dialogo-confirmar {
+  position: fixed;
+  inset: 0;
+  width: min(28rem, calc(100% - 2rem));
+  height: fit-content;
+  margin: auto;
+  padding: 1.5rem;
+  translate: none;
+  border-width: 1px !important;
+}
+
+.dialogo-confirmar::backdrop {
+  background-color: var(--color-velo);
+  backdrop-filter: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .dialogo-confirmar[open] {
+    animation: var(--animate-entrada);
+  }
+}
+
+.silueta-bloque {
+  @apply bg-base-200 dark:bg-base-800;
+}
+
+.aviso-demora {
+  @apply mb-4 text-sm text-gris-medio dark:text-oscuro-suave;
+}
+
+@keyframes pulso {
+  50% { opacity: 0.55; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .silueta-bloque {
+    animation: pulso 1.6s ease-in-out 3;
+  }
+}
+
+@media (forced-colors: active) {
+  .silueta-bloque {
+    forced-color-adjust: none;
+    background-color: GrayText;
+  }
+}

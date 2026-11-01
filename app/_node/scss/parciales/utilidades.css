@@ -1,0 +1,65 @@
+@layer utilities {
+  #barra-progreso {
+    @apply bg-rojo-claro shadow-[0_0_8px_var(--color-rojo-claro)];
+    transition: opacity 150ms var(--ease-out);
+  }
+  body.navegando #barra-progreso {
+    opacity: 1;
+    transition: none;
+    animation: avance-carga 8s cubic-bezier(0.05, 0.7, 0.1, 1) forwards;
+  }
+}
+
+@keyframes avance-carga {
+  from { width: 15%; }
+  to { width: 90%; }
+}
+
+@media (forced-colors: active) {
+  #barra-progreso {
+    forced-color-adjust: none;
+    background-color: Highlight;
+  }
+}
+
+.matriz-permisos input[type="checkbox"]:indeterminate {
+  background-color: var(--color-primary-600);
+  border-color: var(--color-primary-600);
+}
+
+.matriz-permisos input[type="checkbox"]:indeterminate::after {
+  content: "remove";
+  color: var(--color-white);
+}
+
+form:has(input[name="is_superuser"]:checked) .matriz-permisos tr[data-fila] input[type="checkbox"] {
+  background-color: var(--color-primary-600);
+  border-color: var(--color-primary-600);
+}
+
+form:has(input[name="is_superuser"]:checked) .matriz-permisos tr[data-fila] input[type="checkbox"]::after {
+  content: "check_small";
+  color: var(--color-white);
+}
+
+.matriz-permisos input[type="checkbox"]:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.matriz-permisos-celda:has(input:disabled) {
+  cursor: not-allowed;
+  background-color: transparent;
+}
+
+.matriz-permisos-aviso {
+  display: none;
+}
+
+form:has(input[name="is_superuser"]:checked) .matriz-permisos-aviso {
+  display: block;
+}
+
+form:has(input[name="is_superuser"]:disabled) .matriz-permisos-retorno {
+  display: none;
+}

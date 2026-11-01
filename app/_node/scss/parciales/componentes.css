@@ -1,0 +1,289 @@
+@layer components {
+  .lateral {
+    @apply bg-gris-oscuro text-gray-300 dark:bg-oscuro-cabecera;
+  }
+  .zona-archivo {
+    @apply flex max-w-2xl grow flex-col gap-2;
+  }
+  .zona-archivo-actual {
+    @apply flex flex-wrap items-center gap-x-3 gap-y-1 rounded-default border border-base-200 bg-base-50 px-3 py-2 text-sm text-gris-oscuro dark:border-oscuro-elevada dark:bg-oscuro-elevada dark:text-oscuro-texto;
+  }
+  .zona-archivo-destino {
+    @apply relative flex flex-wrap items-center gap-x-3 gap-y-2 rounded-default border-2 border-dashed border-borde bg-white px-4 py-4 text-sm transition-[border-color,background-color,outline-color,outline-width] duration-150 dark:border-oscuro-borde dark:bg-oscuro-fondo motion-reduce:transition-[border-color,background-color,outline-color];
+    outline: 0 solid transparent;
+    outline-offset: 2px;
+  }
+  .zona-archivo-destino:hover,
+  .zona-archivo-destino.encima {
+    @apply border-rojo bg-red-50 dark:border-oscuro-acento dark:bg-red-950/40;
+  }
+  .zona-archivo-destino.elegido {
+    @apply border-solid border-green-700 dark:border-green-500;
+  }
+  .errors .zona-archivo-destino {
+    @apply border-rojo dark:border-red-400;
+  }
+  .zona-archivo-destino > input {
+    @apply absolute inset-0 z-10 size-full cursor-pointer opacity-0;
+  }
+  .zona-archivo-icono {
+    @apply text-[1.75rem] text-gris-medio dark:text-oscuro-suave;
+  }
+  .zona-archivo-destino.elegido .zona-archivo-icono {
+    @apply text-green-700 dark:text-green-500;
+  }
+  .zona-archivo-boton {
+    @apply inline-flex items-center rounded-default border border-borde bg-white px-3 py-1.5 font-medium text-gris-oscuro shadow-xs dark:border-oscuro-borde dark:bg-oscuro-superficie dark:text-oscuro-texto;
+  }
+  .zona-archivo-destino:hover .zona-archivo-boton {
+    @apply bg-base-50 dark:bg-oscuro-elevada;
+  }
+  .zona-archivo-texto {
+    @apply flex min-w-0 flex-col text-gris-medio dark:text-oscuro-suave;
+  }
+  .zona-archivo-nombre {
+    @apply break-all font-medium text-gris-oscuro dark:text-oscuro-texto;
+  }
+  .zona-archivo-formatos {
+    @apply text-xs;
+  }
+  .matriz-permisos {
+    @apply flex min-w-0 max-w-2xl grow flex-col gap-4;
+  }
+  .matriz-permisos-marco {
+    @apply overflow-x-auto rounded-default border border-base-200 bg-white dark:border-oscuro-elevada dark:bg-oscuro-superficie;
+    scroll-padding-inline-start: 7rem;
+    container-type: inline-size;
+  }
+  .matriz-permisos-tabla {
+    @apply w-full border-collapse text-sm;
+  }
+  .matriz-permisos-tabla caption {
+    @apply border-b border-base-200 bg-base-50 px-3 py-2 text-left text-[0.6875rem] font-bold uppercase tracking-widest text-gris-medio dark:border-oscuro-elevada dark:bg-oscuro-elevada dark:text-oscuro-suave;
+  }
+  .matriz-permisos-tabla thead :is(th, td) {
+    @apply border-b border-base-200 px-0.5 py-2 text-center text-[0.6875rem] font-semibold text-gris-medio sm:px-1 sm:text-xs dark:border-oscuro-elevada dark:text-oscuro-suave;
+  }
+  .matriz-permisos-tabla :is(tbody th, thead td:first-child) {
+    @apply sticky left-0 z-[1] w-full min-w-[7rem] bg-white dark:bg-oscuro-superficie;
+  }
+  .matriz-permisos-tabla tbody tr + tr {
+    @apply border-t border-base-200 dark:border-oscuro-elevada;
+  }
+  .matriz-permisos-tabla tbody th {
+    @apply py-1 pl-2 pr-1 text-left text-[0.8125rem] font-medium text-gris-oscuro sm:px-3 sm:text-sm dark:text-oscuro-texto;
+  }
+  .matriz-permisos-tabla tbody td,
+  .matriz-permisos-tabla thead th {
+    @apply w-10 min-w-10 sm:w-14 sm:min-w-14;
+  }
+  .matriz-permisos-tabla tbody td {
+    @apply p-0 text-center;
+  }
+  .matriz-permisos-tabla tbody td:last-child,
+  .matriz-permisos-tabla thead th:last-child {
+    @apply border-l border-base-200 dark:border-oscuro-elevada;
+  }
+  .matriz-permisos-celda {
+    @apply flex min-h-11 cursor-pointer items-center justify-center hover:bg-base-50 dark:hover:bg-oscuro-elevada;
+  }
+  .matriz-permisos-vacia {
+    @apply cursor-default hover:bg-transparent dark:hover:bg-transparent;
+  }
+  .matriz-permisos-verbo {
+    @apply hidden;
+  }
+  @container (width < 20rem) {
+    .matriz-permisos-tabla,
+    .matriz-permisos-tabla tbody,
+    .matriz-permisos-tabla caption {
+      @apply block;
+    }
+    .matriz-permisos-tabla thead {
+      @apply sr-only;
+    }
+    .matriz-permisos-tabla tbody tr {
+      @apply grid grid-cols-5;
+    }
+    .matriz-permisos-tabla tbody th {
+      @apply static col-span-5 w-auto min-w-0 px-3 pt-2.5 pb-0;
+    }
+    .matriz-permisos-tabla tbody td {
+      @apply w-auto min-w-0;
+    }
+    .matriz-permisos-celda {
+      @apply min-h-14 flex-col gap-1;
+    }
+    .matriz-permisos-verbo {
+      @apply block text-[0.6875rem] text-gris-medio dark:text-oscuro-suave;
+    }
+  }
+  .matriz-permisos-nota,
+  .matriz-permisos-aviso {
+    @apply text-xs text-gris-medio dark:text-oscuro-suave;
+  }
+  .barra-acciones {
+    @apply fixed right-0 bottom-0 z-50 border-t border-base-200 bg-white p-3 dark:border-base-800 dark:bg-base-900;
+  }
+  .barra-acciones-caja {
+    @apply flex w-full flex-wrap items-center gap-x-4 gap-y-2 rounded-default bg-primary-600 p-1.5 pl-3 text-sm text-white;
+  }
+  .barra-acciones-seleccion {
+    @apply flex min-h-10 flex-wrap items-center gap-x-3 gap-y-1 font-medium lg:min-h-7;
+  }
+  .barra-acciones-botones {
+    @apply ml-auto flex flex-wrap items-center gap-2;
+  }
+  .barra-acciones-boton {
+    @apply flex min-h-10 cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-default bg-white/20 px-3 font-medium text-white transition-[background-color] hover:bg-white/30 lg:min-h-7;
+  }
+  .barra-acciones-quitar {
+    @apply bg-transparent hover:bg-white/20;
+  }
+  [data-peligro] {
+    @apply text-rojo! dark:text-red-300!;
+  }
+  .boton-borrado-definitivo {
+    @apply inline-flex w-full cursor-pointer items-center justify-center gap-1 whitespace-nowrap rounded-default border border-transparent bg-red-600 px-3 py-2 font-medium text-white tabular-nums hover:bg-red-600/80 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-red-600 lg:w-auto;
+  }
+  .lateral-grupo {
+    @apply mx-3 mb-1 mt-5 flex items-center gap-2 px-3 text-[0.6875rem] font-bold uppercase tracking-widest text-[#B0B6BF];
+  }
+  .lateral-enlace {
+    @apply flex min-h-10 items-center gap-3 rounded-md border-l-4 border-transparent px-3 py-2 text-sm text-gray-300 transition-[color,background-color] hover:bg-white/5 hover:text-white;
+  }
+  .lateral-enlace[aria-current="page"],
+  .lateral-enlace[data-destino] {
+    @apply border-rojo bg-white/10 font-semibold text-white;
+  }
+  html.cargando-vista:has([data-destino]) .lateral-enlace[aria-current="page"]:not([data-destino]) {
+    @apply border-transparent bg-transparent font-normal text-gray-300;
+  }
+  .lateral-boton {
+    @apply flex min-h-10 w-full cursor-pointer items-center gap-3 rounded-md px-3 py-2 text-left text-sm text-gray-300 transition-[color,background-color] hover:bg-white/5 hover:text-white;
+  }
+  @media (forced-colors: active) {
+    .lateral-enlace[aria-current="page"],
+    .lateral-enlace[data-destino] {
+      outline: 2px solid CanvasText;
+      outline-offset: -2px;
+    }
+    html.cargando-vista:has([data-destino]) .lateral-enlace[aria-current="page"]:not([data-destino]) {
+      outline: none;
+    }
+  }
+  .boton-cabecera {
+    @apply inline-flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-md text-gray-300 transition-[color,background-color] hover:bg-white/5 hover:text-white;
+  }
+  .panel-tema {
+    @apply absolute right-0 top-full mt-2 w-56 rounded-lg border border-base-200 bg-white p-1.5 text-sm text-gris-oscuro shadow-lg dark:border-oscuro-elevada dark:bg-oscuro-superficie dark:text-oscuro-texto;
+  }
+  .grupo-tema legend {
+    @apply px-2.5 pb-1 pt-1.5 text-xs font-bold uppercase tracking-wider text-gris-medio dark:text-oscuro-suave;
+  }
+  #menu-cuenta .grupo-tema {
+    @apply mx-1 mb-1 border-b border-base-200 pb-1 dark:border-oscuro-elevada;
+  }
+  .opcion-tema {
+    @apply flex min-h-11 cursor-pointer items-center gap-3 rounded-md px-2.5 transition-colors hover:bg-base-100 has-checked:font-semibold has-checked:text-rojo dark:hover:bg-oscuro-elevada dark:has-checked:text-oscuro-acento;
+  }
+  .opcion-tema input {
+    @apply size-4 shrink-0 cursor-pointer accent-rojo dark:accent-oscuro-acento;
+  }
+  .avatar-iniciales {
+    @apply flex size-8 shrink-0 items-center justify-center rounded-full border border-red-200 bg-red-50 text-xs font-bold text-rojo dark:border-red-900 dark:bg-red-950 dark:text-red-300;
+  }
+  .titulo-pagina {
+    @apply text-2xl font-extrabold tracking-tight text-gris-oscuro dark:text-white;
+  }
+  .bajada {
+    @apply mt-1 text-sm text-gris-medio dark:text-oscuro-suave;
+  }
+  .titulo-seccion {
+    @apply text-sm font-bold text-gris-oscuro dark:text-white;
+  }
+  .enlace {
+    @apply rounded font-medium text-rojo underline underline-offset-2 hover:text-rojo-oscuro dark:text-red-300 dark:hover:text-red-200;
+  }
+  .enlace-accion {
+    @apply inline-flex min-h-6 flex-wrap items-center gap-2 rounded py-1.5 font-medium text-rojo hover:underline dark:text-red-300;
+  }
+  .tarjeta {
+    @apply rounded-xl border border-base-200 bg-white shadow-xs dark:border-base-800 dark:bg-base-900;
+  }
+  .tarjeta-cabecera {
+    @apply flex flex-wrap items-center justify-between gap-2 border-b border-base-200 px-5 py-4 dark:border-base-800;
+  }
+  .boton-primario {
+    @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-rojo px-4 py-2 text-sm font-semibold text-white shadow-sm transition-[color,background-color,transform] hover:bg-rojo-oscuro active:scale-95 motion-reduce:active:scale-100;
+  }
+  .boton-buscar {
+    @apply inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 border-l border-borde bg-gris-claro px-3 text-sm font-medium text-gris-oscuro transition-[color,background-color] hover:bg-base-100 focus-visible:-outline-offset-2 dark:border-oscuro-borde dark:bg-oscuro-elevada dark:text-oscuro-texto dark:hover:bg-base-700;
+  }
+
+  .boton-secundario {
+    @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border border-borde bg-white px-4 py-2 text-sm font-medium text-gris-oscuro transition-[color,background-color,border-color,transform] hover:bg-gray-50 active:scale-95 motion-reduce:active:scale-100 dark:border-oscuro-borde dark:bg-base-900 dark:text-white dark:hover:bg-base-800;
+  }
+  .boton-secundario:disabled {
+    @apply cursor-not-allowed border-base-200 bg-white text-gris-medio opacity-60 active:scale-100 dark:border-oscuro-elevada dark:bg-base-900 dark:text-oscuro-suave;
+  }
+  .numero-pagina {
+    @apply inline-flex min-h-10 items-center justify-center rounded-lg px-2 text-sm font-medium tabular-nums text-gris-oscuro dark:text-white;
+    min-width: max(2.5rem, calc(var(--cifras, 2) * 0.7em + 1rem));
+  }
+  a.numero-pagina {
+    @apply transition-colors hover:bg-base-100 hover:text-rojo dark:hover:bg-base-800 dark:hover:text-oscuro-acento;
+  }
+  .numero-pagina-actual {
+    @apply bg-rojo font-semibold text-white dark:text-white;
+  }
+  .encabezado-orden {
+    @apply flex w-full items-center gap-0.5 py-2 pl-3 pr-1 transition-colors hover:bg-base-100 hover:text-gris-oscuro dark:hover:bg-white/5 dark:hover:text-white;
+  }
+  .encabezado-orden-icono {
+    @apply shrink-0 text-gris-medio transition-colors dark:text-oscuro-suave;
+  }
+  .encabezado-orden:hover .encabezado-orden-icono {
+    @apply text-gris-oscuro dark:text-white;
+  }
+  .encabezado-orden[data-orden],
+  .encabezado-orden[data-orden] .encabezado-orden-icono {
+    @apply text-rojo dark:text-oscuro-acento;
+  }
+  .indicador {
+    @apply flex items-center justify-between gap-4 rounded-xl border border-base-200 bg-white px-5 py-4 shadow-xs transition-[border-color,transform] hover:-translate-y-px hover:border-rojo motion-reduce:hover:translate-y-0 dark:border-base-800 dark:bg-base-900;
+  }
+  .indicador-etiqueta {
+    @apply text-[0.6875rem] font-bold uppercase tracking-wider text-gris-medio dark:text-oscuro-suave;
+  }
+  .indicador-valor {
+    @apply mt-1 text-2xl font-extrabold tabular-nums text-gris-oscuro dark:text-white;
+  }
+  .indicador-icono {
+    @apply flex size-10 shrink-0 items-center justify-center rounded-full bg-red-50 text-rojo dark:bg-red-950 dark:text-red-300;
+  }
+  .filtro-estado {
+    @apply inline-flex min-h-8 items-center gap-2 rounded-full border border-borde bg-white px-3 py-1 text-xs font-semibold text-gris-oscuro transition-[color,background-color,border-color] hover:border-rojo hover:text-rojo dark:border-oscuro-borde dark:bg-base-900 dark:text-white;
+  }
+  .filtro-estado[aria-current="page"] {
+    @apply border-rojo bg-rojo text-white hover:text-white dark:border-rojo dark:bg-rojo;
+  }
+  .filtro-estado-cantidad {
+    @apply rounded-full bg-black/5 px-1.5 tabular-nums dark:bg-white/10;
+  }
+  .filtro-estado[aria-current="page"] .filtro-estado-cantidad {
+    @apply bg-white/20;
+  }
+  .linea-tiempo {
+    @apply divide-y divide-base-200 dark:divide-base-800;
+  }
+  .linea-tiempo > li {
+    @apply flex gap-3 px-5 py-3;
+  }
+  .linea-tiempo-punto {
+    @apply mt-1.5 size-2 shrink-0 rounded-full bg-rojo;
+  }
+  .lista-accesos > li > a {
+    @apply flex min-h-11 items-center gap-3 px-5 py-2.5 text-sm font-medium text-gris-oscuro transition-colors hover:bg-gris-claro hover:text-rojo dark:text-white dark:hover:bg-base-800 dark:hover:text-red-300;
+  }
+}
