@@ -2,17 +2,13 @@ from django.contrib import admin, messages
 from django.contrib.admin.models import LogEntry
 from django.contrib.admin.utils import unquote
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ValidationError
-from django.core.validators import FileExtensionValidator
-from django.db import models
 from django.db.models import Count
 from django.http import Http404, HttpResponseNotAllowed
 from django.shortcuts import redirect
 from django.urls import path, reverse
 from django.utils.html import format_html
 from django.utils.http import url_has_allowed_host_and_scheme
-from django.utils.text import capfirst
-from unfold.admin import ModelAdmin, TabularInline
+from unfold.admin import ModelAdmin
 from unfold.contrib.filters.admin import RelatedDropdownFilter
 from unfold.contrib.filters.forms import DropdownForm
 from unfold.decorators import action, display
@@ -22,7 +18,8 @@ from core.acciones import AccionesDeFila
 from core.busqueda import BusquedaSinTildes
 from core.listado import ListadoParcial, zona_pedida
 from postulaciones import historial
-from postulaciones.models import Announcement, Application, ApprovedProject, Candidate, Member, Organization, Unit
+from postulaciones.admin.comun import FormatosDeArchivo
+from postulaciones.models import Application
 from postulaciones.views import CorreoPostulanteView
 
 ESTADOS = {
@@ -43,17 +40,6 @@ class ConvocatoriaFilter(RelatedDropdownFilter):
     form_class = FormularioDesplegable
 
 
-class FormatosDeArchivo:
-    def formfield_for_dbfield(self, db_field, request, **kwargs):
-        campo = super().formfield_for_dbfield(db_field, request, **kwargs)
-        if isinstance(db_field, models.FileField) and campo is not None:
-            validadores = [validador for validador in db_field.validators if isinstance(validador, FileExtensionValidator)]
-            extensiones = [f".{extension}" for validador in validadores for extension in validador.allowed_extensions or []]
-            if extensiones:
-                campo.widget.attrs["accept"] = ",".join(extensiones)
-        return campo
-
-
 class NotificacionFilter(admin.SimpleListFilter):
     title = "notificación"
     parameter_name = "notificacion"
@@ -67,24 +53,6 @@ class NotificacionFilter(admin.SimpleListFilter):
         if self.value() == "notificada":
             return queryset.filter(fue_notificada=True)
         return queryset
-
-
-@admin.register(Announcement)
-class AnnouncementAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, ModelAdmin):
-    list_display = ["__str__", "inicio", "cierre", "convenio", "ver_postulaciones"]
-    search_fields = ["anio"]
-    list_per_page = 10
-
-    def formfield_for_dbfield(self, db_field, request, **kwargs):
-        campo = super().formfield_for_dbfield(db_field, request, **kwargs)
-        if isinstance(db_field, models.DateField) and campo is not None and not campo.help_text:
-            campo.help_text = "Día/mes/año, por ejemplo 15/03/2027."
-        return campo
-
-    @display(description="Postulaciones")
-    def ver_postulaciones(self, obj):
-        url = reverse("admin:applications_application_changelist")
-        return format_html('<a href="{}?convocatoria__id__exact={}" class="enlace">Ver postulaciones</a>', url, obj.pk)
 
 
 @admin.register(Application)
@@ -238,88 +206,3 @@ class ApplicationAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, Format
     @action(description="Contactar", url_path="contactar", permissions=["change"], icon="person")
     def contactar(self, request, object_id):
         return redirect("admin:applications_application_contactar_correo", pk=object_id)
-
-
-class MemberInline(TabularInline):
-    model = Member
-    fields = ["nombre", "es_visible"]
-    extra = 0
-
-    def formfield_for_dbfield(self, db_field, request, **kwargs):
-        campo = super().formfield_for_dbfield(db_field, request, **kwargs)
-        if campo is not None:
-            campo.widget.attrs["aria-label"] = capfirst(db_field.verbose_name)
-        return campo
-
-
-@admin.register(ApprovedProject)
-class ApprovedProjectAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, ModelAdmin):
-    list_display = ["titulo", "convocatoria", "organizacion", "unidad", "postulante", "semestre", "anio", "tutor", "es_visible"]
-    list_filter = ["es_visible"]
-    search_fields = ["titulo", "postulacion__titulo"]
-    list_select_related = ["postulacion__convocatoria", "postulacion__postulante", "postulacion__unidad__organizacion"]
-    list_per_page = 10
-    inlines = [MemberInline]
-
-    @display(description="Convocatoria")
-    def convocatoria(self, obj):
-        return obj.postulacion.convocatoria if obj.postulacion else "-"
-
-    @display(description="Organización")
-    def organizacion(self, obj):
-        return (obj.postulacion and obj.postulacion.organizacion) or "-"
-
-    @display(description="Unidad")
-    def unidad(self, obj):
-        return (obj.postulacion and obj.postulacion.unidad) or "-"
-
-    @display(description="Postulante")
-    def postulante(self, obj):
-        return obj.postulacion.postulante if obj.postulacion else "-"
-
-
-def logo_png_o_jpg(archivo):
-    extension = archivo.name.rsplit(".", 1)[-1].lower()
-    inicio = archivo.read(4)
-    archivo.seek(0)
-    if extension not in {"png", "jpg", "jpeg"} or not inicio.startswith((b"\x89PNG", b"\xff\xd8\xff")):
-        raise ValidationError("El logo tiene que ser una imagen PNG o JPG.")
-
-
-@admin.register(Candidate)
-class CandidateAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, ModelAdmin):
-    list_display = ["nombre", "correo", "organizacion"]
-    search_fields = ["organizacion__nombre", "nombre", "correo"]
-    list_select_related = ["organizacion"]
-    list_per_page = 10
-
-
-@admin.register(Organization)
-class OrganizationAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, ModelAdmin):
-    list_display = ["rut", "nombre", "rubro"]
-    search_fields = ["rut", "nombre", "rubro"]
-    list_per_page = 10
-
-
-@admin.register(Unit)
-class UnitAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, FormatosDeArchivo, ModelAdmin):
-    list_display = ["id", "nombre", "organizacion", "esta_vetada"]
-    search_fields = ["nombre", "organizacion__nombre", "organizacion__rut"]
-    list_select_related = ["organizacion"]
-    list_per_page = 10
-
-    def get_form(self, request, obj=None, change=False, **kwargs):
-        formulario = super().get_form(request, obj, change, **kwargs)
-        formulario.base_fields["nombre"].required = True
-        logo = formulario.base_fields["logo"]
-        logo.validators.append(logo_png_o_jpg)
-        logo.widget.attrs["accept"] = ".png,.jpg,.jpeg"
-        return formulario
-
-
-@admin.register(Member)
-class MemberAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, ModelAdmin):
-    list_display = ["nombre", "proyecto", "es_visible"]
-    search_fields = ["proyecto__titulo", "nombre"]
-    list_select_related = ["proyecto"]
-    list_per_page = 10
