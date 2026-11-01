@@ -298,15 +298,16 @@ document.addEventListener("DOMContentLoaded", () => {
     campos.forEach((campo) => {
         campo.spellcheck = false;
         campo.setAttribute("autocapitalize", "none");
+        const enIngreso = Boolean(campo.closest("#login-form"));
         const marco = document.createElement("div");
-        marco.className = "campo-contrasena";
+        marco.className = enIngreso ? "campo-contrasena campo-con-ojo" : "campo-contrasena";
         const boton = document.createElement("button");
         boton.type = "button";
-        boton.className = "boton-campo";
+        boton.className = enIngreso ? "boton-ojo" : "boton-campo";
         boton.setAttribute("aria-controls", campo.id);
         boton.innerHTML =
             '<span class="capas" aria-hidden="true"><span class="material-symbols-outlined md-18 si-oculta">visibility</span><span class="material-symbols-outlined md-18 si-visible">visibility_off</span></span>' +
-            '<span class="capas" aria-hidden="true"><span class="si-oculta">Mostrar</span><span class="si-visible">Ocultar</span></span>';
+            (enIngreso ? "" : '<span class="capas" aria-hidden="true"><span class="si-oculta">Mostrar</span><span class="si-visible">Ocultar</span></span>');
         campo.replaceWith(marco);
         marco.append(campo, boton);
         mostrarContrasena(campo, boton, false);

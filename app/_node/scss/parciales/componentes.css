@@ -43,6 +43,15 @@
   .campo-contrasena [data-visible="false"] .si-visible {
     @apply opacity-0;
   }
+  .campo-con-ojo {
+    @apply relative max-w-none;
+  }
+  .campo-con-ojo > input {
+    @apply pr-11!;
+  }
+  .boton-ojo {
+    @apply absolute right-1 top-1/2 flex size-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-default text-gris-medio transition-[color,background-color] duration-150 hover:bg-base-100 hover:text-gris-oscuro overflow-hidden focus-visible:outline-2 focus-visible:outline-rojo motion-reduce:transition-none dark:text-oscuro-suave dark:hover:bg-base-800 dark:hover:text-white dark:focus-visible:outline-oscuro-acento;
+  }
   .lateral {
     @apply bg-gris-oscuro text-gray-300 dark:bg-oscuro-cabecera;
   }
