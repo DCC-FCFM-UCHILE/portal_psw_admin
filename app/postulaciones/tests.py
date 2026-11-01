@@ -891,6 +891,11 @@ class BarraDeGuardadoTests(BaseCompartida):
                 self.assertContains(respuesta, 'name="_continue"')
                 self.assertNotContains(respuesta, 'name="_addanother"')
 
+    def test_la_barra_va_en_el_orden_del_documento(self):
+        respuesta = self.client.get(reverse("admin:applications_application_change", args=[self.postulacion.pk]))
+        barra = re.search(r'id="submit-row".*?name="_save"', respuesta.content.decode(), re.S).group()
+        self.assertNotIn("-reverse", barra)
+
 
 class CatalogoDeTraduccionesTests(BaseCompartida):
     def test_el_catalogo_queda_en_cache_del_navegador(self):
