@@ -496,6 +496,10 @@ html:has(#listado[aria-busy="true"]) :is(#pie-listado, #conteo-cabecera) {
   outline-offset: -2px;
 }
 
+.salto-sobre-oscuro:focus-visible {
+  outline-color: #fff;
+}
+
 :is(.lateral, .barra-oscura) :where(a, button, summary, [tabindex]:not([tabindex="-1"])):focus-visible {
   outline-color: #fff;
 }
