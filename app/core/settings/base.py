@@ -88,6 +88,8 @@ AUTH_PASSWORD_VALIDATORS = [
 LOGIN_URL = reverse_lazy("admin:login")
 LOGIN_REDIRECT_URL = reverse_lazy("admin:index")
 
+SESSION_COOKIE_AGE = 8 * 60 * 60
+
 
 LANGUAGE_CODE = "es-cl"
 TIME_ZONE = "America/Santiago"

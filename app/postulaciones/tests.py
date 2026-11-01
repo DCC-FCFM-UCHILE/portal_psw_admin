@@ -1153,6 +1153,11 @@ class IngresoTests(TestCase):
         self.assertEqual(contenido.count('aria-describedby="error-ingreso"'), 2)
         self.assertIn('id="error-ingreso"', contenido)
 
+    def test_la_sesion_dura_ocho_horas(self):
+        User.objects.create_user("persona", password="clave-de-prueba", is_staff=True)
+        respuesta = self.client.post(reverse("admin:login"), {"username": "persona", "password": "clave-de-prueba"})
+        self.assertEqual(respuesta.cookies["sessionid"]["max-age"], 8 * 60 * 60)
+
     def test_llegar_desde_otra_pagina_explica_que_hay_que_ingresar(self):
         respuesta = self.client.get(reverse("admin:applications_application_changelist"), follow=True)
         self.assertContains(respuesta, "Para ver esa página, primero ingresa con tu cuenta.")
