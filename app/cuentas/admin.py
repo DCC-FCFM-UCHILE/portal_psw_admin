@@ -5,6 +5,7 @@ from django.contrib.auth.models import Group, User
 from unfold.admin import ModelAdmin
 from unfold.forms import AdminPasswordChangeForm, UserCreationForm
 
+from core.acciones import AccionesDeFila
 from cuentas.forms import FichaUsuarioForm
 from cuentas.widgets import CasillasDeGrupos, MatrizPermisos
 
@@ -25,7 +26,7 @@ class PermisosEnTabla:
 
 
 @admin.register(User)
-class UserAdmin(PermisosEnTabla, BaseUserAdmin, ModelAdmin):
+class UserAdmin(AccionesDeFila, PermisosEnTabla, BaseUserAdmin, ModelAdmin):
     form = FichaUsuarioForm
     add_form = UserCreationForm
     change_password_form = AdminPasswordChangeForm
@@ -38,6 +39,6 @@ class UserAdmin(PermisosEnTabla, BaseUserAdmin, ModelAdmin):
 
 
 @admin.register(Group)
-class GroupAdmin(PermisosEnTabla, BaseGroupAdmin, ModelAdmin):
+class GroupAdmin(AccionesDeFila, PermisosEnTabla, BaseGroupAdmin, ModelAdmin):
     def has_module_permission(self, request):
         return False

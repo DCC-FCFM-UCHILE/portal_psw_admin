@@ -505,6 +505,20 @@ class BarraDeAccionesTests(BaseCompartida):
         self.assertContains(respuesta, "Quitar la selección")
         self.assertNotContains(respuesta, '<select name="action"')
 
+    def test_cada_fila_se_edita_y_se_elimina_desde_su_menu(self):
+        organizacion = Organization.objects.create(rut="1-9", nombre="Con menú")
+        for accion, destino in [("editar_fila", "change"), ("eliminar_fila", "delete")]:
+            with self.subTest(accion=accion):
+                respuesta = self.client.get(reverse(f"admin:applications_organization_{accion}", args=[organizacion.pk]))
+                self.assertRedirects(respuesta, reverse(f"admin:applications_organization_{destino}", args=[organizacion.pk]))
+
+    def test_sin_permiso_de_borrar_no_hay_eliminar_por_fila(self):
+        lector = User.objects.create_user("lector", password="clave-de-prueba", is_staff=True)
+        lector.user_permissions.add(Permission.objects.get(codename="view_application"))
+        self.client.force_login(lector)
+        respuesta = self.client.get(reverse("admin:applications_application_changelist"))
+        self.assertNotContains(respuesta, "eliminar-fila")
+
 
 class EmergentesTests(BaseCompartida):
     def test_las_emergentes_no_se_inscriben_en_la_transicion_entre_vistas(self):

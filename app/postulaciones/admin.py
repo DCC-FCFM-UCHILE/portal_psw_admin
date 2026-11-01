@@ -14,6 +14,7 @@ from unfold.contrib.filters.forms import DropdownForm
 from unfold.decorators import action, display
 from unfold.widgets import UnfoldAdminSelectWidget
 
+from core.acciones import AccionesDeFila
 from postulaciones import historial
 from postulaciones.models import Announcement, Application, ApprovedProject, Candidate, Member, Organization, Unit
 from postulaciones.views import CorreoPostulanteView
@@ -63,7 +64,7 @@ class NotificacionFilter(admin.SimpleListFilter):
 
 
 @admin.register(Announcement)
-class AnnouncementAdmin(ModelAdmin):
+class AnnouncementAdmin(AccionesDeFila, ModelAdmin):
     list_display = ["__str__", "inicio", "cierre", "convenio", "ver_postulaciones"]
     search_fields = ["anio"]
     list_per_page = 10
@@ -75,7 +76,7 @@ class AnnouncementAdmin(ModelAdmin):
 
 
 @admin.register(Application)
-class ApplicationAdmin(FormatosDeArchivo, ModelAdmin):
+class ApplicationAdmin(AccionesDeFila, FormatosDeArchivo, ModelAdmin):
     list_display = ["titulo", "convocatoria", "organizacion", "unidad", "postulante", "mostrar_estado", "fue_notificada", "perfil"]
     list_display_links = ["titulo"]
     list_filter = ["estado", NotificacionFilter, ("convocatoria", ConvocatoriaFilter)]
@@ -84,7 +85,7 @@ class ApplicationAdmin(FormatosDeArchivo, ModelAdmin):
     list_select_related = ["convocatoria", "postulante", "unidad__organizacion"]
     list_per_page = 10
     actions = ["aceptar", "rechazar"]
-    actions_row = ["notificar", "contactar"]
+    actions_row = ["editar_fila", "notificar", "contactar", "eliminar_fila"]
     actions_detail = ["notificar", "contactar"]
     list_before_template = "postulaciones/admin/filtros_estado.html"
     change_form_before_template = "postulaciones/admin/resumen_postulacion.html"
@@ -207,7 +208,7 @@ class MemberInline(TabularInline):
 
 
 @admin.register(ApprovedProject)
-class ApprovedProjectAdmin(ModelAdmin):
+class ApprovedProjectAdmin(AccionesDeFila, ModelAdmin):
     list_display = ["titulo", "convocatoria", "organizacion", "unidad", "postulante", "semestre", "anio", "tutor", "es_visible"]
     list_filter = ["es_visible"]
     search_fields = ["titulo", "postulacion__titulo"]
@@ -233,7 +234,7 @@ class ApprovedProjectAdmin(ModelAdmin):
 
 
 @admin.register(Candidate)
-class CandidateAdmin(ModelAdmin):
+class CandidateAdmin(AccionesDeFila, ModelAdmin):
     list_display = ["nombre", "correo", "organizacion"]
     search_fields = ["organizacion__nombre", "nombre", "correo"]
     list_select_related = ["organizacion"]
@@ -241,14 +242,14 @@ class CandidateAdmin(ModelAdmin):
 
 
 @admin.register(Organization)
-class OrganizationAdmin(ModelAdmin):
+class OrganizationAdmin(AccionesDeFila, ModelAdmin):
     list_display = ["rut", "nombre", "rubro"]
     search_fields = ["rut", "nombre", "rubro"]
     list_per_page = 10
 
 
 @admin.register(Unit)
-class UnitAdmin(FormatosDeArchivo, ModelAdmin):
+class UnitAdmin(AccionesDeFila, FormatosDeArchivo, ModelAdmin):
     list_display = ["id", "nombre", "organizacion", "esta_vetada"]
     search_fields = ["nombre", "organizacion__nombre", "organizacion__rut"]
     list_select_related = ["organizacion"]
@@ -256,7 +257,7 @@ class UnitAdmin(FormatosDeArchivo, ModelAdmin):
 
 
 @admin.register(Member)
-class MemberAdmin(ModelAdmin):
+class MemberAdmin(AccionesDeFila, ModelAdmin):
     list_display = ["nombre", "proyecto", "es_visible"]
     search_fields = ["proyecto__titulo", "nombre"]
     list_select_related = ["proyecto"]

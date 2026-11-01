@@ -694,6 +694,9 @@ input[type="checkbox"].appearance-none.rounded-full {
   .barra-acciones-quitar {
     @apply bg-transparent hover:bg-white/20;
   }
+  [data-peligro] {
+    @apply text-rojo dark:text-red-400;
+  }
   .lateral-grupo {
     @apply mx-3 mb-1 mt-5 flex items-center gap-2 px-3 text-[0.6875rem] font-bold uppercase tracking-widest text-[#B0B6BF];
   }
