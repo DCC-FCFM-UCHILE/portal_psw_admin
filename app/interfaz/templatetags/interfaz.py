@@ -86,7 +86,9 @@ def formatos_archivo(accept):
 @register.filter
 def describir_con(atributos, propia):
     otras = [descripcion for descripcion in str(atributos.get("aria-describedby", "")).split() if descripcion != propia]
-    return {**atributos, "aria-describedby": " ".join([propia, *otras])}.items()
+    errores = [descripcion for descripcion in otras if descripcion.endswith("_error")]
+    resto = [descripcion for descripcion in otras if descripcion not in errores]
+    return {**atributos, "aria-describedby": " ".join([*errores, propia, *resto])}.items()
 
 
 @register.filter

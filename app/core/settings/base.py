@@ -99,7 +99,7 @@ USE_TZ = True
 
 LOCALE_PATHS = [BASE_DIR / "_locale"]
 
-FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
+FORM_RENDERER = "interfaz.formularios.Renderizador"
 
 
 STATIC_URL = "static/"

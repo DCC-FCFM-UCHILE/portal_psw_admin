@@ -9,13 +9,7 @@
         <div class="flex flex-col grow">
             {{ field.field }}
 
-            {% if field.field.errors|length > 0 %}
-                <div id="{{ field.field.auto_id }}_error" class="mt-2 text-xs text-rojo dark:text-oscuro-acento">
-                    {% for error in field.field.errors %}
-                        {{ error }}
-                    {% endfor %}
-                </div>
-            {% endif %}
+            {% include "unfold/helpers/form_errors.html" with errors=field.field.errors %}
         </div>
     {% endif %}
 </div>

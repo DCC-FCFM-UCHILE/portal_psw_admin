@@ -317,6 +317,19 @@ class ErroresDeContrasenaTests(BaseCompartida):
         )
 
 
+class ErrorJuntoAlCampoTests(BaseCompartida):
+    def test_el_error_se_lee_y_se_ve_antes_que_la_ayuda(self):
+        contenido = self.client.post(reverse("admin:applications_announcement_add"), {"_save": "1"}).content.decode()
+        self.assertIn('aria-describedby="id_inicio_error id_inicio_helptext"', contenido)
+        self.assertLess(contenido.index('id="id_inicio_error"'), contenido.index('id="id_inicio_helptext"'))
+
+    def test_las_contrasenas_muestran_el_error_como_las_fichas(self):
+        datos = {"old_password": "clave-de-prueba", "new_password1": "12345678", "new_password2": "12345678"}
+        contenido = self.client.post(reverse("admin:password_change"), datos).content.decode()
+        self.assertRegex(contenido, r'<ul class="errorlist" id="id_new_password1_error"><li><span [^>]*aria-hidden="true">warning</span>')
+        self.assertLess(contenido.index('id="id_new_password1_error"'), contenido.index('id="id_new_password1_helptext"'))
+
+
 class ConvocatoriaTests(BaseCompartida):
     def test_rechaza_fechas_que_se_cruzan(self):
         otra = Announcement(
@@ -1125,7 +1138,7 @@ class LogoDeUnidadTests(BaseCompartida):
 class ArchivosTests(BaseCompartida):
     def test_el_error_del_archivo_queda_asociado_al_campo(self):
         respuesta = self.client.post(reverse("admin:commons_rulesapplications_add"), {"descripcion": "Formato", "_save": "1"})
-        self.assertContains(respuesta, 'aria-describedby="id_perfil_de_proyecto_zona id_perfil_de_proyecto_error"')
+        self.assertContains(respuesta, 'aria-describedby="id_perfil_de_proyecto_error id_perfil_de_proyecto_zona"')
 
 
 class CuentaPropiaTests(BaseCompartida):
