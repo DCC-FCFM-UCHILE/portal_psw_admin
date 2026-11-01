@@ -1,8 +1,8 @@
 {% load i18n admin_urls unfold %}
 
 <div {% if not is_popup %}id="submit-row"{% endif %} class="relative lg:sticky lg:bottom-0 z-40">
-    <div class="rounded-b-default pb-4 px-4 lg:border-t lg:border-base-200 relative lg:scrollable-top lg:py-0 dark:border-base-800">
-        <div class="absolute inset-0 backdrop-blur-xs bg-white/80 dark:bg-base-900/80 z-10"></div>
+    <div class="rounded-b-default pb-8 px-4 sm:px-6 lg:border-t lg:border-base-200 relative lg:scrollable-top lg:py-0 dark:border-base-800">
+        <div class="absolute inset-0 backdrop-blur-xs bg-white/80 dark:bg-base-900/80 z-10 max-lg:hidden"></div>
         <div class="flex flex-col gap-3 items-center relative mx-auto lg:flex-row {% if not is_popup %}container{% endif %} lg:h-[64px] z-20">
             {% block submit-row %}
                 {% if show_save %}
