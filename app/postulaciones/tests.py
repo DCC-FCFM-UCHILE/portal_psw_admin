@@ -1037,3 +1037,15 @@ class BorradoBloqueadoTests(BaseCompartida):
         respuesta = self.client.post(lista, {"action": "delete_selected", "index": "0", "_selected_action": [organizacion.pk]})
         self.assertContains(respuesta, "protegidos")
         self.assertContains(respuesta, "Volver al listado")
+
+
+class BorradoDeCuentasTests(BaseCompartida):
+    def test_eliminar_una_cuenta_no_muestra_tablas_internas(self):
+        otra = User.objects.create_user("otra", password="clave-de-prueba", is_staff=True)
+        otra.user_permissions.add(Permission.objects.first())
+        otra.groups.add(Group.objects.create(name="Lectura"))
+        respuesta = self.client.get(reverse("admin:auth_user_delete", args=[otra.pk]))
+        self.assertContains(respuesta, "Usuarios: 1")
+        self.assertNotContains(respuesta, "user-permission")
+        self.assertNotContains(respuesta, "user-group")
+        self.assertNotContains(respuesta, "object (")

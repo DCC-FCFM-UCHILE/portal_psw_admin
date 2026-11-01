@@ -4,6 +4,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import Group, User
 from django.db.models import BooleanField, ExpressionWrapper, Q
 from django.shortcuts import redirect
+from django.utils.text import capfirst
 from unfold.admin import ModelAdmin
 from unfold.forms import AdminPasswordChangeForm, UserCreationForm
 
@@ -31,6 +32,25 @@ class PermisosEnTabla:
 
 
 ACCESO_PROPIO = ["is_active", "is_staff", "is_superuser", "groups", "user_permissions"]
+
+
+def sin_relaciones_internas(modelo, borrados, cantidades):
+    intermedias = [campo.remote_field.through._meta for campo in modelo._meta.many_to_many if campo.remote_field.through._meta.auto_created]
+    nombres = tuple(f"{capfirst(opciones.verbose_name)}: " for opciones in intermedias)
+    plurales = {str(opciones.verbose_name_plural) for opciones in intermedias}
+
+    def limpiar(lista):
+        limpia = []
+        for elemento in lista:
+            if isinstance(elemento, list):
+                hijos = limpiar(elemento)
+                if hijos:
+                    limpia.append(hijos)
+            elif not str(elemento).startswith(nombres):
+                limpia.append(elemento)
+        return limpia
+
+    return limpiar(borrados), {nombre: cantidad for nombre, cantidad in cantidades.items() if str(nombre) not in plurales}
 
 
 @admin.register(User)
@@ -82,6 +102,7 @@ class UserAdmin(BusquedaSinTildes, ListadoParcial, AccionesDeFila, PermisosEnTab
 
     def get_deleted_objects(self, objs, request):
         borrados, cantidades, faltantes, protegidos = super().get_deleted_objects(objs, request)
+        borrados, cantidades = sin_relaciones_internas(self.model, borrados, cantidades)
         if any(obj.pk == request.user.pk for obj in objs):
             faltantes = {"tu propia cuenta (quítala de la selección)"}
         return borrados, cantidades, faltantes, protegidos
