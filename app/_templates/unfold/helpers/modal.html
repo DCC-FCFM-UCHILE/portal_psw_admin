@@ -6,12 +6,15 @@
      x-on:keydown.escape.window="openModal = shortcutsOpen = filterModalOpen = openCommandResults = false">
 </div>
 
-<div class="flex flex-col fixed inset-0 p-4 lg:p-32 z-[1000]"
+<div id="capa-emergente" role="dialog" aria-modal="true" tabindex="-1" class="flex flex-col fixed inset-0 p-4 lg:p-32 z-[1000]"
      x-cloak
      x-show="openModal"
      x-transition:enter="capa-entra" x-transition:enter-start="capa-fuera" x-transition:enter-end=""
      x-transition:leave="capa-sale" x-transition:leave-start="" x-transition:leave-end="capa-fuera"
      x-trap.noautofocus="openModal"
      x-on:keydown.escape.window="openModal = false">
+    <button type="button" class="mb-2 flex size-10 shrink-0 cursor-pointer items-center justify-center self-end rounded-md bg-white text-gris-oscuro shadow-lg hover:bg-base-100 dark:bg-base-800 dark:text-white dark:hover:bg-base-700" x-on:click="openModal = false" aria-label="Cerrar">
+        <span class="material-symbols-outlined" aria-hidden="true">close</span>
+    </button>
     <div id="modal-content" class="bg-white dark:bg-base-800 flex flex-col max-w-2xl min-h-0 mx-auto overflow-hidden rounded-default shadow-lg w-full" x-bind:class="modalContentClasses" x-on:click.outside="openModal = false"></div>
 </div>

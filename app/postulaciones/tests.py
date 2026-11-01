@@ -913,3 +913,9 @@ class LoteTests(BaseCompartida):
         self.postulacion.refresh_from_db()
         self.assertTrue(self.postulacion.fue_notificada)
         self.assertContains(respuesta, "Las postulaciones elegidas ya estaban aceptadas; no cambió nada.")
+
+
+class EmergentesAccesiblesTests(BaseCompartida):
+    def test_la_capa_de_las_emergentes_es_un_dialogo(self):
+        respuesta = self.client.get(reverse("admin:applications_unit_add"))
+        self.assertContains(respuesta, '<div id="capa-emergente" role="dialog" aria-modal="true"')
