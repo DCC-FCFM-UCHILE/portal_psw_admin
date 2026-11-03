@@ -1,26 +1,26 @@
-.PHONY: levantar bajar logs consola migrar superusuario desplegar
+.PHONY: up down logs shell migrate superuser deploy
 
 PROYECTO = portal-admin-psw
 
-levantar:
+up:
 	docker compose --env-file app/.env --project-name $(PROYECTO) up -d --build --remove-orphans
 	docker ps
 
-bajar:
+down:
 	docker compose --env-file app/.env --project-name $(PROYECTO) down
 
 logs:
 	docker logs -f $(PROYECTO)
 
-consola:
+shell:
 	docker exec -it $(PROYECTO) bash
 
-migrar:
+migrate:
 	docker exec $(PROYECTO) python manage.py migrate
 
-superusuario:
+superuser:
 	docker exec -it $(PROYECTO) python manage.py createsuperuser
 
-desplegar:
+deploy:
 	docker compose --env-file app/.env --file dc-produccion.yml --project-name $(PROYECTO) up -d --build --force-recreate --remove-orphans
 	docker ps

@@ -29,9 +29,9 @@ En ese archivo hay que generar un `DJANGO_SECRET_KEY` y copiar `DJANGO_DB_NAME`,
 
 ```bash
 cd .docker
-make levantar
-make migrar
-make superusuario
+make up
+make migrate
+make superuser
 ```
 
 Queda en http://localhost:8003/admin/. El contenedor `portal-admin-tailwind` recompila
@@ -40,12 +40,12 @@ Queda en http://localhost:8003/admin/. El contenedor `portal-admin-tailwind` rec
 Si el público vive en otra carpeta o con otro nombre de proyecto, `MEDIA_PUBLICO` y
 `RED_PUBLICO` en el mismo `.env` apuntan a sus archivos y a su red.
 
-Otros atajos: `make logs`, `make consola`, `make bajar`.
+Otros atajos: `make logs`, `make shell`, `make down`.
 
 ## Base de datos en producción
 
 En producción el portal apunta a la base compartida con los otros portales. Ahí las
-tablas ya existen y sus migraciones viven en otro repositorio, así que `make migrar` no
+tablas ya existen y sus migraciones viven en otro repositorio, así que `make migrate` no
 se corre contra esa base.
 
 ## Organización

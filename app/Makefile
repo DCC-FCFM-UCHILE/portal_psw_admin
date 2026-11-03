@@ -1,28 +1,28 @@
 SHELL := /bin/bash
 
-.PHONY: migraciones migrar formato revisar seguridad test cobertura
+.PHONY: migrations migrate format lint security test coverage
 
 # Base de datos
-migraciones:
+migrations:
 	python manage.py makemigrations
 
-migrar:
+migrate:
 	python manage.py migrate
 
-formato:
+format:
 	ruff check --select I --fix .
 	ruff format .
 
-revisar:
+lint:
 	ruff check .
 	ruff format --check .
 
-seguridad:
+security:
 	bandit -r core cuentas interfaz convenios postulaciones -x postulaciones/tests.py
 
 test:
 	pytest
 
-cobertura:
+coverage:
 	coverage run -m pytest
 	coverage report
