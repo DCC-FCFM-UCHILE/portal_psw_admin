@@ -286,9 +286,6 @@ msgstr "Por seguridad, escribe tu contraseña actual y después la nueva dos vec
 msgid "No data"
 msgstr "Sin datos"
 
-msgid "View site"
-msgstr "Ver el portal público"
-
 msgid "Log out"
 msgstr "Cerrar sesión"
 

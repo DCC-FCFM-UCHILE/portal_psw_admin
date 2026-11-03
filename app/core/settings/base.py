@@ -119,8 +119,6 @@ EMAIL_HOST_PASSWORD = get_env_variable("DJANGO_EMAIL_HOST_PASSWORD", "")
 DEFAULT_FROM_EMAIL = get_env_variable("DJANGO_DEFAULT_FROM_EMAIL", "no-reply@dcc.uchile.cl")
 EMAIL_TIMEOUT = 10
 
-URL_PORTAL_PUBLICO = get_env_variable("DJANGO_URL_PORTAL_PUBLICO", "")
-
 
 def puede(permiso):
     return lambda request: request.user.has_perm(permiso)
@@ -187,7 +185,7 @@ UNFOLD = {
     "SITE_TITLE": "Portal PSW · Administración",
     "SITE_HEADER": "Portal PSW",
     "SITE_SUBHEADER": "Administración",
-    "SITE_URL": URL_PORTAL_PUBLICO or None,
+    "SITE_URL": None,
     "SITE_SYMBOL": "school",
     "SITE_FAVICONS": [
         {"rel": "icon", "sizes": "any", "type": "image/x-icon", "href": lambda request: static("images/favicon/favicon.ico")},

@@ -1,9 +1,3 @@
-{% if site_url %}
-    <a href="{{ site_url }}" target="_blank" rel="noopener" class="mx-1 flex min-h-10 items-center rounded-md px-3 py-2 hover:bg-base-100 dark:hover:bg-base-700">
-        Ver el portal público<span class="sr-only"> (se abre en otra pestaña)</span>
-    </a>
-{% endif %}
-
 {% for link in account_links %}
     <a href="{{ link.link }}" class="mx-1 flex min-h-10 items-center rounded-md px-3 py-2 hover:bg-base-100 dark:hover:bg-base-700">{{ link.title }}</a>
 {% empty %}

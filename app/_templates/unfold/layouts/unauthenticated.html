@@ -27,11 +27,6 @@
                     <span class="min-w-0 text-xs font-semibold uppercase leading-tight tracking-wide text-gray-300 sm:tracking-widest">Proyecto de Software</span>
                 </div>
                 <div class="flex shrink-0 items-center gap-3">
-                    {% if site_url %}
-                        <a href="{{ site_url }}" class="hidden items-center gap-1 rounded py-1.5 text-xs text-gray-300 hover:text-white sm:inline-flex">
-                            Ver el portal público
-                        </a>
-                    {% endif %}
                     {% if not theme %}{% include "components/selector_tema.html" %}{% endif %}
                 </div>
             </div>
