@@ -3,7 +3,7 @@ services:
         networks:
             - nginx-proxy
         container_name: portal-admin-psw
-        hostname: portal-admin-psw.apps.dcc.uchile.cl
+        hostname: adminpsw.apps.dcc.uchile.cl
         build:
             context: ../
             dockerfile: .docker/app/Dockerfile
@@ -11,7 +11,7 @@ services:
             args:
                 UID: 1001
                 GID: 100
-        command: [ "sh", "-c", "python manage.py collectstatic --noinput && gunicorn --workers=2 --threads=4 --worker-class=gthread --worker-tmp-dir /dev/shm --env SCRIPT_NAME=/portal-admin --bind :8000 core.wsgi" ]
+        command: [ "sh", "-c", "python manage.py collectstatic --noinput && gunicorn --workers=2 --threads=4 --worker-class=gthread --worker-tmp-dir /dev/shm --bind :8000 core.wsgi" ]
         volumes:
             - /home/instalar/static/portal-admin-psw/:/static/:rw
             - /home/instalar/media/portalpsw2/:/media/:rw
@@ -20,7 +20,7 @@ services:
         expose:
             - 8000
         healthcheck:
-            test: [ "CMD", "python", "-c", "import os, urllib.request as u; u.urlopen(u.Request('http://127.0.0.1:8000/portal-admin/ingresar/', headers={'Host': os.environ['DJANGO_ALLOWED_HOSTS'].split(',')[0]}), timeout=5)" ]
+            test: [ "CMD", "python", "-c", "import os, urllib.request as u; u.urlopen(u.Request('http://127.0.0.1:8000/ingresar/', headers={'Host': os.environ['DJANGO_ALLOWED_HOSTS'].split(',')[0]}), timeout=5)" ]
             interval: 30s
             timeout: 10s
             retries: 3
