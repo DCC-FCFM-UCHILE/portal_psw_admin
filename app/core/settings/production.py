@@ -12,7 +12,14 @@ USE_X_FORWARDED_HOST = True
 # La redirección a HTTPS y HSTS las pone el proxy; sin eso, quitar esta línea.
 SILENCED_SYSTEM_CHECKS = ["security.W004", "security.W008"]
 
-DATABASES["default"] |= {"CONN_MAX_AGE": 60, "CONN_HEALTH_CHECKS": True}
+DATABASES["default"] |= {
+    "NAME": get_env_variable("DJANGO_DB_NAME"),
+    "USER": get_env_variable("DJANGO_DB_USER"),
+    "PASSWORD": get_env_variable("DJANGO_DB_PASSWORD"),
+    "HOST": get_env_variable("DJANGO_DB_HOST"),
+    "CONN_MAX_AGE": 60,
+    "CONN_HEALTH_CHECKS": True,
+}
 
 STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},

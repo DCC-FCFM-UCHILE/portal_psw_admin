@@ -42,7 +42,24 @@ Si el público vive en otra carpeta o con otro nombre de proyecto, `MEDIA_PUBLIC
 
 Otros atajos: `make logs`, `make shell`, `make down`.
 
-## Base de datos en producción
+## Despliegue
+
+```bash
+cp .docker/app/.env.produccion.example .docker/app/.env
+```
+
+Se completa lo que quedó vacío (base y correo) y se revisan la dirección y los demás
+valores. Si falta una variable obligatoria, el contenedor no arranca y
+`docker logs portal-admin-psw` dice cuál.
+
+```bash
+cd .docker
+make deploy
+```
+
+Al final del mismo archivo van el hostname, la red, los directorios del servidor y el
+usuario del contenedor; si quedan comentados, valen los de `dc-produccion.yml`. El
+directorio de archivos tiene que ser el mismo del portal público.
 
 En producción el portal apunta a la base compartida con los otros portales. Ahí las
 tablas ya existen y sus migraciones viven en otro repositorio, así que `make migrate` no

@@ -3,18 +3,18 @@ services:
         networks:
             - nginx-proxy
         container_name: portal-admin-psw
-        hostname: adminpsw.apps.dcc.uchile.cl
+        hostname: ${DESPLIEGUE_HOSTNAME:-adminpsw.apps.dcc.uchile.cl}
         build:
             context: ../
             dockerfile: .docker/app/Dockerfile
             target: production
             args:
-                UID: 1001
-                GID: 100
+                UID: ${DESPLIEGUE_UID:-1001}
+                GID: ${DESPLIEGUE_GID:-100}
         command: [ "sh", "-c", "python manage.py collectstatic --noinput && gunicorn --workers=2 --threads=4 --worker-class=gthread --worker-tmp-dir /dev/shm --bind :8000 core.wsgi" ]
         volumes:
-            - /home/instalar/static/portal-admin-psw/:/static/:rw
-            - /home/instalar/media/portalpsw2/:/media/:rw
+            - ${DESPLIEGUE_ESTATICOS:-/home/instalar/static/portal-admin-psw/}:/static/:rw
+            - ${DESPLIEGUE_ARCHIVOS:-/home/instalar/media/portalpsw2/}:/media/:rw
             - /etc/timezone:/etc/timezone:ro
             - /etc/localtime:/etc/localtime:ro
         expose:
@@ -32,4 +32,4 @@ services:
 networks:
     nginx-proxy:
       external: true
-      name: nginx-proxy
+      name: ${DESPLIEGUE_RED:-nginx-proxy}
