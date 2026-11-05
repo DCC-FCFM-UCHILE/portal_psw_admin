@@ -29,6 +29,10 @@ STORAGES = {
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_PATH = CSRF_COOKIE_PATH = get_env_variable("DJANGO_COOKIE_PATH", "/")
+# Nombres propios para un dominio compartido (test.dcc.uchile.cl/portal-psw-admin/): si
+# otra app deja un sessionid o csrftoken con Path=/, Django lee ese y la sesión se pierde.
+SESSION_COOKIE_NAME = get_env_variable("DJANGO_SESSION_COOKIE_NAME", "sessionid")
+CSRF_COOKIE_NAME = get_env_variable("DJANGO_CSRF_COOKIE_NAME", "csrftoken")
 
 EMAIL_BACKEND = get_env_variable("DJANGO_EMAIL_BACKEND")
 if EMAIL_BACKEND == "django.core.mail.backends.smtp.EmailBackend":
