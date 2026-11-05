@@ -150,6 +150,7 @@ document.addEventListener("alpine:init", () => {
     Alpine.data("zonaArchivo", () => ({
         nombre: "",
         encima: false,
+        rechazado: false,
 
         init() {
             this.$refs.entrada.hasChangeListener = true;

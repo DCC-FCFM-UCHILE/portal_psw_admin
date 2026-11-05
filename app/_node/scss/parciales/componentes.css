@@ -76,6 +76,9 @@
   .errors .zona-archivo-destino {
     @apply border-rojo dark:border-red-400;
   }
+  .zona-archivo-destino.rechazado {
+    @apply border-solid border-rojo dark:border-red-400;
+  }
   .zona-archivo-destino > input {
     @apply absolute inset-0 z-10 size-full cursor-pointer opacity-0;
   }
@@ -84,6 +87,9 @@
   }
   .zona-archivo-destino.elegido .zona-archivo-icono {
     @apply text-green-700 dark:text-green-500;
+  }
+  .zona-archivo-destino.rechazado .zona-archivo-icono {
+    @apply text-rojo dark:text-red-400;
   }
   .zona-archivo-boton {
     @apply inline-flex items-center rounded-default border border-borde bg-white px-3 py-1.5 font-medium text-gris-oscuro shadow-xs dark:border-oscuro-borde dark:bg-oscuro-superficie dark:text-oscuro-texto;

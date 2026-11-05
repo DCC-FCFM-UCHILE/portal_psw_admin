@@ -146,6 +146,108 @@ document.addEventListener(
     true,
 );
 
+const MAXIMO_EN_MB = 10;
+const MAXIMO_ENVIO = MAXIMO_EN_MB * 1024 * 1024;
+const bytes = new TextEncoder();
+
+const pesoDelEnvio = (formulario) =>
+    [...new FormData(formulario)].reduce((total, [nombre, valor]) => {
+        const contenido = valor instanceof File ? valor.size + bytes.encode(valor.name).length : bytes.encode(valor).length;
+        return total + 200 + bytes.encode(nombre).length + contenido;
+    }, 0);
+
+const megas = (peso) => {
+    const exacto = peso / 1024 / 1024;
+    const redondeado = Math.round(exacto * 10) / 10;
+    const texto = redondeado > MAXIMO_EN_MB ? redondeado.toFixed(1) : (Math.ceil(exacto * 100) / 100).toFixed(2);
+    return texto.replace(".", ",");
+};
+
+const marcarZona = (campo, rechazado) => {
+    const zona = campo.closest(".zona-archivo");
+    if (zona && window.Alpine) {
+        Alpine.$data(zona).rechazado = rechazado;
+    }
+};
+
+const quitarAvisoDePeso = (campo) => {
+    document.getElementById(`${campo.id}_peso`)?.parentElement.remove();
+    marcarZona(campo, false);
+    const descripciones = (campo.getAttribute("aria-describedby") ?? "").split(" ").filter((id) => id && id !== `${campo.id}_peso`);
+    campo.setAttribute("aria-describedby", descripciones.join(" "));
+    if (campo.dataset.invalidoAntes !== undefined) {
+        if (campo.dataset.invalidoAntes) {
+            campo.setAttribute("aria-invalid", campo.dataset.invalidoAntes);
+        } else {
+            campo.removeAttribute("aria-invalid");
+        }
+        delete campo.dataset.invalidoAntes;
+    }
+};
+
+const avisarPeso = (campo, texto, anunciar) => {
+    const marco = document.createElement("div");
+    marco.className = "mt-2 text-xs text-rojo dark:text-oscuro-acento";
+    if (anunciar) {
+        marco.setAttribute("role", "alert");
+    }
+    const lista = document.createElement("ul");
+    lista.className = "errorlist";
+    lista.id = `${campo.id}_peso`;
+    const item = document.createElement("li");
+    item.innerHTML = '<span class="material-symbols-outlined mr-1 select-none align-bottom text-[18px] leading-none" aria-hidden="true">warning</span>';
+    item.append(texto);
+    lista.append(item);
+    marco.append(lista);
+    (campo.closest(".zona-archivo") ?? campo).after(marco);
+    marcarZona(campo, true);
+    campo.dataset.invalidoAntes = campo.getAttribute("aria-invalid") ?? "";
+    campo.setAttribute("aria-invalid", "true");
+    campo.setAttribute("aria-describedby", [lista.id, campo.getAttribute("aria-describedby")].filter(Boolean).join(" "));
+};
+
+const revisarPeso = (formulario, cambiado, anunciar) => {
+    const campos = [...formulario.querySelectorAll('input[type="file"]')];
+    campos.forEach(quitarAvisoDePeso);
+    const total = pesoDelEnvio(formulario);
+    if (total <= MAXIMO_ENVIO) {
+        return null;
+    }
+    const peso = (campo) => [...campo.files].reduce((suma, archivo) => suma + archivo.size, 0);
+    const campo = campos.find((otro) => peso(otro) > MAXIMO_ENVIO) ?? cambiado ?? campos.reduce((mayor, otro) => (peso(otro) > peso(mayor) ? otro : mayor));
+    const texto =
+        peso(campo) > MAXIMO_ENVIO
+            ? `El archivo pesa ${megas(peso(campo))} MB y el máximo por envío son ${MAXIMO_EN_MB} MB. Elige uno más liviano.`
+            : `Los archivos de este formulario suman ${megas(total)} MB y el máximo por envío son ${MAXIMO_EN_MB} MB. Elige uno más liviano.`;
+    avisarPeso(campo, texto, anunciar);
+    return campo;
+};
+
+document.addEventListener("change", (evento) => {
+    const campo = evento.target;
+    if (campo.type === "file" && campo.form?.method === "post") {
+        revisarPeso(campo.form, campo.files.length ? campo : null, true);
+    }
+});
+
+document.addEventListener(
+    "submit",
+    (evento) => {
+        const formulario = evento.target;
+        if (formulario.method !== "post" || formulario.target || !formulario.querySelector('input[type="file"]')) {
+            return;
+        }
+        const campo = revisarPeso(formulario, null, false);
+        if (campo) {
+            evento.preventDefault();
+            evento.stopImmediatePropagation();
+            campo.focus({ focusVisible: true });
+            campo.closest(".zona-archivo")?.scrollIntoView({ block: "center" });
+        }
+    },
+    true,
+);
+
 document.addEventListener(
     "submit",
     (evento) => {
