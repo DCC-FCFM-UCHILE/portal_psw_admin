@@ -76,10 +76,22 @@ app/postulaciones/  convocatorias, postulaciones, proyectos y correos a postulan
 app/convenios/      formatos de postulación
 app/_templates/     plantillas que sobrescriben las de unfold y páginas de error
 app/_node/          fuente de administrativo.css y su compilación
-app/_staticfiles/   logo, favicon, fuente de íconos y js/administrativo/
+app/_staticfiles/   logo, favicon, fuentes y js/administrativo/
 app/_locale/        textos de unfold en español (unfold no trae traducción)
 .docker/            Dockerfile, compose y Makefile
 ```
+
+## Fuentes
+
+Inter va en `app/_staticfiles/fuentes/`, recortada al eje de 400 a 900 y a los caracteres de
+cada `unicode-range`. Si cambia su versión en `app/_node/package.json`:
+
+```bash
+docker exec -w /app/_node portal-admin-tailwind python3 recortar-inter.py
+```
+
+y revisar que los `unicode-range` de `administrativo.css` sigan iguales a los de
+`node_modules/@fontsource-variable/inter/wght.css`.
 
 ## Textos en español
 

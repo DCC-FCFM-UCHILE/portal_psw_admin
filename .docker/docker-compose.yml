@@ -23,7 +23,7 @@ services:
             context: ../
             dockerfile: .docker/app/Dockerfile
             target: develop
-        command: [ "sh", "-c", "npm install && npm run vendorizar && npx -y nodemon -L --watch ../ --ignore ../_staticfiles/unfold/ --ignore scss/unfold.css --ext html,css,js,py --exec 'npm run tailwind-build'" ]
+        command: [ "sh", "-c", "npm install && npx -y nodemon -L --watch ../ --ignore ../_staticfiles/unfold/ --ignore scss/unfold.css --ext html,css,js,py --exec 'npm run tailwind-build'" ]
         working_dir: /app/_node
         tty: true
         volumes:

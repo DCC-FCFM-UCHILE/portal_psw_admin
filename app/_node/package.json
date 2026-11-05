@@ -12,9 +12,8 @@
     "version": "1.0.0",
     "main": "",
     "scripts": {
-        "vendorizar": "mkdir -p ../_staticfiles/vendor/inter && cp node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2 node_modules/@fontsource-variable/inter/files/inter-latin-ext-wght-normal.woff2 node_modules/@fontsource-variable/inter/LICENSE ../_staticfiles/vendor/inter/",
         "tailwind-build": "node preparar-unfold.mjs && npx @tailwindcss/cli -i ./scss/administrativo.css -o ../_staticfiles/unfold/css/styles.css && node aplanar-css.mjs ../_staticfiles/unfold/css/styles.css",
-        "tailwind-prod": "npm run vendorizar && node preparar-unfold.mjs && npx @tailwindcss/cli -i ./scss/administrativo.css -o ../_staticfiles/unfold/css/styles.css && node aplanar-css.mjs ../_staticfiles/unfold/css/styles.css --minify"
+        "tailwind-prod": "node preparar-unfold.mjs && npx @tailwindcss/cli -i ./scss/administrativo.css -o ../_staticfiles/unfold/css/styles.css && node aplanar-css.mjs ../_staticfiles/unfold/css/styles.css --minify"
     },
     "author": "Área de Desarrollo de Software",
     "license": "UNLICENSED",
