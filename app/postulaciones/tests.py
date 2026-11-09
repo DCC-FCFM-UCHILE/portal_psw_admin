@@ -32,7 +32,7 @@ from cuentas.requisitos import NO_CUMPLE
 from interfaz.iconos import FUENTE, iconos_posibles, iconos_recortados
 from interfaz.management.commands.recortar_iconos import ligaduras
 from interfaz.politica import resumen
-from interfaz.templatetags.interfaz import paginas_cercanas
+from interfaz.templatetags.interfaz import diferir, paginas_cercanas
 from postulaciones import correo, tablas_compartidas
 from postulaciones.imagenes import ImagenInvalida, comprimir
 from postulaciones.models import Announcement, Application, ApprovedProject, Candidate, Member, Organization, Unit
@@ -1139,6 +1139,14 @@ class GuionesDeUnfoldTests(BaseCompartida):
         self.assertLess(cuerpo.index("parrafo.group = false"), cuerpo.index("<trix-editor"))
         with open(finders.find("js/administrativo/formularios.js")) as archivo:
             self.assertNotIn("trix-before-initialize", archivo.read())
+
+    def test_trix_no_se_difiere_con_los_nombres_de_produccion(self):
+        trix = (
+            '<script src="/portal-psw-admin/static/unfold/forms/js/trix/trix.59e458866970.js"></script>'
+            '<script src="/portal-psw-admin/static/unfold/forms/js/trix.config.e08a6b89bf4b.js"></script>'
+        )
+        otro = '<script src="/portal-psw-admin/static/unfold/js/app.a0602e0877c4.js">'
+        self.assertEqual(diferir(trix + otro), trix + otro[:-1] + " defer>")
 
 
 class IconosTests(BaseCompartida):

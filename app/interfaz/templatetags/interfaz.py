@@ -34,7 +34,7 @@ def iniciales(usuario):
 
 GUION = re.compile(r"<script\b[^>]*>")
 ORIGEN = re.compile(r'\bsrc="([^"]*)"')
-SIN_DIFERIR = re.compile(r"/admin/js/|jsi18n/$|/unfold/forms/js/trix(/trix)?\.(config\.)?js$")
+SIN_DIFERIR = re.compile(r"/admin/js/|jsi18n/$|/unfold/forms/js/trix(/trix)?\.(config\.)?([0-9a-f]{12}\.)?js$")
 
 
 @register.filter(is_safe=True)
