@@ -152,9 +152,9 @@ class ApprovedProject(Auditada):
     )
     titulo = models.CharField("título", max_length=100, db_column="title")
     descripcion = models.TextField("descripción", blank=True, null=True, db_column="description")
-    semestre = models.CharField("semestre", max_length=2, choices=Semestre.choices, blank=True, null=True, db_column="semester")
+    semestre = models.CharField("semestre", max_length=2, choices=Semestre.choices, blank=True, db_column="semester")
     anio = models.PositiveIntegerField("año", default=anio_actual, blank=True, null=True, db_column="year")
-    tutor = models.CharField("auxiliar", max_length=100, blank=True, null=True, db_column="aux")
+    tutor = models.CharField("auxiliar", max_length=100, blank=True, db_column="aux")
     es_visible = models.BooleanField("visible", default=False, db_column="is_visible")
 
     class Meta:

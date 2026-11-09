@@ -17,6 +17,7 @@ from django.core.exceptions import ValidationError
 from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
+from django.db import connection
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
@@ -239,7 +240,46 @@ class ProyectoSinPeriodoTests(BaseCompartida):
         self.assertEqual(respuesta.status_code, 302)
         proyecto.refresh_from_db()
         self.assertTrue(proyecto.es_visible)
-        self.assertEqual((proyecto.semestre, proyecto.anio, proyecto.tutor), (None, None, None))
+        self.assertEqual((proyecto.semestre, proyecto.anio, proyecto.tutor), ("", None, ""))
+
+
+class EsquemaDelMonolitoTests(BaseCompartida):
+    def setUp(self):
+        super().setUp()
+        with connection.cursor() as cursor:
+            cursor.execute(
+                'ALTER TABLE applications_approvedproject DROP COLUMN "order", '
+                "ALTER semester TYPE varchar, ALTER semester SET NOT NULL, ALTER year SET NOT NULL, ALTER aux SET NOT NULL"
+            )
+
+    def test_notificar_una_aceptada_sin_proyecto_lo_crea(self):
+        Application.objects.filter(pk=self.postulacion.pk).update(estado=Application.Estado.ACEPTADA)
+        url = reverse("admin:applications_application_notificar_correo", args=[self.postulacion.pk])
+        respuesta = self.client.post(url, {"correo": "ana@ejemplo.cl", "asunto": "Resultado", "contenido": "<p>x</p>"})
+        self.assertEqual(respuesta.status_code, 302)
+        proyecto = ApprovedProject.objects.get(postulacion=self.postulacion)
+        self.assertEqual((proyecto.titulo, proyecto.semestre, proyecto.anio, proyecto.tutor), ("Sistema de riego", "SP", 2026, ""))
+
+    def test_un_proyecto_sin_semestre_ni_auxiliar_se_guarda(self):
+        self.postulacion.estado = Application.Estado.ACEPTADA
+        self.postulacion.save()
+        proyecto = ApprovedProject.objects.get()
+        datos = {
+            "titulo": "Sistema de riego",
+            "descripcion": "",
+            "semestre": "",
+            "anio": "2026",
+            "tutor": "",
+            "integrantes-TOTAL_FORMS": "0",
+            "integrantes-INITIAL_FORMS": "0",
+            "integrantes-MIN_NUM_FORMS": "0",
+            "integrantes-MAX_NUM_FORMS": "1000",
+            "_save": "",
+        }
+        respuesta = self.client.post(reverse("admin:applications_approvedproject_change", args=[proyecto.pk]), datos)
+        self.assertEqual(respuesta.status_code, 302)
+        proyecto.refresh_from_db()
+        self.assertEqual((proyecto.semestre, proyecto.anio, proyecto.tutor), ("", 2026, ""))
 
 
 class DescripcionConSaltosTests(BaseCompartida):

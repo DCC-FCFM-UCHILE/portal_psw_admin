@@ -8,10 +8,14 @@ from postulaciones.models import Application, ApprovedProject
 def crear_proyecto_al_aceptar(sender, instance, **kwargs):
     if instance.estado != Application.Estado.ACEPTADA:
         return
-    proyecto, creado = ApprovedProject.objects.get_or_create(postulacion=instance)
-    if creado or not proyecto.es_visible:
-        proyecto.titulo = instance.titulo
-        proyecto.descripcion = instance.descripcion
-        proyecto.semestre = instance.convocatoria.semestre
-        proyecto.anio = instance.convocatoria.anio
-        proyecto.save()
+    datos = {
+        "titulo": instance.titulo,
+        "descripcion": instance.descripcion,
+        "semestre": instance.convocatoria.semestre,
+        "anio": instance.convocatoria.anio,
+    }
+    proyecto, creado = ApprovedProject.objects.get_or_create(postulacion=instance, defaults=datos | {"tutor": ""})
+    if not creado and not proyecto.es_visible:
+        for campo, valor in datos.items():
+            setattr(proyecto, campo, valor)
+        proyecto.save(update_fields=[*datos, "actualizada_en"])
