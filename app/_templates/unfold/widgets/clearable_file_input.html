@@ -1,6 +1,7 @@
 {% load interfaz %}
+{% maximo_envio_mb as maximo %}
 
-<div class="zona-archivo" x-data="zonaArchivo">
+<div class="zona-archivo" x-data="zonaArchivo" data-maximo-mb="{{ maximo }}">
     {% if widget.is_initial %}
         <div class="zona-archivo-actual">
             {% if widget.attrs.accept == 'image/*' %}
@@ -35,9 +36,9 @@
         <span id="{{ widget.attrs.id }}_zona" class="zona-archivo-texto">
             <span x-show="!nombre">o arrástralo aquí</span>
             <span x-show="nombre" x-cloak class="zona-archivo-nombre"><span class="sr-only">Archivo elegido: </span><span x-text="nombre"></span></span>
-            {% if widget.attrs.accept and widget.attrs.accept != 'image/*' %}
-                <span class="zona-archivo-formatos">{{ widget.attrs.accept|formatos_archivo }}</span>
-            {% endif %}
+            <span class="zona-archivo-requisitos">
+                {% if widget.attrs.accept and widget.attrs.accept != 'image/*' %}{{ widget.attrs.accept|formatos_archivo }}, hasta{% else %}Hasta{% endif %} {{ maximo }} MB por envío
+            </span>
         </span>
     </div>
 

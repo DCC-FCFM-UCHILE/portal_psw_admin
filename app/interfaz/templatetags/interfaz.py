@@ -83,6 +83,11 @@ def formatos_archivo(accept):
     return f"Formatos {', '.join(formatos[:-1])} o {formatos[-1]}"
 
 
+@register.simple_tag
+def maximo_envio_mb():
+    return settings.MAXIMO_ENVIO_MB
+
+
 @register.filter
 def describir_con(atributos, propia):
     otras = [descripcion for descripcion in str(atributos.get("aria-describedby", "")).split() if descripcion != propia]

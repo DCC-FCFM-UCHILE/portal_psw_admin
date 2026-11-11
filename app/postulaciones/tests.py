@@ -718,7 +718,7 @@ class FormulariosTests(BaseCompartida):
     def test_el_archivo_declara_sus_formatos(self):
         respuesta = self.client.get(reverse("admin:applications_application_add"))
         self.assertContains(respuesta, 'accept=".pdf"')
-        self.assertContains(respuesta, "Formato PDF")
+        self.assertContains(respuesta, "Formato PDF, hasta 10 MB por envío")
         self.assertContains(respuesta, "zona-archivo-destino")
 
     def test_el_filtro_por_convocatoria_no_carga_select2(self):
@@ -1354,6 +1354,20 @@ class ArchivosTests(BaseCompartida):
     def test_el_error_del_archivo_queda_asociado_al_campo(self):
         respuesta = self.client.post(reverse("admin:commons_rulesapplications_add"), {"descripcion": "Formato", "_save": "1"})
         self.assertContains(respuesta, 'aria-describedby="id_perfil_de_proyecto_error id_perfil_de_proyecto_zona"')
+
+    def test_la_zona_dice_el_tope_por_envio_antes_de_elegir(self):
+        respuesta = self.client.get(reverse("admin:commons_rulesapplications_add"))
+        self.assertContains(respuesta, 'data-maximo-mb="10"', count=2)
+        for campo in ["perfil_de_proyecto", "convenio_de_colaboracion"]:
+            with self.subTest(campo=campo):
+                zona = re.search(rf'<span id="id_{campo}_zona".*?</div>', respuesta.content.decode(), re.S).group()
+                self.assertIn("Hasta 10 MB por envío", zona)
+
+    @override_settings(MAXIMO_ENVIO_MB=25)
+    def test_el_tope_sale_de_los_ajustes(self):
+        respuesta = self.client.get(reverse("admin:commons_rulesapplications_add"))
+        self.assertContains(respuesta, 'data-maximo-mb="25"', count=2)
+        self.assertContains(respuesta, "Hasta 25 MB por envío", count=2)
 
 
 class CuentaPropiaTests(BaseCompartida):

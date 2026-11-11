@@ -146,8 +146,6 @@ document.addEventListener(
     true,
 );
 
-const MAXIMO_EN_MB = 10;
-const MAXIMO_ENVIO = MAXIMO_EN_MB * 1024 * 1024;
 const bytes = new TextEncoder();
 
 const pesoDelEnvio = (formulario) =>
@@ -156,10 +154,10 @@ const pesoDelEnvio = (formulario) =>
         return total + 200 + bytes.encode(nombre).length + contenido;
     }, 0);
 
-const megas = (peso) => {
+const megas = (peso, maximo) => {
     const exacto = peso / 1024 / 1024;
     const redondeado = Math.round(exacto * 10) / 10;
-    const texto = redondeado > MAXIMO_EN_MB ? redondeado.toFixed(1) : (Math.ceil(exacto * 100) / 100).toFixed(2);
+    const texto = redondeado > maximo ? redondeado.toFixed(1) : (Math.ceil(exacto * 100) / 100).toFixed(2);
     return texto.replace(".", ",");
 };
 
@@ -209,16 +207,18 @@ const avisarPeso = (campo, texto, anunciar) => {
 const revisarPeso = (formulario, cambiado, anunciar) => {
     const campos = [...formulario.querySelectorAll('input[type="file"]')];
     campos.forEach(quitarAvisoDePeso);
+    const maximo = Number(formulario.querySelector("[data-maximo-mb]")?.dataset.maximoMb);
+    const tope = maximo * 1024 * 1024;
     const total = pesoDelEnvio(formulario);
-    if (total <= MAXIMO_ENVIO) {
+    if (!maximo || total <= tope) {
         return null;
     }
     const peso = (campo) => [...campo.files].reduce((suma, archivo) => suma + archivo.size, 0);
-    const campo = campos.find((otro) => peso(otro) > MAXIMO_ENVIO) ?? cambiado ?? campos.reduce((mayor, otro) => (peso(otro) > peso(mayor) ? otro : mayor));
+    const campo = campos.find((otro) => peso(otro) > tope) ?? cambiado ?? campos.reduce((mayor, otro) => (peso(otro) > peso(mayor) ? otro : mayor));
     const texto =
-        peso(campo) > MAXIMO_ENVIO
-            ? `El archivo pesa ${megas(peso(campo))} MB y el máximo por envío son ${MAXIMO_EN_MB} MB. Elige uno más liviano.`
-            : `Los archivos de este formulario suman ${megas(total)} MB y el máximo por envío son ${MAXIMO_EN_MB} MB. Elige uno más liviano.`;
+        peso(campo) > tope
+            ? `El archivo pesa ${megas(peso(campo), maximo)} MB y el máximo por envío son ${maximo} MB. Elige uno más liviano.`
+            : `Los archivos de este formulario suman ${megas(total, maximo)} MB y el máximo por envío son ${maximo} MB. Elige uno más liviano.`;
     avisarPeso(campo, texto, anunciar);
     return campo;
 };

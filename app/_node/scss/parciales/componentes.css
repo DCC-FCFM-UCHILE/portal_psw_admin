@@ -103,7 +103,7 @@
   .zona-archivo-nombre {
     @apply break-all font-medium text-gris-oscuro dark:text-oscuro-texto;
   }
-  .zona-archivo-formatos {
+  .zona-archivo-requisitos {
     @apply text-xs;
   }
   .matriz-permisos {

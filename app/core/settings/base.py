@@ -109,6 +109,8 @@ STATICFILES_DIRS = [BASE_DIR / "_staticfiles"]
 MEDIA_URL = "archivos/"
 MEDIA_ROOT = get_env_variable("DJANGO_MEDIA_ROOT", "/media")
 
+MAXIMO_ENVIO_MB = 10
+
 
 EMAIL_BACKEND = get_env_variable("DJANGO_EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend")
 EMAIL_HOST = get_env_variable("DJANGO_EMAIL_HOST", "")
