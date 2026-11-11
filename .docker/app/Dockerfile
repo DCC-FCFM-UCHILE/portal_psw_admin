@@ -39,6 +39,9 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONFAULTHANDLER=1
 ENV PYTHONUNBUFFERED=1
 
+RUN apt-get update && apt-get install -y --no-install-recommends media-types \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY app/_requirements/ ./_requirements/
 RUN pip install --no-cache-dir pip==26.2.2 && pip install --no-cache-dir -r _requirements/production.txt
 
